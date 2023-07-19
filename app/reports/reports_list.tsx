@@ -1,14 +1,10 @@
 // A server page containing client component and nested server component
 
-import { ReportResponse } from "../types";
-import Client from "./client";
-
 export async function getData() {
     const apiKey = process.env.AF_REPORTS_DB_API_KEY;
+    // Temporary till we implement tokens in portal
     const studentId = process.env.NEXT_PUBLIC_STUDENT_ID;
     const url = `${process.env.AF_REPORTS_URL}/student_reports/${studentId}?format=json`;
-    console.log(url);
-    console.log(apiKey);
 
     try {
         const response = await fetch(url, {
