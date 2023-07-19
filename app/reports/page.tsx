@@ -28,9 +28,6 @@ export async function getData() {
 }
 
 export default async function ReportsData() {
-    console.log("HELLO!");
-    // console.log(process.env.AF_REPORTS_DB_API_KEY);
-
     return (
         <div>
             <h1>Reports Page</h1>
