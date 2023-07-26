@@ -9,8 +9,6 @@ export async function getData() {
     const apiKey = process.env.AF_REPORTS_DB_API_KEY;
     const studentId = process.env.NEXT_PUBLIC_STUDENT_ID;
     const url = `${process.env.AF_REPORTS_URL}/student_reports/${studentId}?format=json`;
-    console.log(url);
-    console.log(apiKey);
 
     try {
         const response = await fetch(url, {
@@ -39,17 +37,3 @@ export default async function ReportsData() {
         </div>
     );
 }
-
-// export default function MixMatchPage() {
-//     console.log("MixMatchPage rendering");
-//     return (
-//         <div>
-//             <h1>Server Page</h1>
-//             <div className="box">
-//                 <Client message="A message from server">
-//                     <div>Hello!</div>
-//                 </Client>
-//             </div>
-//         </div>
-//     );
-// }
