@@ -7,7 +7,7 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 
 const InputField: React.FC<InputFieldProps> = ({ id, className, ...rest }) => {
   return (
-    <input id={id} className={className} {...rest} />
+    <input id={id} className={`ps-2 pe-2 ${className}`} {...rest} />
   );
 };
 
