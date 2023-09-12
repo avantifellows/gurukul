@@ -12,7 +12,7 @@ const PrimaryButton = React.forwardRef<HTMLButtonElement, PrimaryButtonProps>(
         ref={ref}
         className={`${
           disabled ? 'opacity-25' : ''
-        } ${className}`}
+        } bg-primary border-primary text-white ${className}`}
         disabled={disabled}
       >
         {children}

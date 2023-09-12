@@ -54,7 +54,7 @@ const Login = () => {
                     value={studentId}
                     onChange={(e) => setStudentId(e.target.value)}
                 />
-                <PrimaryButton className='w-72 border-2 rounded-md h-12 bg-primary border-primary mt-4 text-white' onClick={handleLogin}>LOGIN</PrimaryButton>
+                <PrimaryButton className='w-72 border-2 rounded-md h-12 mt-4' onClick={handleLogin}>LOGIN</PrimaryButton>
                 {error && <div className="text-red-500">{error}</div>}
             </div>
         </>
