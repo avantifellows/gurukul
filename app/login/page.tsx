@@ -20,10 +20,7 @@ const Login = () => {
 
     const handleLogin = async () => {
         const validationResponse = await validateStudent(studentId);
-
         setIsUserValid(validationResponse === null);
-        console.log(isUserValid, "isUserValid")
-        console.log(loginAttempts, "loginAttempts")
 
         if (validationResponse === null || loginAttempts > 1) {
             setError('');
