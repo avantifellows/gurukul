@@ -11,7 +11,7 @@ function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
     const [verificationResult, setVerificationResult] = useState({
         isValid: false,
         message: '',
-        data: undefined, // Initialize data as undefined
+        data: undefined,
     });
 
     useEffect(() => {
