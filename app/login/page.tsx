@@ -9,30 +9,46 @@ import InputField from '@/components/InputField';
 import PrimaryButton from '@/components/PrimaryButton';
 import CurrentTime from '@/components/CurrentTime';
 import axios from 'axios';
+import validateStudent from './validateStudent';
 
 const Login = () => {
     const [studentId, setStudentId] = useState('');
     const [error, setError] = useState('');
+    const [isUserValid, setIsUserValid] = useState(true);
+    const [loginAttempts, setLoginAttempts] = useState(0);
     const authUrl = `${process.env.NEXT_PUBLIC_AF_PORTAL_BACKEND_URL}/create-access-token`;
 
     const handleLogin = async () => {
-        const requestBody = {
-            id: studentId,
-            type: 'user',
-            is_user_valid: true,
-        };
-        try {
-            const response = await axios.post(authUrl, requestBody);
-            console.log(response)
-            if (response.status === 200) {
-                const data = response.data;
-                localStorage.setItem('accessToken', data.access_token);
-                localStorage.setItem('refreshToken', data.refresh_token);
-            } else {
-                setError(`Error: ${response.statusText}`);
+        const validationResponse = await validateStudent(studentId);
+
+        setIsUserValid(validationResponse === null);
+        console.log(isUserValid, "isUserValid")
+        console.log(loginAttempts, "loginAttempts")
+
+        if (validationResponse === null || loginAttempts > 1) {
+            setError('');
+
+            const requestBody = {
+                id: studentId,
+                type: 'user',
+                is_user_valid: isUserValid,
+            };
+            try {
+                const response = await axios.post(authUrl, requestBody);
+
+                if (response.status === 200) {
+                    const data = response.data;
+                    localStorage.setItem('accessToken', data.access_token);
+                    localStorage.setItem('refreshToken', data.refresh_token);
+                } else {
+                    setError(`Error: ${response.statusText}`);
+                }
+            } catch (err) {
+                throw err;
             }
-        } catch (err) {
-            throw err;
+        } else {
+            setLoginAttempts(loginAttempts + 1);
+            setError(validationResponse);
         }
     };
 
@@ -55,7 +71,7 @@ const Login = () => {
                     onChange={(e) => setStudentId(e.target.value)}
                 />
                 <PrimaryButton className='w-72 border-2 rounded-md h-12 mt-4' onClick={handleLogin}>LOGIN</PrimaryButton>
-                {error && <div className="text-red-500">{error}</div>}
+                {error && <div className="text-red-500 text-center">{error}</div>}
             </div>
         </>
     )
