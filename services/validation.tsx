@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { getCookie } from 'cookies-next';
 
 export async function verifyToken() {
-    const token = localStorage.getItem('access_token');
+    const token = getCookie('access_token');
     const url = `${process.env.NEXT_PUBLIC_AF_PORTAL_BACKEND_URL}/verify`;
 
     if (!token) {
