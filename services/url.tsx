@@ -1,7 +1,7 @@
 export const api = {
     portal: {
       frontend: {
-        baseUrl: process.env.AF_PORTAL_FRONTEND_URL || '',
+        baseUrl: process.env.NEXT_PUBLIC_AF_PORTAL_FRONTEND_URL || '',
       },
       backend: {
         baseUrl: process.env.NEXT_PUBLIC_AF_PORTAL_BACKEND_URL || '',
