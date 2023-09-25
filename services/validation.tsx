@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { getCookie } from 'cookies-next';
+import { api } from './url';
 
 export async function verifyToken() {
     const token = getCookie('access_token');
-    const url = `${process.env.NEXT_PUBLIC_AF_PORTAL_BACKEND_URL}/verify`;
+    const url = `${api.portal.backend.baseUrl}${api.portal.backend.verify}`;
 
     if (!token) {
         return { isValid: false, message: 'Token not found' };
