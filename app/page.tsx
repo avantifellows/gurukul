@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       {loggedIn ? (
-        <p>Welcom to Gurukul</p>
+        <p>Welcome to Gurukul</p>
       ) : (
         <p>User not logged in</p>
       )}
