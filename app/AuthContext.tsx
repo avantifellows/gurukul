@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const result = await verifyToken();
                 if (result.isValid) {
                     setLoggedIn(true);
-                    setUserId(result.data.userId);
+                    setUserId(result.data.id);
                 } else {
                     setLoggedIn(false);
                     setUserId(null);

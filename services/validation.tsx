@@ -19,6 +19,6 @@ export async function verifyToken() {
         return { isValid: true, data: response.data };
         
     } catch (error) {
-        return { isValid: false, message: 'Token invalid' };
+        return { isValid: false, message: error };
     }
 }
