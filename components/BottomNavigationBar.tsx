@@ -18,9 +18,9 @@ const BottomNavigationBar = () => {
     <div className="fixed bottom-0 left-0 right-0 text-xs md:text-lg pl-16 pr-16 bg-white pb-4 pt-2 flex justify-between border-t-2 items-center shadow-2xl shadow-black">
       <NavLink href="/library" active={isActive('/library')}>
         {isActive('/library') ? (
-          <MdLibraryBooks className='h-8 w-8 fill-primary' />
+          <MdLibraryBooks className="h-8 w-8 fill-primary" />
         ) : (
-          <MdOutlineLibraryBooks className='h-8 w-8' />
+          <MdOutlineLibraryBooks className="h-8 w-8" />
         )}
         Library
       </NavLink>
@@ -30,9 +30,9 @@ const BottomNavigationBar = () => {
       </NavLink>
       <NavLink href="/reports" active={isActive('/reports')}>
         {isActive('/reports') ? (
-          <RiBarChart2Fill className='h-8 w-8 fill-primary' />
+          <RiBarChart2Fill className="h-8 w-8 fill-primary" />
         ) : (
-          <RiBarChart2Line className='h-8 w-8' />
+          <RiBarChart2Line className="h-8 w-8" />
         )}
         Report
       </NavLink>
