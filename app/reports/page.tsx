@@ -4,6 +4,7 @@ import Client from "./client";
 import ReportsList from "./reports_list";
 import { Suspense } from "react";
 import Loading from "../loading";
+import BottomNavigationBar from "@/components/BottomNavigationBar";
 
 export async function getData() {
     const apiKey = process.env.AF_REPORTS_DB_API_KEY;
@@ -34,6 +35,7 @@ export default async function ReportsData() {
                     <ReportsList />
                 </Suspense>
             </Client>
+            <BottomNavigationBar />
         </div>
     );
 }
