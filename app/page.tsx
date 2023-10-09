@@ -1,10 +1,16 @@
-import BottomNavigationBar from "@/components/BottomNavigationBar";
+"use client"
+import { useAuth } from "./AuthContext";
 
 export default function Home() {
-    return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24">
-            Welcome To Gurukul
-            <BottomNavigationBar />
-        </main>
-    );
+  const { loggedIn, userId } = useAuth();
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      {loggedIn ? (
+        <p>Welcome to Gurukul</p>
+      ) : (
+        <p>User not logged in</p>
+      )}
+    </main>
+  );
 }

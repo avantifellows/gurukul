@@ -1,4 +1,5 @@
 # Avanti Gurukul
+
 Welcome to Gurukul, a product of Avanti.
 
 ## Getting Started
@@ -29,7 +30,25 @@ To run the development server, follow these steps:
     npm run dev
     ```
 
+## Instructions for testing locally
+
+1. Navigate to the portal-backend directory:
+
+    ```bash
+    cd path-to-portal-backend-app
+    ```
+
+2. Start the application server by running:
+
+    ```bash
+    cd app; uvicorn main:app --reload
+    ```
+
+3. Add gurukul origin to the CORS allowed origins array in `main.py`:
+
+    ```    origins = ["http://localhost:3000"]
+    ```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`.
-
