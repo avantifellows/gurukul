@@ -46,8 +46,9 @@ To run the development server, follow these steps:
 
 3. Add gurukul origin to the CORS allowed origins array in `main.py`:
 
-    ```    origins = ["http://localhost:3000"]
-    ```
+    `
+        origins = ["http://localhost:3000"]
+    `
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
