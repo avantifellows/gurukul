@@ -1,5 +1,7 @@
 // A server page containing client component and nested server component
 import { api } from "@/services/url";
+import Link from "next/link";
+import { Report } from "../types";
 
 export async function getData() {
     const apiKey = process.env.AF_REPORTS_DB_API_KEY;
@@ -18,7 +20,7 @@ export async function getData() {
         const responseData = await response.json();
         return responseData;
     } catch (error) {
-        console.log(error);
+        throw error;
     }
 }
 
@@ -26,10 +28,15 @@ export default async function ReportsList() {
     const responseData = await getData();
 
     return (
-        <div>
-            <div>
-                <pre id="json">{JSON.stringify(responseData, null, 4)}</pre>
-            </div>
+        <div className="grid grid-cols-1 gap-4 pb-40">
+            {responseData.reports.map((report: Report, index: number) => (
+                <Link href={report.report_link} target="_blank" key={index} className="bg-card rounded-lg shadow-lg h-24 mx-4 mt-4 relative"
+                >
+                    <div className="bg-red-200 h-full w-2 absolute left-0 top-0"></div>
+                    <p className="text-sm font-semibold mx-4 mt-2">{report.test_name}</p>
+                    <p className="text-gray-700 text-sm mx-4 mt-2">Rank: {report.rank}</p>
+                </Link>
+            ))}
         </div>
     );
 }
