@@ -6,24 +6,13 @@ import Loading from "../loading";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
 import TopBar from "@/components/TopBar";
 import { useAuth } from "../AuthContext";
-import AccessDenied from "@/components/AccessDenied";
-import { useState, useEffect } from "react";
 
 export default function ReportsData() {
-    const [isLoading, setIsLoading] = useState(true);
     const { loggedIn } = useAuth();
-
-    useEffect(() => {
-        if (loggedIn) {
-            setIsLoading(false);
-        }
-    }, [loggedIn]);
 
     return (
         <>
-            {isLoading ? (
-                <Loading />
-            ) : loggedIn ? (
+            {loggedIn ? (
                 <div>
                     <TopBar />
                     <Client message="">
@@ -32,7 +21,7 @@ export default function ReportsData() {
                     <BottomNavigationBar />
                 </div>
             ) : (
-                <AccessDenied />
+                <Loading />
             )}
         </>
     );
