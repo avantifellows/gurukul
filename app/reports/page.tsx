@@ -8,23 +8,35 @@ import BottomNavigationBar from "@/components/BottomNavigationBar";
 import TopBar from "@/components/TopBar";
 import { useAuth } from "../AuthContext";
 import AccessDenied from "@/components/AccessDenied";
+import { useState, useEffect } from "react";
 
-export default async function ReportsData() {
+export default function ReportsData() {
+    const [isLoading, setIsLoading] = useState(true);
     const { loggedIn } = useAuth();
+
+    useEffect(() => {
+        if (loggedIn) {
+            setIsLoading(false);
+        }
+    }, [loggedIn]);
+
     return (
         <>
-            {loggedIn ? (<div>
-                <TopBar />
-                <Client message="">
-                    <Suspense fallback={<Loading />}>
-                        <ReportsList />
-                    </Suspense>
-                </Client>
-                <BottomNavigationBar />
-            </div>) : (
+            {isLoading ? (
+                <Loading />
+            ) : loggedIn ? (
+                <div>
+                    <TopBar />
+                    <Client message="">
+                        <Suspense fallback={<Loading />}>
+                            <ReportsList />
+                        </Suspense>
+                    </Client>
+                    <BottomNavigationBar />
+                </div>
+            ) : (
                 <AccessDenied />
-            )
-            }
+            )}
         </>
     );
 }

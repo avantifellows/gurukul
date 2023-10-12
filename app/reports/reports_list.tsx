@@ -1,24 +1,23 @@
-// A server page containing client component and nested server component
 import { api } from "@/services/url";
 import Link from "next/link";
 import { Report } from "../types";
+import axios from "axios";
 
 export async function getData() {
-    const apiKey = process.env.AF_REPORTS_DB_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_AF_REPORTS_DB_API_KEY;
     // Temporary till we implement tokens in portal
     const studentId = process.env.NEXT_PUBLIC_STUDENT_ID;
     const url = `${api.reports.baseUrl}${api.reports.student_reports}${studentId}?format=json`;
 
     try {
-        const response = await fetch(url, {
-            method: "GET",
+        const responseData = await axios.get(url, {
             headers: {
                 accept: "application/json",
                 Authorization: `Bearer ${apiKey}`,
             },
         });
-        const responseData = await response.json();
-        return responseData;
+        return responseData.data;
+
     } catch (error) {
         throw error;
     }
