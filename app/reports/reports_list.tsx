@@ -33,7 +33,7 @@ export default function ReportsList() {
                 const data = await getData();
                 setResponseData(data);
             } catch (error) {
-                console.error("Error fetching data:", error);
+                throw error;
             }
         }
 
