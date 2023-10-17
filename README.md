@@ -30,6 +30,8 @@ To run the development server, follow these steps:
     npm run dev
     ```
 
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
 ## Instructions for testing locally
 
 1. Navigate to the portal-backend directory:
@@ -50,6 +52,10 @@ To run the development server, follow these steps:
         origins = ["http://localhost:3000"]
     `
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Portal frontend will be responsible for setting up the token in browser cookies. For setting token manually:
 
-You can start editing the page by modifying `app/page.tsx`.
+    i: Create an access token first through portal backend using `http://localhost:8000/docs#/Authentication/create_access_token_auth_create_access_token_post`.    You can adjust the `type` in body to be `user`.
+
+    ii: Once the access token is generated, you need to set it in the browser cookies [Note: Since cookies are subject to the same-origin policy so try to set in the `localhost:3000` only, otherwise  you need to make changes in the portal-frontend such that they could share their resource with other domains if token generation is done from frontend]
+
+    iii: On refreshing the page, it would show `Welcome to gurukul` if the token is correct else it would show `User not logged in`
