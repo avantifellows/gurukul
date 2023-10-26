@@ -20,6 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const [loggedIn, setLoggedIn] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
+    const [userName, setUserName] = useState<string | null>(null);
 
     useEffect(() => {
         async function checkToken() {
@@ -28,6 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (result.isValid) {
                     setLoggedIn(true);
                     setUserId(result.data.id);
+                    setUserName(result.data.data.name)
                 } else {
                     setLoggedIn(false);
                     setUserId(null);
@@ -44,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ loggedIn, userId }}>
+        <AuthContext.Provider value={{ loggedIn, userId, userName }}>
             {children}
         </AuthContext.Provider>
     );
