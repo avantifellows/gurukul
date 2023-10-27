@@ -45,7 +45,7 @@ export interface Chapter {
 export interface Resource {
   id: number;
   name: string;
-  chapter_id: number;
+  topic_id: number;
 }
 
 export interface Topic {
