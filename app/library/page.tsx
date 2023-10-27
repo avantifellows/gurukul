@@ -5,8 +5,8 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
-import { getSubjects, getChapters, getResources, getTopics } from './contentList';
-import { Subject, Chapter, Resource, Topic } from '../types';
+import { getSubjects, getChapters, getResources, getTopics, getGrades } from './contentList';
+import { Chapter, Resource, Topic } from '../types';
 import { useEffect } from 'react';
 
 const Page = () => {
@@ -15,15 +15,24 @@ const Page = () => {
   const [topics, setTopics] = useState<Topic[]>([]); // New state for topics
   const [resources, setResources] = useState<Resource[]>([]);
   const [expandedChapters, setExpandedChapters] = useState<Record<number, boolean>>({});
+  const [page, setPage] = useState(1); // Initialize the page number to 1
+  const [selectedGrade, setSelectedGrade] = useState(9); // Initialize to Grade 9
 
   const handleTabClick = async (tabName: string) => {
     setActiveTab(tabName);
+    if (activeTab != tabName) {
+      setPage(1);
+    }
+    console.log(page, "page")
     try {
       const actualTabName = tabName.toLowerCase();
       const subjectData = await getSubjects(actualTabName);
+      const gradeData = await getGrades(selectedGrade);
       if (subjectData.length > 0) {
         const subjectId = subjectData[0].id;
-        const chapterData = await getChapters(subjectId, 5, 0);
+        const gradeId = gradeData[0].id;
+        const offset = (page - 1) * 5;
+        const chapterData = await getChapters(subjectId, gradeId, 5, offset);
         setChapters(chapterData);
         const chapterIds = chapterData.map((chapter) => chapter.id);
         const topicData = await getTopics(chapterIds, 5, 0);
@@ -33,23 +42,32 @@ const Page = () => {
         setResources(resourceData);
 
       } else {
-        // Handle the case when no subjects are found
+        console.log("Bad request")
       }
     } catch (error) {
       console.error('Error fetching data:', error);
-      // Handle the error and display an error message to the user
     }
   };
 
   useEffect(() => {
-    handleTabClick('Physics');
-  }, []);
+    handleTabClick(activeTab); // Pass selectedGrade
+  }, [selectedGrade, page]);
 
   const toggleChapterExpansion = (chapterId: number) => {
     setExpandedChapters((prevExpanded) => ({
       ...prevExpanded,
       [chapterId]: !prevExpanded[chapterId],
     }));
+  };
+
+  const handleNextPage = () => {
+    const nextPage = page + 1; // Increment the page number
+    setPage(nextPage); // Update the page state
+    handleTabClick(activeTab); // Call the API with the updated page
+  };
+
+  const handleGradeChange = (grade: number) => {
+    setSelectedGrade(grade);
   };
 
   return (
@@ -59,29 +77,40 @@ const Page = () => {
         <h1 className="font-semibold ml-4 text-xl pt-6">NEET Course <br /></h1>
         <span className="text-xs ml-4 font-normal">New Delhi</span>
       </div>
-      <div className="flex flex-row justify-between px-5 mt-4">
-        <div className="flex flex-row justify-between px-5 mt-4 mb-4">
-          <PrimaryButton
-            onClick={() => handleTabClick('Physics')}
-            className={activeTab === 'Physics' ? 'bg-heading text-primary' : 'bg-white text-slate-600 w-20'}
-          >
-            Physics
-          </PrimaryButton>
-          <PrimaryButton
-            onClick={() => handleTabClick('Chemistry')}
-            className={activeTab === 'Chemistry' ? 'bg-heading text-primary' : 'bg-white text-slate-600'}
-          >
-            Chemistry
-          </PrimaryButton>
-          <PrimaryButton
-            onClick={() => handleTabClick('Maths')}
-            className={activeTab === 'Maths' ? 'bg-heading text-primary' : 'bg-white text-slate-600'}
-          >
-            Maths
-          </PrimaryButton>
-        </div>
+      <div className="flex flex-row mt-4 mb-4">
+        <PrimaryButton
+          onClick={() => handleTabClick('Physics')}
+          className={activeTab === 'Physics' ? 'bg-heading text-primary' : 'bg-white text-slate-600'}
+        >
+          Physics
+        </PrimaryButton>
+        <PrimaryButton
+          onClick={() => handleTabClick('Chemistry')}
+          className={activeTab === 'Chemistry' ? 'bg-heading text-primary' : 'bg-white text-slate-600'}
+        >
+          Chemistry
+        </PrimaryButton>
+        <PrimaryButton
+          onClick={() => handleTabClick('Maths')}
+          className={activeTab === 'Maths' ? 'bg-heading text-primary' : 'bg-white text-slate-600'}
+        >
+          Maths
+        </PrimaryButton>
+        <PrimaryButton
+          onClick={() => handleTabClick('Biology')}
+          className={activeTab === 'Biology' ? 'bg-heading text-primary' : 'bg-white text-slate-600'}
+        >
+          Biology
+        </PrimaryButton>
       </div>
-      <BottomNavigationBar />
+      <div className="bg-heading h-20 flex justify-start items-center px-8">
+        <select onChange={(e) => handleGradeChange(+e.target.value)} className="w-28 h-8 rounded-lg text-center">
+          <option value={9} className="text-xs">Grade 9</option>
+          <option value={10} className="text-xs">Grade 10</option>
+          <option value={11} className="text-xs">Grade 11</option>
+          <option value={12} className="text-xs">Grade 12</option>
+        </select>
+      </div>
       {resources.length > 0 ? (
         <div className="mt-4 mb-40">
           {chapters.map((chapter) => (
@@ -110,6 +139,10 @@ const Page = () => {
               )}
             </div>
           ))}
+          <div className="flex justify-center rounded-lg mt-8">
+            <PrimaryButton onClick={handleNextPage} className="bg-heading text-primary">Next Page</PrimaryButton>
+          </div>
+          <BottomNavigationBar />
         </div>
       ) : (
         <Loading />

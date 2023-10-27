@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Subject, Chapter, Resource, Topic } from '../types'
+import { Subject, Grade, Chapter, Resource, Topic } from '../types'
 
 const url = process.env.NEXT_PUBLIC_AF_DB_SERVICE_URL;
 
@@ -15,10 +15,22 @@ export const getSubjects = async (subjectName: string): Promise<Subject[]> => {
   }
 };
 
-export const getChapters = async (subjectId: number, limit: number, offset: number): Promise<Chapter[]> => {
+export const getGrades = async (number: number): Promise<Grade[]> => {
+  try {
+    const response = await axios.get(`${url}/grade`, {
+      params: { number: number },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in getSubjects:", error);
+    throw error;
+  }
+};
+
+export const getChapters = async (subjectId: number, gradeId: number, limit: number, offset: number): Promise<Chapter[]> => {
   try {
     const response = await axios.get(`${url}/chapter`, {
-      params: { subject_id: subjectId, limit, offset },
+      params: { subject_id: subjectId, grade_id: gradeId, limit, offset },
     });
     return response.data;
   } catch (error) {
@@ -28,6 +40,7 @@ export const getChapters = async (subjectId: number, limit: number, offset: numb
 };
 
 export const getTopics = async (chapterIds: number[], limit: number, offset: number): Promise<Topic[]> => {
+  console.log(chapterIds, "chapterIds")
   const topics: Topic[] = [];
   for (const chapterId of chapterIds) {
     try {

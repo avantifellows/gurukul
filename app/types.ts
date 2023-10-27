@@ -37,6 +37,11 @@ export interface Subject {
   name: string;
 }
 
+export interface Grade {
+  id: number;
+  number: number;
+}
+
 export interface Chapter {
   id: number;
   name: string;
