@@ -5,9 +5,13 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
-import { getSubjects, getChapters, getResources, getTopics, getGrades } from './contentList';
+import { getSubjects, getChapters, getResourcesWithSource, getTopics, getGrades } from './contentList';
 import { Chapter, Resource, Topic } from '../types';
 import { useEffect } from 'react';
+import Link from 'next/link';
+import ExpandIcon from "../../assets/expand.png";
+import CollapseIcon from "../../assets/collapse.png";
+import Image from 'next/image';
 
 const Page = () => {
   const [activeTab, setActiveTab] = useState('Physics');
@@ -31,14 +35,14 @@ const Page = () => {
       if (subjectData.length > 0) {
         const subjectId = subjectData[0].id;
         const gradeId = gradeData[0].id;
-        const offset = (page - 1) * 5;
-        const chapterData = await getChapters(subjectId, gradeId, 5, offset);
+        const offset = (page - 1) * 4;
+        const chapterData = await getChapters(subjectId, gradeId, 4, offset);
         setChapters(chapterData);
         const chapterIds = chapterData.map((chapter) => chapter.id);
-        const topicData = await getTopics(chapterIds, 5, 0);
+        const topicData = await getTopics(chapterIds, 4, 0);
         setTopics(topicData);
         const topicIds = topicData.map((topic) => topic.id);
-        const resourceData = await getResources(topicIds);
+        const resourceData = await getResourcesWithSource(topicIds);
         setResources(resourceData);
 
       } else {
@@ -115,10 +119,19 @@ const Page = () => {
         <div className="mt-4 mb-40">
           {chapters.map((chapter) => (
             <div key={chapter.id} className="mx-5">
-              <h2 className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4" onClick={() => toggleChapterExpansion(chapter.id)}>
-                {chapter.name}
-                {expandedChapters[chapter.id] ? ' \u25BC' : ' \u25B2'}
-              </h2>
+              <div
+                className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
+                onClick={() => toggleChapterExpansion(chapter.id)}
+              >
+                <div className="w-52">{chapter.name}</div>
+                <div className="w-8 flex justify-center">
+                  {expandedChapters[chapter.id] ? (
+                    <Image src={ExpandIcon} alt="Expand" />
+                  ) : (
+                    <Image src={CollapseIcon} alt="Collapse" />
+                  )}
+                </div>
+              </div>
               {expandedChapters[chapter.id] && (
                 <ul>
                   {topics
@@ -130,7 +143,11 @@ const Page = () => {
                           {resources
                             .filter((resource) => resource.topic_id === topic.id)
                             .map((resource) => (
-                              <li key={resource.id} className="py-2">{resource.name}</li>
+                              <li key={resource.id} className="py-2">
+                                <Link href={resource.link} target="_blank" rel="noopener noreferrer">
+                                  {resource.name}
+                                </Link>
+                              </li>
                             ))}
                         </ul>
                       </div>

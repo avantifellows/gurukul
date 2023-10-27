@@ -51,6 +51,8 @@ export interface Resource {
   id: number;
   name: string;
   topic_id: number;
+  source_id: number;
+  link: string;
 }
 
 export interface Topic {
