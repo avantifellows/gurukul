@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import ExpandIcon from "../../assets/expand.png";
 import CollapseIcon from "../../assets/collapse.png";
+import PlayIcon from "../../assets/play.png"
 import Image from 'next/image';
 
 const Page = () => {
@@ -144,8 +145,8 @@ const Page = () => {
                             .filter((resource) => resource.topic_id === topic.id)
                             .map((resource) => (
                               <li key={resource.id} className="py-2">
-                                <Link href={resource.link} target="_blank" rel="noopener noreferrer">
-                                  {resource.name}
+                                <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row">
+                                <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2  "/> {resource.name}
                                 </Link>
                               </li>
                             ))}
