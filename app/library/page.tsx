@@ -17,18 +17,17 @@ import Image from 'next/image';
 const Page = () => {
   const [activeTab, setActiveTab] = useState('Physics');
   const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [topics, setTopics] = useState<Topic[]>([]); // New state for topics
+  const [topics, setTopics] = useState<Topic[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
   const [expandedChapters, setExpandedChapters] = useState<Record<number, boolean>>({});
-  const [page, setPage] = useState(1); // Initialize the page number to 1
-  const [selectedGrade, setSelectedGrade] = useState(9); // Initialize to Grade 9
+  const [page, setPage] = useState(1);
+  const [selectedGrade, setSelectedGrade] = useState(9);
 
   const handleTabClick = async (tabName: string) => {
     setActiveTab(tabName);
     if (activeTab != tabName) {
       setPage(1);
     }
-    console.log(page, "page")
     try {
       const actualTabName = tabName.toLowerCase();
       const subjectData = await getSubjects(actualTabName);
@@ -55,7 +54,7 @@ const Page = () => {
   };
 
   useEffect(() => {
-    handleTabClick(activeTab); // Pass selectedGrade
+    handleTabClick(activeTab);
   }, [selectedGrade, page]);
 
   const toggleChapterExpansion = (chapterId: number) => {
@@ -66,9 +65,9 @@ const Page = () => {
   };
 
   const handleNextPage = () => {
-    const nextPage = page + 1; // Increment the page number
-    setPage(nextPage); // Update the page state
-    handleTabClick(activeTab); // Call the API with the updated page
+    const nextPage = page + 1;
+    setPage(nextPage);
+    handleTabClick(activeTab);
   };
 
   const handleGradeChange = (grade: number) => {

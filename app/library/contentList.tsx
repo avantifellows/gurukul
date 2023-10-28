@@ -40,7 +40,6 @@ export const getChapters = async (subjectId: number, gradeId: number, limit: num
 };
 
 export const getTopics = async (chapterIds: number[], limit: number, offset: number): Promise<Topic[]> => {
-  console.log(chapterIds, "chapterIds")
   const topics: Topic[] = [];
   for (const chapterId of chapterIds) {
     try {
@@ -71,16 +70,14 @@ export const getSource = async (sourceId: number) => {
     }
   } catch (error) {
     console.error("Error in getSource for sourceId", sourceId, ":", error);
-    // You can choose to handle or ignore this error as needed.
   }
-  return null; // Return null if source data is not found or an error occurs.
+  return null;
 };
 
 export const getResourcesWithSource = async (topicIds: number[]): Promise<Resource[]> => {
   const resources: Resource[] = [];
 
   for (const topicId of topicIds) {
-    console.log(topicId, "topicId")
     try {
       const response = await axios.get(`${url}/resource`, {
         params: { topic_id: topicId },
@@ -88,7 +85,6 @@ export const getResourcesWithSource = async (topicIds: number[]): Promise<Resour
 
       if (response.data) {
         const chapterResources: Resource[] = response.data;
-        console.log(chapterResources, "chapterResources")
 
         for (const resource of chapterResources) {
           if (resource.source_id) {
@@ -103,7 +99,6 @@ export const getResourcesWithSource = async (topicIds: number[]): Promise<Resour
       }
     } catch (error) {
       console.error("Error in getResources for topicId", topicId, ":", error);
-      // You can choose to handle or ignore this error and continue processing other topics
     }
   }
   return resources;
