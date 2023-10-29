@@ -27,10 +27,10 @@ export const getGrades = async (number: number): Promise<Grade[]> => {
   }
 };
 
-export const getChapters = async (subjectId: number, gradeId: number, limit: number, offset: number): Promise<Chapter[]> => {
+export const getChapters = async (subjectId?: number, gradeId?: number, limit?: number, offset?: number, id?: number): Promise<Chapter[]> => {
   try {
     const response = await axios.get(`${url}/chapter`, {
-      params: { subject_id: subjectId, grade_id: gradeId, limit, offset },
+      params: { id: id, subject_id: subjectId, grade_id: gradeId, limit, offset },
     });
     return response.data;
   } catch (error) {

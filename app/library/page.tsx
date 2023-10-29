@@ -22,12 +22,15 @@ const Page = () => {
   const [expandedChapters, setExpandedChapters] = useState<Record<number, boolean>>({});
   const [page, setPage] = useState(1);
   const [selectedGrade, setSelectedGrade] = useState(9);
+  const [selectedChapter, setSelectedChapter] = useState(''); // Initialize with an empty string
+  const [chapterList, setChapterList] = useState<Chapter[]>([]);
 
   const handleTabClick = async (tabName: string) => {
     setActiveTab(tabName);
     if (activeTab != tabName) {
       setPage(1);
     }
+
     try {
       const actualTabName = tabName.toLowerCase();
       const subjectData = await getSubjects(actualTabName);
@@ -36,15 +39,21 @@ const Page = () => {
         const subjectId = subjectData[0].id;
         const gradeId = gradeData[0].id;
         const offset = (page - 1) * 4;
+        setSelectedChapter('');
+        await fetchChapters(subjectId, gradeId);
         const chapterData = await getChapters(subjectId, gradeId, 4, offset);
-        setChapters(chapterData);
-        const chapterIds = chapterData.map((chapter) => chapter.id);
-        const topicData = await getTopics(chapterIds, 4, 0);
-        setTopics(topicData);
-        const topicIds = topicData.map((topic) => topic.id);
-        const resourceData = await getResourcesWithSource(topicIds);
-        setResources(resourceData);
-
+        if (chapterData.length > 0) {
+          setChapters(chapterData);
+          const chapterIds = chapterData.map((chapter) => chapter.id);
+          const topicData = await getTopics(chapterIds, 4, 0);
+          setTopics(topicData);
+          const topicIds = topicData.map((topic) => topic.id);
+          const resourceData = await getResourcesWithSource(topicIds);
+          setResources(resourceData);
+        }
+        else {
+          setPage(page - 1);
+        }
       } else {
         console.log("Bad request")
       }
@@ -70,8 +79,21 @@ const Page = () => {
     handleTabClick(activeTab);
   };
 
+  const handlePreviousPage = () => {
+    const previousPage = page - 1;
+    if (previousPage >= 1) {
+      setPage(previousPage);
+      handleTabClick(activeTab);
+    }
+  };
+
   const handleGradeChange = (grade: number) => {
     setSelectedGrade(grade);
+  };
+
+  const fetchChapters = async (subjectId: number, gradeId: number) => {
+    const chapterData = await getChapters(subjectId, gradeId);
+    setChapterList(chapterData);
   };
 
   return (
@@ -81,7 +103,7 @@ const Page = () => {
         <h1 className="font-semibold ml-4 text-xl pt-6">NEET Course <br /></h1>
         <span className="text-xs ml-4 font-normal">New Delhi</span>
       </div>
-      <div className="flex flex-row mt-4 mb-4">
+      <div className="flex flex-row mt-4 mb-4 justify-between">
         <PrimaryButton
           onClick={() => handleTabClick('Physics')}
           className={activeTab === 'Physics' ? 'bg-heading text-primary' : 'bg-white text-slate-600'}
@@ -107,12 +129,24 @@ const Page = () => {
           Biology
         </PrimaryButton>
       </div>
-      <div className="bg-heading h-20 flex justify-start items-center px-8">
-        <select onChange={(e) => handleGradeChange(+e.target.value)} className="w-28 h-8 rounded-lg text-center">
+      <div className="bg-heading h-20 flex justify-between items-center px-4">
+        <select onChange={(e) => handleGradeChange(+e.target.value)} className="w-32 h-8 rounded-lg text-center">
           <option value={9} className="text-xs">Grade 9</option>
           <option value={10} className="text-xs">Grade 10</option>
           <option value={11} className="text-xs">Grade 11</option>
           <option value={12} className="text-xs">Grade 12</option>
+        </select>
+        <select
+          onChange={(e) => setSelectedChapter(e.target.value)}
+          value={selectedChapter}
+          className="w-32 h-8 rounded-lg text-center"
+        >
+          <option value="">Chapter: All</option>
+          {chapterList.map((chapter) => (
+            <option key={chapter.id} value={chapter.id}>
+              {chapter.name}
+            </option>
+          ))}
         </select>
       </div>
       {resources.length > 0 ? (
@@ -145,7 +179,7 @@ const Page = () => {
                             .map((resource) => (
                               <li key={resource.id} className="py-2">
                                 <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row">
-                                <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2  "/> {resource.name}
+                                  <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name}
                                 </Link>
                               </li>
                             ))}
@@ -156,8 +190,9 @@ const Page = () => {
               )}
             </div>
           ))}
-          <div className="flex justify-center rounded-lg mt-8">
-            <PrimaryButton onClick={handleNextPage} className="bg-heading text-primary">Next Page</PrimaryButton>
+          <div className="flex justify-between rounded-lg mt-8 px-4">
+            <PrimaryButton onClick={handlePreviousPage} className="bg-heading text-primary">Previous</PrimaryButton>
+            <PrimaryButton onClick={handleNextPage} className="bg-heading text-primary">Next</PrimaryButton>
           </div>
           <BottomNavigationBar />
         </div>
