@@ -94,6 +94,7 @@ const Page = () => {
 
   const handleGradeChange = (grade: number) => {
     setSelectedGrade(grade);
+    setSelectedChapter(null)
   };
 
   const fetchChapters = async (subjectId: number, gradeId: number) => {

@@ -2,11 +2,15 @@ import axios from 'axios';
 import { Subject, Grade, Chapter, Resource, Topic } from '../types'
 
 const url = process.env.NEXT_PUBLIC_AF_DB_SERVICE_URL;
+const bearerToken = process.env.NEXT_PUBLIC_AF_DB_SERVICE_BEARER_TOKEN;
 
 export const getSubjects = async (subjectName: string): Promise<Subject[]> => {
   try {
     const response = await axios.get(`${url}/subject`, {
       params: { name: subjectName },
+      headers: {
+        'Authorization': `Bearer ${bearerToken}`
+      }
     });
     return response.data;
   } catch (error) {
@@ -19,6 +23,9 @@ export const getGrades = async (number: number): Promise<Grade[]> => {
   try {
     const response = await axios.get(`${url}/grade`, {
       params: { number: number },
+      headers: {
+        'Authorization': `Bearer ${bearerToken}`
+      }
     });
     return response.data;
   } catch (error) {
@@ -31,6 +38,9 @@ export const getChapters = async (subjectId?: number, gradeId?: number, limit?: 
   try {
     const response = await axios.get(`${url}/chapter`, {
       params: { id: id, subject_id: subjectId, grade_id: gradeId, limit, offset },
+      headers: {
+        'Authorization': `Bearer ${bearerToken}`
+      }
     });
     return response.data;
   } catch (error) {
@@ -44,6 +54,9 @@ export const getTopics = async (chapterIds: number[], limit: number, offset: num
     try {
       const response = await axios.get(`${url}/topic`, {
         params: { chapter_id: chapterId, limit, offset },
+        headers: {
+          'Authorization': `Bearer ${bearerToken}`
+        }
       });
       return response.data || [];
     } catch (error) {
@@ -60,6 +73,9 @@ export const getSource = async (sourceId: number) => {
   try {
     const response = await axios.get(`${url}/source`, {
       params: { id: sourceId },
+      headers: {
+        'Authorization': `Bearer ${bearerToken}`
+      }
     });
 
     if (response.data) {
@@ -76,6 +92,9 @@ export const getResourcesWithSource = async (topicIds: number[]): Promise<Resour
     try {
       const response = await axios.get(`${url}/resource`, {
         params: { topic_id: topicId },
+        headers: {
+          'Authorization': `Bearer ${bearerToken}`
+        }
       });
 
       if (response.data) {
