@@ -26,7 +26,7 @@ export async function getData() {
     }
 }
 
-export default async function ReportsData() {
+export default async function ReportsPage() {
     return (
         <div>
             <h1>Reports Page</h1>
