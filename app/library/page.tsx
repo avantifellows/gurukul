@@ -24,7 +24,6 @@ const Page = () => {
   const [selectedGrade, setSelectedGrade] = useState(9);
   const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
   const [chapterList, setChapterList] = useState<Chapter[]>([]);
-  console.log(page, "page")
 
   const handleTabClick = async (tabName: string) => {
     setActiveTab(tabName);
@@ -44,15 +43,9 @@ const Page = () => {
 
         const finalOffset = offset >= 0 ? offset : 0;
         await fetchChapters(subjectId, gradeId);
-        let chapterData: Chapter[];
-        console.log(selectedChapter, "id is here")
-        if (selectedChapter) {
-          chapterData = await getChapters(subjectId, gradeId, 4, finalOffset, selectedChapter);
-          console.log(chapterData, "chapterData")
-        }
-        else {
-          chapterData = await getChapters(subjectId, gradeId, 4, finalOffset);
-        }
+        const chapterData = selectedChapter
+          ? await getChapters(subjectId, gradeId, 4, finalOffset, selectedChapter)
+          : await getChapters(subjectId, gradeId, 4, finalOffset);
 
         if (chapterData.length > 0) {
           setChapters(chapterData);

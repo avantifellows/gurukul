@@ -40,24 +40,21 @@ export const getChapters = async (subjectId?: number, gradeId?: number, limit?: 
 };
 
 export const getTopics = async (chapterIds: number[], limit: number, offset: number): Promise<Topic[]> => {
-  const topics: Topic[] = [];
-  for (const chapterId of chapterIds) {
+  const topicPromises = chapterIds.map(async (chapterId) => {
     try {
       const response = await axios.get(`${url}/topic`, {
         params: { chapter_id: chapterId, limit, offset },
       });
-
-      if (response.data) {
-        const chapterTopics: Topic[] = response.data;
-        topics.push(...chapterTopics);
-      }
+      return response.data || [];
     } catch (error) {
       console.error("Error in getTopics for chapterId", chapterId, ":", error);
+      return [];
     }
-  }
-  return topics;
-};
+  });
 
+  const topicResponses = await Promise.all(topicPromises);
+  return topicResponses.flat();
+};
 
 export const getSource = async (sourceId: number) => {
   try {
@@ -75,9 +72,7 @@ export const getSource = async (sourceId: number) => {
 };
 
 export const getResourcesWithSource = async (topicIds: number[]): Promise<Resource[]> => {
-  const resources: Resource[] = [];
-
-  for (const topicId of topicIds) {
+  const resourcePromises = topicIds.map(async (topicId) => {
     try {
       const response = await axios.get(`${url}/resource`, {
         params: { topic_id: topicId },
@@ -86,20 +81,25 @@ export const getResourcesWithSource = async (topicIds: number[]): Promise<Resour
       if (response.data) {
         const chapterResources: Resource[] = response.data;
 
-        for (const resource of chapterResources) {
+        const sourcePromises = chapterResources.map(async (resource) => {
           if (resource.source_id) {
             const sourceData = await getSource(resource.source_id);
             if (sourceData) {
               resource.link = sourceData[0].link;
             }
           }
+          return resource;
+        });
 
-          resources.push(resource);
-        }
+        const resourcesWithSource = await Promise.all(sourcePromises);
+        return resourcesWithSource;
       }
     } catch (error) {
       console.error("Error in getResources for topicId", topicId, ":", error);
     }
-  }
-  return resources;
+    return [];
+  });
+
+  const resourceResponses = await Promise.all(resourcePromises);
+  return resourceResponses.flat();
 };
