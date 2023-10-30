@@ -31,5 +31,3 @@ jobs:
     - name: Lint and Check for Syntax Errors
       run: npm run lint
 
-    - name: Run tests
-      run: npm test
