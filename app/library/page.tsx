@@ -22,13 +22,15 @@ const Page = () => {
   const [expandedChapters, setExpandedChapters] = useState<Record<number, boolean>>({});
   const [page, setPage] = useState(1);
   const [selectedGrade, setSelectedGrade] = useState(9);
-  const [selectedChapter, setSelectedChapter] = useState(''); // Initialize with an empty string
+  const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
   const [chapterList, setChapterList] = useState<Chapter[]>([]);
+  console.log(page, "page")
 
   const handleTabClick = async (tabName: string) => {
     setActiveTab(tabName);
     if (activeTab != tabName) {
       setPage(1);
+      setSelectedChapter(null)
     }
 
     try {
@@ -39,9 +41,19 @@ const Page = () => {
         const subjectId = subjectData[0].id;
         const gradeId = gradeData[0].id;
         const offset = (page - 1) * 4;
-        setSelectedChapter('');
+
+        const finalOffset = offset >= 0 ? offset : 0;
         await fetchChapters(subjectId, gradeId);
-        const chapterData = await getChapters(subjectId, gradeId, 4, offset);
+        let chapterData: Chapter[];
+        console.log(selectedChapter, "id is here")
+        if (selectedChapter) {
+          chapterData = await getChapters(subjectId, gradeId, 4, finalOffset, selectedChapter);
+          console.log(chapterData, "chapterData")
+        }
+        else {
+          chapterData = await getChapters(subjectId, gradeId, 4, finalOffset);
+        }
+
         if (chapterData.length > 0) {
           setChapters(chapterData);
           const chapterIds = chapterData.map((chapter) => chapter.id);
@@ -64,7 +76,7 @@ const Page = () => {
 
   useEffect(() => {
     handleTabClick(activeTab);
-  }, [selectedGrade, page]);
+  }, [selectedGrade, page, selectedChapter]);
 
   const toggleChapterExpansion = (chapterId: number) => {
     setExpandedChapters((prevExpanded) => ({
@@ -137,8 +149,8 @@ const Page = () => {
           <option value={12} className="text-xs">Grade 12</option>
         </select>
         <select
-          onChange={(e) => setSelectedChapter(e.target.value)}
-          value={selectedChapter}
+          onChange={(e) => setSelectedChapter(+e.target.value)}
+          value={selectedChapter || ''}
           className="w-32 h-8 rounded-lg text-center"
         >
           <option value="">Chapter: All</option>
