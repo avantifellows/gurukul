@@ -7,7 +7,7 @@ import BottomNavigationBar from "@/components/BottomNavigationBar";
 import TopBar from "@/components/TopBar";
 import { useAuth } from "../AuthContext";
 
-export default function ReportsData() {
+export default function ReportsPage() {
     const { loggedIn } = useAuth();
 
     return (
