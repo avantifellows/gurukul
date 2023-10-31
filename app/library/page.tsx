@@ -24,6 +24,8 @@ const Page = () => {
   const [selectedGrade, setSelectedGrade] = useState(9);
   const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
   const [chapterList, setChapterList] = useState<Chapter[]>([]);
+  const limit = 4;
+  const gradeOptions = [9, 10, 11, 12];
 
   const handleTabClick = async (tabName: string) => {
     setActiveTab(tabName);
@@ -39,18 +41,18 @@ const Page = () => {
       if (subjectData.length > 0) {
         const subjectId = subjectData[0].id;
         const gradeId = gradeData[0].id;
-        const offset = (page - 1) * 4;
+        const offset = (page - 1) * limit;
 
         const finalOffset = offset >= 0 ? offset : 0;
         await fetchChapters(subjectId, gradeId);
         const chapterData = selectedChapter
-          ? await getChapters(subjectId, gradeId, 4, finalOffset, selectedChapter)
-          : await getChapters(subjectId, gradeId, 4, finalOffset);
+          ? await getChapters(subjectId, gradeId, limit, finalOffset, selectedChapter)
+          : await getChapters(subjectId, gradeId, limit, finalOffset);
 
         if (chapterData.length > 0) {
           setChapters(chapterData);
           const chapterIds = chapterData.map((chapter) => chapter.id);
-          const topicData = await getTopics(chapterIds, 4, 0);
+          const topicData = await getTopics(chapterIds, limit, 0);
           setTopics(topicData);
           const topicIds = topicData.map((topic) => topic.id);
           const resourceData = await getResourcesWithSource(topicIds);
@@ -136,20 +138,25 @@ const Page = () => {
         </PrimaryButton>
       </div>
       <div className="bg-heading h-20 flex justify-between items-center px-4">
-        <select onChange={(e) => handleGradeChange(+e.target.value)} className="w-32 h-8 rounded-lg text-center">
-          <option value={9} className="text-xs">Grade 9</option>
-          <option value={10} className="text-xs">Grade 10</option>
-          <option value={11} className="text-xs">Grade 11</option>
-          <option value={12} className="text-xs">Grade 12</option>
+        <select
+          onChange={(e) => handleGradeChange(+e.target.value)}
+          value={selectedGrade}
+          className="w-32 h-8 rounded-lg text-center"
+        >
+          {gradeOptions.map((grade) => (
+            <option key={grade} value={grade} className="text-sm">
+              Grade {grade}
+            </option>
+          ))}
         </select>
         <select
           onChange={(e) => setSelectedChapter(+e.target.value)}
           value={selectedChapter || ''}
           className="w-32 h-8 rounded-lg text-center"
         >
-          <option value="">Chapter: All</option>
+          <option value="" className="text-sm">Chapter: All</option>
           {chapterList.map((chapter) => (
-            <option key={chapter.id} value={chapter.id}>
+            <option key={chapter.id} value={chapter.id} className="text-sm">
               {chapter.name}
             </option>
           ))}
