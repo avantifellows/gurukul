@@ -15,7 +15,7 @@ const BottomNavigationBar = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 text-xs md:text-lg pl-16 pr-16 bg-white pb-4 pt-2 flex justify-between border-t-2 items-center shadow-2xl shadow-black">
+    <div className="max-w-xl mx-auto fixed bottom-0 left-0 right-0 text-xs md:text-lg pl-16 pr-16 bg-white pb-4 pt-2 flex justify-between border-t-2 items-center shadow-2xl shadow-black">
       <NavLink href="/library" active={isActive('/library')}>
         {isActive('/library') ? (
           <MdLibraryBooks className="h-8 w-8 fill-primary" />
@@ -25,7 +25,7 @@ const BottomNavigationBar = () => {
         Library
       </NavLink>
       <NavLink href="/" active={isActive('/')}>
-        <Image src={AvantiLogo} alt="Avanti Logo" className="w-12 h-12 absolute bottom-10 border-2 rounded-full" />
+        <Image src={AvantiLogo} alt="Avanti Logo" className="w-12 h-12 absolute bottom-10 md:bottom-14 md:w-16 md:h-16 border-2 rounded-full" />
         <span className="pt-8">Home</span>
       </NavLink>
       <NavLink href="/reports" active={isActive('/reports')}>

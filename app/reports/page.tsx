@@ -13,15 +13,19 @@ export default function ReportsPage() {
     return (
         <>
             {loggedIn ? (
-                <div>
+                <main className="max-w-xl mx-auto bg-white">
                     <TopBar />
                     <Client message="">
                         <ReportsList />
                     </Client>
                     <BottomNavigationBar />
-                </div>
+                </main>
             ) : (
-                <Loading />
+                <main className="max-w-xl mx-auto bg-white">
+                    <TopBar />
+                    <Loading />
+                </main>
+
             )}
         </>
     );
