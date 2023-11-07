@@ -15,7 +15,7 @@ const BottomNavigationBar = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto fixed bottom-0 left-0 right-0 text-xs md:text-lg pl-16 pr-16 bg-white pb-4 pt-2 flex justify-between border-t-2 items-center shadow-2xl shadow-black">
+    <div className="max-w-xl mx-auto fixed bottom-0 left-0 right-0 text-xs md:text-lg px-12 md:px-16 bg-white pb-4 pt-2 flex justify-between border-t-2 items-center shadow-2xl shadow-black">
       <NavLink href="/library" active={isActive('/library')}>
         {isActive('/library') ? (
           <MdLibraryBooks className="h-8 w-8 fill-primary" />
