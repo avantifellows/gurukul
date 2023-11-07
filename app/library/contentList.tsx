@@ -14,7 +14,7 @@ export const getSubjects = async (subjectName: string): Promise<Subject[]> => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error in getSubjects:", error);
+    console.error("Error in fetching Subjects:", error);
     throw error;
   }
 };
@@ -29,7 +29,7 @@ export const getGrades = async (number: number): Promise<Grade[]> => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error in getSubjects:", error);
+    console.error("Error in fetching Grades:", error);
     throw error;
   }
 };
@@ -44,7 +44,7 @@ export const getChapters = async (subjectId?: number, gradeId?: number, limit?: 
     });
     return response.data;
   } catch (error) {
-    console.error("Error in getChapters:", error);
+    console.error("Error in fetching Chapters:", error);
     throw error;
   }
 };
@@ -60,7 +60,7 @@ export const getTopics = async (chapterIds: number[], limit: number, offset: num
       });
       return response.data || [];
     } catch (error) {
-      console.error("Error in getTopics for chapterId", chapterId, ":", error);
+      console.error("Error in fetching topics for chapterId", chapterId, ":", error);
       return [];
     }
   });
@@ -82,7 +82,7 @@ export const getSource = async (sourceId: number) => {
       return response.data;
     }
   } catch (error) {
-    console.error("Error in getSource for sourceId", sourceId, ":", error);
+    console.error("Error in fetching Source for sourceId", sourceId, ":", error);
   }
   return null;
 };
@@ -114,7 +114,7 @@ export const getResourcesWithSource = async (topicIds: number[]): Promise<Resour
         return resourcesWithSource;
       }
     } catch (error) {
-      console.error("Error in getResources for topicId", topicId, ":", error);
+      console.error("Error in fetching Topic for topicId", topicId, ":", error);
     }
     return [];
   });
