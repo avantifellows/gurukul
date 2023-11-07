@@ -105,7 +105,7 @@ const Page = () => {
   };
 
   return (
-    <main className="max-w-xl mx-auto bg-white">
+    <main className="max-w-xl mx-auto bg-white min-h-screen">
       <TopBar />
       <div className="bg-heading text-primary h-20 flex flex-col">
         <h1 className="font-semibold ml-4 text-xl pt-6">NEET Course <br /></h1>
