@@ -1,21 +1,28 @@
-// A server page containing client component and nested server component
+"use client"
 
 import Client from "./client";
 import ReportsList from "./reports_list";
-import { Suspense } from "react";
 import Loading from "../loading";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
+import TopBar from "@/components/TopBar";
+import { useAuth } from "../AuthContext";
 
-export default async function ReportsPage() {
+export default function ReportsPage() {
+    const { loggedIn } = useAuth();
+
     return (
-        <div>
-            <h1>Reports Page</h1>
-            <Client message="">
-                <Suspense fallback={<Loading />}>
-                    <ReportsList />
-                </Suspense>
-            </Client>
-            <BottomNavigationBar />
-        </div>
+        <>
+            {loggedIn ? (
+                <div>
+                    <TopBar />
+                    <Client message="">
+                        <ReportsList />
+                    </Client>
+                    <BottomNavigationBar />
+                </div>
+            ) : (
+                <Loading />
+            )}
+        </>
     );
 }
