@@ -105,7 +105,7 @@ const Page = () => {
   };
 
   return (
-    <>
+    <main className="max-w-xl mx-auto bg-white min-h-screen">
       <TopBar />
       <div className="bg-heading text-primary h-20 flex flex-col">
         <h1 className="font-semibold ml-4 text-xl pt-6">NEET Course <br /></h1>
@@ -144,7 +144,7 @@ const Page = () => {
           className="w-32 h-8 rounded-lg text-center"
         >
           {gradeOptions.map((grade) => (
-            <option key={grade} value={grade} className="text-sm">
+            <option key={grade} value={grade} className="text-sm md:text-lg">
               Grade {grade}
             </option>
           ))}
@@ -154,16 +154,16 @@ const Page = () => {
           value={selectedChapter || ''}
           className="w-32 h-8 rounded-lg text-center"
         >
-          <option value="" className="text-sm">Chapter: All</option>
+          <option value="" className="text-sm md:text-lg">Chapter: All</option>
           {chapterList.map((chapter) => (
-            <option key={chapter.id} value={chapter.id} className="text-sm">
+            <option key={chapter.id} value={chapter.id} className="text-sm md:text-lg">
               {chapter.name}
             </option>
           ))}
         </select>
       </div>
       {resources.length > 0 ? (
-        <div className="mt-4 mb-40">
+        <div className="mt-4 pb-40">
           {chapters.map((chapter) => (
             <div key={chapter.id} className="mx-5">
               <div
@@ -173,9 +173,9 @@ const Page = () => {
                 <div className="w-52">{chapter.name}</div>
                 <div className="w-8 flex justify-center">
                   {expandedChapters[chapter.id] ? (
-                    <Image src={ExpandIcon} alt="Expand" />
-                  ) : (
                     <Image src={CollapseIcon} alt="Collapse" />
+                  ) : (
+                    <Image src={ExpandIcon} alt="Expand" />
                   )}
                 </div>
               </div>
@@ -212,7 +212,7 @@ const Page = () => {
       ) : (
         <Loading />
       )}
-    </>
+    </main>
   );
 };
 

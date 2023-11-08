@@ -15,13 +15,13 @@ export default function Client({
             <div className="bg-heading h-20">
                 <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Overall Performance Analysis</h1>
             </div>
-            <div className="px-8">
+            <div className="px-8 text-sm md:text-base">
                 <div className="flex flex-row py-2">
                     <Image src={Forecast} alt="Forecast" />
-                    <h1 className="text-primary ml-4 font-semibold text-sm">Predictive rank <p className="text-black font-normal">Top 15k All India Ranks</p></h1>
+                    <h1 className="text-primary ml-4 font-semibold">Predictive rank <p className="text-black font-normal">Top 15k All India Ranks</p></h1>
 
                 </div>
-                <p className="text-sm pb-3">
+                <p className="pb-3 text-justify">
                     Based on your performance in all the tests, we predict that you will be eligible for an MBBS admission. Keep up the Good Work!
                 </p>
             </div>
