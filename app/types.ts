@@ -79,6 +79,7 @@ export interface Session {
     subject: string;
     batch: string;
     stream: string;
+    test_type: string;
   };
 }
 

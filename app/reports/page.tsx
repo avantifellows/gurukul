@@ -12,7 +12,7 @@ export default function ReportsPage() {
 
     return (
         <>
-            {loggedIn ? (
+            {/* {loggedIn ? ( */}
                 <main className="max-w-xl mx-auto bg-white">
                     <TopBar />
                     <Client message="">
@@ -20,13 +20,13 @@ export default function ReportsPage() {
                     </Client>
                     <BottomNavigationBar />
                 </main>
-            ) : (
+            {/* ) : (
                 <main className="max-w-xl mx-auto bg-white">
                     <TopBar />
                     <Loading />
                 </main>
 
-            )}
+            )} */}
         </>
     );
 }

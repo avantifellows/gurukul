@@ -48,7 +48,7 @@ export default function ReportsList() {
         <div className="grid grid-cols-1 gap-4 pb-40">
             {responseData.reports.map((report: Report, index: number) => (
                 <Link href={report.report_link} target="_blank" key={index} className="bg-card rounded-lg shadow-lg h-24 mx-4 mt-4 relative">
-                    <div className="bg-red-200 h-full w-2 absolute left-0 top-0"></div>
+                    <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
                     <p className="text-sm md:text-base font-semibold mx-6 md:mx-8 mt-2 md:mt-4">{report.test_name}</p>
                     <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8 mt-2">Rank: {report.rank}</p>
                 </Link>
