@@ -111,7 +111,7 @@ const Page = () => {
         <h1 className="font-semibold ml-4 text-xl pt-6">NEET Course <br /></h1>
         <span className="text-xs ml-4 font-normal">New Delhi</span>
       </div>
-      <div className="flex flex-row mt-4 mb-4 justify-between">
+      <div className="flex flex-row mt-4 mb-4 justify-between md:mx-4 mx-1">
         <PrimaryButton
           onClick={() => handleTabClick('Physics')}
           className={activeTab === 'Physics' ? 'bg-heading text-primary' : 'bg-white text-slate-600'}

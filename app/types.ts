@@ -27,7 +27,7 @@ export interface Report {
 };
 
 export interface PrimaryButton {
-  onClick: () => void;
+  onClick?: () => void;
   children: React.ReactNode;
   className?: string;
 }
@@ -60,3 +60,31 @@ export interface Topic {
   name: string;
   chapter_id: number;
 }
+
+export interface SessionOccurrence {
+  id: number;
+  name: string;
+  session_id: string;
+  session_fk: number;
+  start_time: string;
+  end_time: string;
+}
+
+export interface Session {
+  id: number;
+  name: string;
+  platform: string;
+  platform_link: string;
+  meta_data: {
+    subject: string;
+    batch: string;
+    stream: string;
+    test_type: string;
+  };
+}
+
+export interface LiveClasses {
+  sessionOccurrence: SessionOccurrence;
+  sessionDetail: Session;
+}
+
