@@ -9,7 +9,7 @@ import { LiveClasses } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
-import { isSameDay, formatTime } from "@/utils/dateUtils";
+import { isSameDay, formatCurrentTime, formatSessionTime } from "@/utils/dateUtils";
 
 export default function Home() {
   const { loggedIn, userId } = useAuth();
@@ -56,8 +56,8 @@ export default function Home() {
 
   function renderButton(data: { sessionOccurrence: any, sessionDetail: any }) {
     const currentTime = new Date();
-    const sessionTimeStr = formatTime(data.sessionOccurrence.start_time);
-    const currentTimeStr = formatTime(currentTime.toISOString());
+    const sessionTimeStr = formatSessionTime(data.sessionOccurrence.start_time);
+    const currentTimeStr = formatCurrentTime(currentTime.toISOString());
 
     if (data.sessionDetail.platform === 'meet') {
       if (sessionTimeStr <= currentTimeStr) {
@@ -121,10 +121,10 @@ export default function Home() {
                 <div key={index} className="flex mt-4 items-center" >
                   <div>
                     <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
-                      {formatTime(data.sessionOccurrence.start_time)}
+                      {formatSessionTime(data.sessionOccurrence.start_time)}
                     </p>
                     <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
-                      {formatTime(data.sessionOccurrence.end_time)}
+                      {formatSessionTime(data.sessionOccurrence.end_time)}
                     </p>
                   </div>
                   <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
@@ -148,10 +148,10 @@ export default function Home() {
                 <div key={index} className="flex mt-4 items-center" >
                   <div>
                     <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
-                      {formatTime(data.sessionOccurrence.start_time)}
+                      {formatSessionTime(data.sessionOccurrence.start_time)}
                     </p>
                     <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
-                      {formatTime(data.sessionOccurrence.end_time)}
+                      {formatSessionTime(data.sessionOccurrence.end_time)}
                     </p>
                   </div>
                   <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
