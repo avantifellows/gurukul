@@ -1,13 +1,15 @@
 "use client"
-import { useAuth } from "./AuthContext";
+
+import { useAuth } from "@/services/AuthContext";
 import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getSessionOccurrences, getSessions } from "./SessionList";
+import { getSessionOccurrences, getSessions } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
 import { LiveClasses } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
+import { isSameDay, formatTime } from "@/utils/dateUtils";
 
 export default function Home() {
   const { loggedIn, userId } = useAuth();
@@ -50,24 +52,6 @@ export default function Home() {
     } catch (error) {
       console.error("Error in fetching Live Classes:", error);
     }
-  }
-
-
-
-  function isSameDay(date1: Date, date2: Date): boolean {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
-  }
-
-
-  function formatTime(dateTimeStr: string) {
-    const date = new Date(dateTimeStr);
-    const hours = String(date.getUTCHours()).padStart(2, "0");
-    const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-    return `${hours}:${minutes}`;
   }
 
   function renderButton(data: { sessionOccurrence: any, sessionDetail: any }) {
