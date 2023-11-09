@@ -23,28 +23,25 @@ export default function Home() {
       const sessionOccurrenceData = await getSessionOccurrences();
       const currentDate = new Date();
       currentDate.setHours(0, 0, 0, 0);
-      const endOfWeek = new Date();
-      endOfWeek.setDate(endOfWeek.getDate() + (6 - endOfWeek.getDay()));
 
       const todaySessions = [];
 
       for (const sessionOccurrence of sessionOccurrenceData) {
         const sessionStartTime = new Date(sessionOccurrence.start_time);
 
-        if (sessionStartTime > currentDate && sessionStartTime <= endOfWeek) {
+        if (isSameDay(sessionStartTime, currentDate)) {
           try {
             const sessionDetail = await getSessions(sessionOccurrence.session_fk);
-            if (isSameDay(sessionStartTime, currentDate)) {
-              todaySessions.push({
-                sessionOccurrence,
-                sessionDetail,
-              });
-            }
+            todaySessions.push({
+              sessionOccurrence,
+              sessionDetail,
+            });
           } catch (error) {
             console.error("Error fetching session details for session ID:", sessionOccurrence.session_fk, error);
           }
         }
       }
+
       const liveClassesToday = todaySessions.filter(data => data.sessionDetail.platform === "meet");
       const quizzesToday = todaySessions.filter(data => data.sessionDetail.platform === "quiz");
 
@@ -54,6 +51,7 @@ export default function Home() {
       console.error("Error in fetching Live Classes:", error);
     }
   }
+
 
 
   function isSameDay(date1: Date, date2: Date): boolean {
@@ -88,7 +86,7 @@ export default function Home() {
       } else {
         return (
           <p className="text-sm italic font-normal mr-6">
-            Starts on <br />
+            Starts at <br />
             {sessionTimeStr}
           </p>
         );
