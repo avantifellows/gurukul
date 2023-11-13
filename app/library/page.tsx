@@ -6,8 +6,8 @@ import PrimaryButton from '@/components/Button';
 import TopBar from '@/components/TopBar';
 import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Image from 'next/image';
-import Stethoscope from '../../assets/stethoscope.png';
-import Blueprint from '../../assets/blueprint.png';
+import StethoscopeIcon from '../../assets/stethoscope.png';
+import BlueprintIcon from '../../assets/blueprint.png';
 
 const Page: React.FC = () => {
   const [selectedLibrary, setSelectedLibrary] = useState<string | null>('Content');
@@ -52,7 +52,7 @@ const Page: React.FC = () => {
           <div onClick={() => handleLibraryChange('NEET Content')} className="pt-4">
             <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6">
               <div className="flex items-center">
-                <Image src={Stethoscope} alt="Stethoscope" className="w-10 h-10" />
+                <Image src={StethoscopeIcon} alt="Stethoscope Icon" className="w-10 h-10" />
                 <div className="flex flex-col ml-4 ">
                   <h3 className="font-semibold">NEET course</h3>
                   <h5 className="text-sm">Browse all the NEET courses</h5>
@@ -64,7 +64,7 @@ const Page: React.FC = () => {
           <div onClick={() => handleLibraryChange('JEE Content')}>
             <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6">
               <div className="flex flex-row items-center">
-                <Image src={Blueprint} alt="Blueprint" className="w-10 h-10" />
+                <Image src={BlueprintIcon} alt="Blueprint Icon" className="w-10 h-10" />
                 <div className="flex flex-col ml-4 ">
                   <h3 className="font-semibold">JEE Mains course</h3>
                   <h5 className="text-sm">Browse all the JEE courses</h5>
@@ -81,7 +81,7 @@ const Page: React.FC = () => {
           <div onClick={() => handleLibraryChange('NEET Classes')} className="pt-4">
             <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6">
               <div className="flex items-center">
-                <Image src={Stethoscope} alt="Stethoscope" className="w-10 h-10" />
+                <Image src={StethoscopeIcon} alt="Stethoscope Icon" className="w-10 h-10" />
                 <div className="flex flex-col ml-4 ">
                   <h3 className="font-semibold">NEET classes</h3>
                   <h5 className="text-sm">Browse all the NEET classes</h5>
@@ -93,7 +93,7 @@ const Page: React.FC = () => {
           <div onClick={() => handleLibraryChange('JEE Classes')}>
             <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6">
               <div className="flex flex-row items-center">
-                <Image src={Blueprint} alt="Blueprint" className="w-10 h-10" />
+                <Image src={BlueprintIcon} alt="Blueprint Icon" className="w-10 h-10" />
                 <div className="flex flex-col ml-4 ">
                   <h3 className="font-semibold">JEE Mains classes</h3>
                   <h5 className="text-sm">Browse all the JEE classes</h5>
