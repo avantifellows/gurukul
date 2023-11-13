@@ -23,7 +23,7 @@ const Page: React.FC = () => {
   }
 
   const buttonStyle = 'mx-4 w-40 md:w-64';
-  const selectedButtonStyle = 'bg-white text-primary';
+  const selectedButtonStyle = 'bg-white text-primary font-semibold';
   const unselectedButtonStyle = 'bg-heading text-slate-600';
 
   return (
