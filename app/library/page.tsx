@@ -18,7 +18,12 @@ const Page: React.FC = () => {
   };
 
   if (selectedLibrary === 'NEET Content') {
-    push('/library/show');
+    push(`/library/show?course=${selectedLibrary}`);
+    return null;
+  }
+
+  if (selectedLibrary === 'JEE Content') {
+    push(`/library/show?course=${selectedLibrary}`);
     return null;
   }
 

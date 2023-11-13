@@ -15,6 +15,7 @@ import CollapseIcon from "../../../assets/collapse.png";
 import PlayIcon from "../../../assets/play.png";
 import BackIcon from "../../../assets/icon.png";
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 
 const ContentLibrary = () => {
     const [activeTab, setActiveTab] = useState('Physics');
@@ -29,6 +30,10 @@ const ContentLibrary = () => {
     const limit = 4;
     const gradeOptions = [9, 10, 11, 12];
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const selectedCourse = searchParams.get('course');
+    const neetSubjects = ['Physics', 'Chemistry', 'Biology'];
+    const jeeSubjects = ['Physics', 'Chemistry', 'Maths'];
 
     const handleTabClick = async (tabName: string) => {
         setActiveTab(tabName);
@@ -73,8 +78,13 @@ const ContentLibrary = () => {
     };
 
     useEffect(() => {
-        handleTabClick(activeTab);
+        const fetchData = async () => {
+            await handleTabClick(activeTab);
+        };
+    
+        fetchData();
     }, [selectedGrade, page, selectedChapter]);
+    
 
     const toggleChapterExpansion = (chapterId: number) => {
         setExpandedChapters((prevExpanded) => ({
@@ -111,41 +121,28 @@ const ContentLibrary = () => {
         setChapterList(chapterData);
     };
 
+    const generateSubjectButton = (subject: string, label: string) => (
+        <PrimaryButton
+            onClick={() => handleTabClick(subject)}
+            className={activeTab === subject ? 'bg-heading text-primary' : 'bg-white text-slate-600'}
+        >
+            {label}
+        </PrimaryButton>
+    );
+
     return (
         <main className="max-w-xl mx-auto bg-white min-h-screen">
             <TopBar />
             <div className="bg-heading text-primary h-20 flex flex-col">
                 <div className='flex items-center mx-4 mt-4'>
                     <Image src={BackIcon} onClick={handleBackClick} alt="Play" className="w-5 h-5" />
-                    <h1 className="font-semibold ml-4 text-xl pt-1">NEET Course <br /></h1>
+                    <h1 className="font-semibold ml-4 text-xl pt-1">{selectedCourse === 'NEET Content' ? "NEET Course" : "JEE Course"}<br /></h1>
                 </div>
                 <span className="text-sm ml-[52px] font-normal">Content Library</span>
             </div>
             <div className="flex flex-row mt-4 mb-4 justify-between md:mx-4 mx-1">
-                <PrimaryButton
-                    onClick={() => handleTabClick('Physics')}
-                    className={activeTab === 'Physics' ? 'bg-heading text-primary' : 'bg-white text-slate-600'}
-                >
-                    Physics
-                </PrimaryButton>
-                <PrimaryButton
-                    onClick={() => handleTabClick('Chemistry')}
-                    className={activeTab === 'Chemistry' ? 'bg-heading text-primary' : 'bg-white text-slate-600'}
-                >
-                    Chemistry
-                </PrimaryButton>
-                <PrimaryButton
-                    onClick={() => handleTabClick('Maths')}
-                    className={activeTab === 'Maths' ? 'bg-heading text-primary' : 'bg-white text-slate-600'}
-                >
-                    Maths
-                </PrimaryButton>
-                <PrimaryButton
-                    onClick={() => handleTabClick('Biology')}
-                    className={activeTab === 'Biology' ? 'bg-heading text-primary' : 'bg-white text-slate-600'}
-                >
-                    Biology
-                </PrimaryButton>
+                {selectedCourse === 'NEET Content' && neetSubjects.map(subject => generateSubjectButton(subject, subject))}
+                {selectedCourse === 'JEE Content' && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
             </div>
             <div className="bg-heading h-20 flex justify-between items-center px-4">
                 <select
