@@ -25,7 +25,7 @@ export default function Client({
                     Based on your performance in all the tests, we predict that you will be eligible for an MBBS admission. Keep up the Good Work!
                 </p>
             </div>
-            <div className="bg-heading h-20">
+            <div className="bg-heading h-20 mb-4">
                 <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Test Reports</h1>
             </div>
             {children}
