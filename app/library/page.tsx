@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PrimaryButton from '@/components/Button';
 import TopBar from '@/components/TopBar';
@@ -17,15 +17,11 @@ const Page: React.FC = () => {
     setSelectedLibrary(library);
   };
 
-  if (selectedLibrary === 'NEET Content') {
-    push(`/library/show?course=${selectedLibrary}`);
-    return null;
-  }
-
-  if (selectedLibrary === 'JEE Content') {
-    push(`/library/show?course=${selectedLibrary}`);
-    return null;
-  }
+  useEffect(() => {
+    if (selectedLibrary === 'NEET Content' || selectedLibrary === 'JEE Content') {
+      push(`/library/show?course=${selectedLibrary}`);
+    }
+  }, [selectedLibrary, push]);
 
   const buttonStyle = 'mx-4 w-40 md:w-64';
   const selectedButtonStyle = 'bg-white text-primary font-semibold';
