@@ -152,7 +152,7 @@ const ContentLibrary = () => {
     return (
         <>
             {isLoading ? (
-                <div className="md:max-w-xl md:mx-auto">
+                <div className="max-w-xl mx-auto">
                     <TopBar />
                     <Loading />
                 </div>

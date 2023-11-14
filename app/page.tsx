@@ -123,12 +123,12 @@ export default function Home() {
     <>
       {/* {loggedIn ? ( */}
       {isLoading ? (
-        <div className="md:max-w-xl md:mx-auto">
+        <div className="max-w-xl mx-auto">
           <TopBar />
           <Loading />
         </div>
       ) : (
-        <main className="md:max-w-xl md:mx-auto bg-white">
+        <main className="max-w-xl mx-auto md:mx-auto bg-white">
           <TopBar />
           <div className="min-h-screen bg-heading">
             <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Live Classes</h1>
