@@ -141,6 +141,7 @@ const ContentLibrary = () => {
 
     const generateSubjectButton = (subject: string, label: string) => (
         <PrimaryButton
+            key={subject}
             onClick={() => handleTabClick(subject)}
             className={activeTab === subject ? 'bg-heading text-primary' : 'bg-white text-slate-600'}
         >

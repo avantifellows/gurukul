@@ -12,10 +12,10 @@ const TopBar = () => {
   };
 
   const pathname = usePathname();
-  const routeName = routeNames[pathname] || <p>Welcome <br /> {userName} </p>  ;
+  const routeName = routeNames[pathname] || <p>Welcome <br /> {userName} </p>;
 
   return (
-    <div className="text-white p-4 h-32 justify-between items-center bg-primary">
+    <div className="max-w-xl mx-auto text-white p-4 h-32 justify-between items-center bg-primary">
       <CurrentTime className="text-sm mb-4" />
       <div className="mt-6 text-xl font-semibold">
         {routeName}
