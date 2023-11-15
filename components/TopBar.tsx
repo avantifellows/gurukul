@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import CurrentTime from "./CurrentTime";
-import { useAuth } from "@/app/AuthContext";
+import { useAuth } from "@/services/AuthContext";
 
 const TopBar = () => {
   const { userName } = useAuth();
@@ -12,7 +12,7 @@ const TopBar = () => {
   };
 
   const pathname = usePathname();
-  const routeName = routeNames[pathname] || <p>Welcome <br /> {userName} </p>  ;
+  const routeName = routeNames[pathname] || <p>Welcome <br /> {userName} </p>;
 
   return (
     <div className="text-white p-4 h-32 justify-between items-center bg-primary">

@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { verifyToken } from '@/services/validation';
 import { useRouter } from 'next/navigation';
-import { AuthContextProps } from './types';
+import { AuthContextProps } from '../app/types';
 import { api } from '@/services/url';
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);

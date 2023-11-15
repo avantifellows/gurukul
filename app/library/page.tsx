@@ -5,7 +5,7 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
-import { getSubjects, getChapters, getResourcesWithSource, getTopics, getGrades } from './contentList';
+import { getSubjects, getChapters, getResourcesWithSource, getTopics, getGrades } from '../../api/afdb/library';
 import { Chapter, Resource, Topic } from '../types';
 import { useEffect } from 'react';
 import Link from 'next/link';

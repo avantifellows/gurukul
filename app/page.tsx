@@ -1,13 +1,15 @@
 "use client"
-import { useAuth } from "./AuthContext";
+
+import { useAuth } from "@/services/AuthContext";
 import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getSessionOccurrences, getSessions } from "./SessionList";
+import { getSessionOccurrences, getSessions } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
 import { LiveClasses } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
+import { isSameDay, formatCurrentTime, formatSessionTime } from "@/utils/dateUtils";
 
 export default function Home() {
   const { loggedIn, userId } = useAuth();
@@ -52,28 +54,10 @@ export default function Home() {
     }
   }
 
-
-
-  function isSameDay(date1: Date, date2: Date): boolean {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
-  }
-
-
-  function formatTime(dateTimeStr: string) {
-    const date = new Date(dateTimeStr);
-    const hours = String(date.getUTCHours()).padStart(2, "0");
-    const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-    return `${hours}:${minutes}`;
-  }
-
   function renderButton(data: { sessionOccurrence: any, sessionDetail: any }) {
     const currentTime = new Date();
-    const sessionTimeStr = formatTime(data.sessionOccurrence.start_time);
-    const currentTimeStr = formatTime(currentTime.toISOString());
+    const sessionTimeStr = formatSessionTime(data.sessionOccurrence.start_time);
+    const currentTimeStr = formatCurrentTime(currentTime.toISOString());
 
     if (data.sessionDetail.platform === 'meet') {
       if (sessionTimeStr <= currentTimeStr) {
@@ -137,10 +121,10 @@ export default function Home() {
                 <div key={index} className="flex mt-4 items-center" >
                   <div>
                     <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
-                      {formatTime(data.sessionOccurrence.start_time)}
+                      {formatSessionTime(data.sessionOccurrence.start_time)}
                     </p>
                     <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
-                      {formatTime(data.sessionOccurrence.end_time)}
+                      {formatSessionTime(data.sessionOccurrence.end_time)}
                     </p>
                   </div>
                   <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
@@ -164,10 +148,10 @@ export default function Home() {
                 <div key={index} className="flex mt-4 items-center" >
                   <div>
                     <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
-                      {formatTime(data.sessionOccurrence.start_time)}
+                      {formatSessionTime(data.sessionOccurrence.start_time)}
                     </p>
                     <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
-                      {formatTime(data.sessionOccurrence.end_time)}
+                      {formatSessionTime(data.sessionOccurrence.end_time)}
                     </p>
                   </div>
                   <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
