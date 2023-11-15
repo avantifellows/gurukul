@@ -151,50 +151,47 @@ const ContentLibrary = () => {
 
     return (
         <>
-            {isLoading ? (
-                <div className="max-w-xl mx-auto">
-                    <TopBar />
-                    <Loading />
+            <main className="max-w-xl mx-auto bg-white min-h-screen">
+                <TopBar />
+                <div className="bg-heading text-primary h-20 flex flex-col">
+                    <div className='flex items-center mx-4 mt-4'>
+                        <Image src={BackIcon} onClick={handleBackClick} alt="Play" className="w-5 h-5" />
+                        <h1 className="font-semibold ml-4 text-xl pt-1">{selectedCourse === 'NEET Content' ? "NEET Course" : "JEE Course"}<br /></h1>
+                    </div>
+                    <span className="text-sm ml-[52px] font-normal">Content Library</span>
                 </div>
-            ) : (
-                <main className="max-w-xl mx-auto bg-white min-h-screen">
-                    <TopBar />
-                    <div className="bg-heading text-primary h-20 flex flex-col">
-                        <div className='flex items-center mx-4 mt-4'>
-                            <Image src={BackIcon} onClick={handleBackClick} alt="Play" className="w-5 h-5" />
-                            <h1 className="font-semibold ml-4 text-xl pt-1">{selectedCourse === 'NEET Content' ? "NEET Course" : "JEE Course"}<br /></h1>
-                        </div>
-                        <span className="text-sm ml-[52px] font-normal">Content Library</span>
-                    </div>
-                    <div className="flex flex-row mt-4 mb-4 justify-between md:mx-4 mx-1">
-                        {selectedCourse === 'NEET Content' && neetSubjects.map(subject => generateSubjectButton(subject, subject))}
-                        {selectedCourse === 'JEE Content' && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
-                    </div>
-                    <div className="bg-heading h-20 flex justify-between items-center px-4">
-                        <select
-                            onChange={(e) => handleGradeChange(+e.target.value)}
-                            value={selectedGrade}
-                            className="w-32 h-8 rounded-lg text-center"
-                        >
-                            {gradeOptions.map((grade) => (
-                                <option key={grade} value={grade} className="text-sm md:text-lg">
-                                    Grade {grade}
-                                </option>
-                            ))}
-                        </select>
-                        <select
-                            onChange={(e) => setSelectedChapter(+e.target.value)}
-                            value={selectedChapter || ''}
-                            className="w-32 h-8 rounded-lg text-center"
-                        >
-                            <option value="" className="text-sm md:text-lg">Chapter: All</option>
-                            {chapterList.map((chapter) => (
-                                <option key={chapter.id} value={chapter.id} className="text-sm md:text-lg">
-                                    {chapter.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                <div className="flex flex-row mt-4 mb-4 justify-between mx-6">
+                    {selectedCourse === 'NEET Content' && neetSubjects.map(subject => generateSubjectButton(subject, subject))}
+                    {selectedCourse === 'JEE Content' && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
+                </div>
+                <div className="bg-heading h-20 flex justify-between items-center px-4">
+                    <select
+                        onChange={(e) => handleGradeChange(+e.target.value)}
+                        value={selectedGrade}
+                        className="w-32 h-8 rounded-lg text-center"
+                    >
+                        {gradeOptions.map((grade) => (
+                            <option key={grade} value={grade} className="text-sm md:text-lg">
+                                Grade {grade}
+                            </option>
+                        ))}
+                    </select>
+                    <select
+                        onChange={(e) => setSelectedChapter(+e.target.value)}
+                        value={selectedChapter || ''}
+                        className="w-32 h-8 rounded-lg text-center"
+                    >
+                        <option value="" className="text-sm md:text-lg">Chapter: All</option>
+                        {chapterList.map((chapter) => (
+                            <option key={chapter.id} value={chapter.id} className="text-sm md:text-lg">
+                                {chapter.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                {isLoading ? (
+                    <Loading />
+                ) : (
                     <div className="mt-4 pb-40">
                         {chapters.map((chapter) => (
                             <div key={chapter.id} className="mx-5">
@@ -241,7 +238,8 @@ const ContentLibrary = () => {
                         </div>
                         <BottomNavigationBar />
                     </div>
-                </main>)}
+                )}
+            </main>
         </>
     );
 };
