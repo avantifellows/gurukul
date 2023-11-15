@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import CurrentTime from "./CurrentTime";
-import { useAuth } from "@/app/AuthContext";
+import { useAuth } from "@/services/AuthContext";
 
 const TopBar = () => {
   const { userName } = useAuth();
