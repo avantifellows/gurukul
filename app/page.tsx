@@ -30,8 +30,10 @@ export default function Home() {
 
       for (const sessionOccurrence of sessionOccurrenceData) {
         const sessionStartTime = new Date(sessionOccurrence.start_time);
+        const formattedSessionTime = formatSessionTime(sessionOccurrence.end_time);
+        const formattedCurrentTime = formatCurrentTime(new Date().toISOString());
 
-        if (isSameDay(sessionStartTime, currentDate)) {
+        if (isSameDay(sessionStartTime, currentDate) && formattedSessionTime > formattedCurrentTime) {
           try {
             const sessionDetail = await getSessions(sessionOccurrence.session_fk);
             todaySessions.push({
@@ -59,8 +61,12 @@ export default function Home() {
     const sessionTimeStr = formatSessionTime(data.sessionOccurrence.start_time);
     const currentTimeStr = formatCurrentTime(currentTime.toISOString());
 
+    const sessionTime = new Date(`2000-01-01T${sessionTimeStr}`);
+    const currentTimeObj = new Date(`2000-01-01T${currentTimeStr}`);
+    const timeDifference = (sessionTime.getTime() - currentTimeObj.getTime()) / (1000 * 60);
+
     if (data.sessionDetail.platform === 'meet') {
-      if (sessionTimeStr <= currentTimeStr) {
+      if (timeDifference <= 5) {
         return (
           <Link href={`https://${data.sessionDetail.platform_link}`} target="_blank">
             <PrimaryButton
