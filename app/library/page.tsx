@@ -51,7 +51,7 @@ const Page: React.FC = () => {
       {selectedLibrary === 'Content' && (
         <div className="bg-white h-72">
           <div onClick={() => handleLibraryChange('NEET Content')} className="pt-4">
-            <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6">
+            <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6 cursor-pointer">
               <div className="flex items-center">
                 <Image src={StethoscopeIcon} alt="Stethoscope Icon" className="w-10 h-10" />
                 <div className="flex flex-col ml-4 ">
@@ -63,7 +63,7 @@ const Page: React.FC = () => {
 
           </div>
           <div onClick={() => handleLibraryChange('JEE Content')}>
-            <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6">
+            <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6 cursor-pointer">
               <div className="flex flex-row items-center">
                 <Image src={BlueprintIcon} alt="Blueprint Icon" className="w-10 h-10" />
                 <div className="flex flex-col ml-4 ">
