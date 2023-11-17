@@ -34,10 +34,10 @@ export const getGrades = async (number: number): Promise<Grade[]> => {
   }
 };
 
-export const getChapters = async (subjectId?: number, gradeId?: number, limit?: number, offset?: number, id?: number): Promise<Chapter[]> => {
+export const getChapters = async (subjectId?: number, gradeId?: number, id?: number): Promise<Chapter[]> => {
   try {
     const response = await axios.get(`${url}/chapter`, {
-      params: { id: id, subject_id: subjectId, grade_id: gradeId, limit, offset },
+      params: { id: id, subject_id: subjectId, grade_id: gradeId },
       headers: {
         'Authorization': `Bearer ${bearerToken}`
       }
@@ -49,11 +49,11 @@ export const getChapters = async (subjectId?: number, gradeId?: number, limit?: 
   }
 };
 
-export const getTopics = async (chapterIds: number[], limit: number, offset: number): Promise<Topic[]> => {
+export const getTopics = async (chapterIds: number[]): Promise<Topic[]> => {
   const topicPromises = chapterIds.map(async (chapterId) => {
     try {
       const response = await axios.get(`${url}/topic`, {
-        params: { chapter_id: chapterId, limit, offset },
+        params: { chapter_id: chapterId },
         headers: {
           'Authorization': `Bearer ${bearerToken}`
         }
