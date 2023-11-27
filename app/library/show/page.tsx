@@ -24,11 +24,10 @@ const ContentLibrary = () => {
     const [resources, setResources] = useState<Resource[]>([]);
     const [expandedChapters, setExpandedChapters] = useState<Record<number, boolean>>({});
     const [page, setPage] = useState(1);
-    const [selectedGrade, setSelectedGrade] = useState(9);
+    const [selectedGrade, setSelectedGrade] = useState(11);
     const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
     const [chapterList, setChapterList] = useState<Chapter[]>([]);
-    const limit = 4;
-    const gradeOptions = [9, 10, 11, 12];
+    const gradeOptions = [11, 12];
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isLoading, setIsLoading] = useState(true);
@@ -50,13 +49,11 @@ const ContentLibrary = () => {
             if (subjectData.length > 0) {
                 const subjectId = subjectData[0].id;
                 const gradeId = gradeData[0].id;
-                const offset = (page - 1) * limit;
 
-                const finalOffset = offset >= 0 ? offset : 0;
                 await fetchChapters(subjectId, gradeId);
                 const chapterData = selectedChapter
-                    ? await getChapters(subjectId, gradeId, limit, finalOffset, selectedChapter)
-                    : await getChapters(subjectId, gradeId, limit, finalOffset);
+                    ? await getChapters(subjectId, gradeId, selectedChapter)
+                    : await getChapters(subjectId, gradeId);
 
                 if (chapterData.length > 0) {
                     setChapters(chapterData);
@@ -90,7 +87,7 @@ const ContentLibrary = () => {
 
     const handleChapterClick = async (chapterId: number) => {
         try {
-            const topicData = await getTopics([chapterId], limit, 0);
+            const topicData = await getTopics([chapterId]);
             setTopics(topicData);
             const topicIds = topicData.map((topic) => topic.id);
             const resourceData = await getResourcesWithSource(topicIds);
@@ -108,20 +105,6 @@ const ContentLibrary = () => {
 
         if (!expandedChapters[chapterId]) {
             await handleChapterClick(chapterId);
-        }
-    };
-
-    const handleNextPage = () => {
-        const nextPage = page + 1;
-        setPage(nextPage);
-        handleTabClick(activeTab);
-    };
-
-    const handlePreviousPage = () => {
-        const previousPage = page - 1;
-        if (previousPage >= 1) {
-            setPage(previousPage);
-            handleTabClick(activeTab);
         }
     };
 
@@ -232,10 +215,6 @@ const ContentLibrary = () => {
                                 )}
                             </div>
                         ))}
-                        <div className="flex justify-between rounded-lg mt-8 px-4">
-                            <PrimaryButton onClick={handlePreviousPage} className="bg-heading text-primary">Previous</PrimaryButton>
-                            <PrimaryButton onClick={handleNextPage} className="bg-heading text-primary">Next</PrimaryButton>
-                        </div>
                         <BottomNavigationBar />
                     </div>
                 )}
