@@ -149,7 +149,7 @@ export default function Home() {
                 ))}
               </div>) : (
               <p className={`${commonTextClass}`}>
-                Good job! There is no more pending live classes today.
+                Good Job! There are no more pending live classes today.
               </p>
             )}
           </div>
@@ -181,7 +181,7 @@ export default function Home() {
                 ))}
               </div>) : (
               <p className={commonTextClass}>
-                Good job! There is no more pending test today.
+                Good Job! There are no more pending tests today.
               </p>
             )}
           </div>
