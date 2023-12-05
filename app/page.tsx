@@ -19,6 +19,7 @@ export default function Home() {
   const baseUrl = process.env.NEXT_PUBLIC_AF_QUIZ_URL;
   const apiKey = process.env.NEXT_PUBLIC_AF_QUIZ_API_KEY;
   const userID = process.env.NEXT_PUBLIC_AF_QUIZ_USER_ID;
+  const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8"
 
   const fetchSessionOccurrencesAndDetails = async () => {
     try {
@@ -127,10 +128,10 @@ export default function Home() {
                 {liveClasses.map((data, index) => (
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
-                      <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
+                      <p className={`${commonTextClass}`}>
                         {formatSessionTime(data.sessionOccurrence.start_time)}
                       </p>
-                      <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
+                      <p className={`${commonTextClass}`}>
                         {formatSessionTime(data.sessionOccurrence.end_time)}
                       </p>
                     </div>
@@ -147,8 +148,8 @@ export default function Home() {
                   </div>
                 ))}
               </div>) : (
-              <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
-                Good job, there is no more pending live classes today.
+              <p className={`${commonTextClass}`}>
+                Good job! There is no more pending live classes today.
               </p>
             )}
           </div>
@@ -159,10 +160,10 @@ export default function Home() {
                 {quizzes.map((data, index) => (
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
-                      <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
+                      <p className={`${commonTextClass}`}>
                         {formatSessionTime(data.sessionOccurrence.start_time)}
                       </p>
-                      <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
+                      <p className={`${commonTextClass}`}>
                         {formatSessionTime(data.sessionOccurrence.end_time)}
                       </p>
                     </div>
@@ -179,8 +180,8 @@ export default function Home() {
                   </div>
                 ))}
               </div>) : (
-              <p className="text-gray-700 text-sm md:text-base mx-6 md:mx-8">
-                Good job, there is no more pending test today.
+              <p className={commonTextClass}>
+                Good job! There is no more pending test today.
               </p>
             )}
           </div>
