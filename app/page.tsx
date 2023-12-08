@@ -19,7 +19,8 @@ export default function Home() {
   const baseUrl = process.env.NEXT_PUBLIC_AF_QUIZ_URL;
   const apiKey = process.env.NEXT_PUBLIC_AF_QUIZ_API_KEY;
   const userID = process.env.NEXT_PUBLIC_AF_QUIZ_USER_ID;
-  const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8"
+  const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
+  const infoMessageClass = "flex items-center justify-center text-center py-12";
 
   const fetchSessionOccurrencesAndDetails = async () => {
     try {
@@ -148,7 +149,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>) : (
-              <p className="flex items-center justify-center text-center py-12">
+              <p className={infoMessageClass}>
                 Good Job! There are no more pending live classes today.
               </p>
             )}
@@ -180,7 +181,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>) : (
-              <p className="flex items-center justify-center text-center py-12">
+              <p className={infoMessageClass}>
                 Good Job! There are no more pending tests today.
               </p>
             )}
