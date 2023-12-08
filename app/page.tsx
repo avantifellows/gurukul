@@ -148,7 +148,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>) : (
-              <p className={`${commonTextClass}`}>
+              <p className="flex items-center justify-center text-center py-12">
                 Good Job! There are no more pending live classes today.
               </p>
             )}
@@ -180,7 +180,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>) : (
-              <p className={commonTextClass}>
+              <p className="flex items-center justify-center text-center py-12">
                 Good Job! There are no more pending tests today.
               </p>
             )}
