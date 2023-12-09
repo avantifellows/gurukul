@@ -9,7 +9,7 @@ export const api = {
       }
     },
     reports: {
-      baseUrl: process.env.NEXT_PUBLIC_AF_REPORTS_URL || '',
+      baseUrl: process.env.AF_REPORTS_URL || '',
       student_reports: '/student_reports/',
     }
 }

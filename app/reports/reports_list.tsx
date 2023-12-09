@@ -1,28 +1,8 @@
-import { api } from "@/services/url";
 import Link from "next/link";
 import { Report } from "../types";
-import axios from "axios";
 import { useState, useEffect } from "react";
 import Loading from "../loading";
-
-export async function getData() {
-    const apiKey = process.env.NEXT_PUBLIC_AF_REPORTS_DB_API_KEY;
-    // Temporary till we implement tokens in portal
-    const studentId = process.env.NEXT_PUBLIC_STUDENT_ID;
-    const url = `${api.reports.baseUrl}${api.reports.student_reports}${studentId}?format=json`;
-
-    try {
-        const responseData = await axios.get(url, {
-            headers: {
-                accept: "application/json",
-                Authorization: `Bearer ${apiKey}`,
-            },
-        });
-        return responseData.data;
-    } catch (error) {
-        throw error;
-    }
-}
+import { getData } from "./getReports";
 
 export default function ReportsList() {
     const [responseData, setResponseData] = useState<{ reports: Report[] } | null>(null);
