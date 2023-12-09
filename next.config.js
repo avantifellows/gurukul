@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
-// const nextConfig = {};
+const nextConfig = {
+    experimental: {
+        serverActions: true,
+    },
+};
 
 module.exports = {
     async redirects() {
@@ -11,7 +15,6 @@ module.exports = {
             }
         ]
     }
-
 }
 
-// module.exports = nextConfig;
+module.exports = nextConfig;

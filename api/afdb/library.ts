@@ -1,8 +1,10 @@
+"use server"
+
 import axios from 'axios';
 import { Subject, Grade, Chapter, Resource, Topic } from '../../app/types'
 
-const url = process.env.NEXT_PUBLIC_AF_DB_SERVICE_URL;
-const bearerToken = process.env.NEXT_PUBLIC_AF_DB_SERVICE_BEARER_TOKEN;
+const url = process.env.AF_DB_SERVICE_URL;
+const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN;
 
 export const getSubjects = async (subjectName: string): Promise<Subject[]> => {
   try {
