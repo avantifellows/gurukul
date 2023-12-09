@@ -3,9 +3,7 @@ const nextConfig = {
     experimental: {
         serverActions: true,
     },
-};
 
-module.exports = {
     async redirects() {
         return [
             {
@@ -13,8 +11,8 @@ module.exports = {
                 destination: '/library',
                 permanent: false,
             }
-        ]
+        ];
     }
-}
+};
 
 module.exports = nextConfig;
