@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Report } from "../types";
 import { useState, useEffect } from "react";
 import Loading from "../loading";
-import { getData } from "./getReports";
+import { getReports } from "@/api/reporting/reports";
 
 export default function ReportsList() {
     const [responseData, setResponseData] = useState<{ reports: Report[] } | null>(null);
@@ -10,7 +10,7 @@ export default function ReportsList() {
     useEffect(() => {
         async function fetchReportsData() {
             try {
-                const data = await getData();
+                const data = await getReports();
                 setResponseData(data);
             } catch (error) {
                 throw error;
@@ -36,6 +36,5 @@ export default function ReportsList() {
                 </Link>
             ))}
         </div>
-
     );
 }
