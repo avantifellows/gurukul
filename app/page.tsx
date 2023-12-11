@@ -17,7 +17,6 @@ export default function Home() {
   const [liveClasses, setLiveClasses] = useState<LiveClasses[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [quizzes, setQuizzes] = useState<LiveClasses[]>([]);
-  const [quizLink, setQuizLink] = useState<string | null>(null);
   const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4";
 
@@ -53,21 +52,6 @@ export default function Home() {
       setLiveClasses(liveClassesToday);
       setQuizzes(quizzesToday);
 
-      try {
-        const quizLinks = await Promise.all(
-          quizzesToday.map(async (quizData) => {
-            return {
-              link: await generateQuizLink(quizData.sessionDetail.platform_link),
-            };
-          })
-        );
-
-        quizLinks.forEach(({ link }) => {
-          setQuizLink(link);
-        });
-      } catch (error) {
-        console.error("Error fetching quiz links:", error);
-      }
     } catch (error) {
       console.error("Error in fetching Live Classes:", error);
     }
@@ -99,14 +83,19 @@ export default function Home() {
         );
       }
     } else if (data.sessionDetail.platform === 'quiz') {
-      if (quizLink) {
-        return (
-          <Link href={quizLink} target="_blank">
-            <PrimaryButton
-              className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
-          </Link>
-        );
-      }
+      generateQuizLink(data.sessionDetail.platform_link)
+        .then((quizLink) => {
+          return (
+            <Link href={quizLink} target="_blank">
+              <PrimaryButton
+                className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
+            </Link>
+          );
+        })
+        .catch((error) => {
+          console.error("Error generating quiz link:", error);
+          return null;
+        });
     }
     return null;
   }
