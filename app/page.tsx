@@ -51,7 +51,6 @@ export default function Home() {
 
       setLiveClasses(liveClassesToday);
       setQuizzes(quizzesToday);
-
     } catch (error) {
       console.error("Error in fetching Live Classes:", error);
     }
