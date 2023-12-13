@@ -10,16 +10,15 @@ import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
 import { isSameDay, formatCurrentTime, formatSessionTime } from "@/utils/dateUtils";
+import { generateQuizLink } from "@/utils/quizUtils";
 
 export default function Home() {
   const { loggedIn, userId } = useAuth();
   const [liveClasses, setLiveClasses] = useState<LiveClasses[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [quizzes, setQuizzes] = useState<LiveClasses[]>([]);
-  const baseUrl = process.env.NEXT_PUBLIC_AF_QUIZ_URL;
-  const apiKey = process.env.NEXT_PUBLIC_AF_QUIZ_API_KEY;
-  const userID = process.env.NEXT_PUBLIC_AF_QUIZ_USER_ID;
-  const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8"
+  const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
+  const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4";
 
   const fetchSessionOccurrencesAndDetails = async () => {
     try {
@@ -83,12 +82,19 @@ export default function Home() {
         );
       }
     } else if (data.sessionDetail.platform === 'quiz') {
-      return (
-        <Link href={`${baseUrl}${data.sessionDetail.platform_link}?apiKey=${apiKey}&userId=${userID}`} target="_blank">
-          <PrimaryButton
-            className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
-        </Link>
-      );
+      generateQuizLink(data.sessionDetail.platform_link)
+        .then((quizLink) => {
+          return (
+            <Link href={quizLink} target="_blank">
+              <PrimaryButton
+                className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
+            </Link>
+          );
+        })
+        .catch((error) => {
+          console.error("Error generating quiz link:", error);
+          return null;
+        });
     }
     return null;
   }
@@ -108,7 +114,6 @@ export default function Home() {
 
     fetchData();
   }, []);
-
 
   return (
     <>
@@ -148,7 +153,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>) : (
-              <p className={`${commonTextClass}`}>
+              <p className={infoMessageClass}>
                 Good Job! There are no more pending live classes today.
               </p>
             )}
@@ -180,7 +185,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>) : (
-              <p className={commonTextClass}>
+              <p className={`${infoMessageClass} pb-40`}>
                 Good Job! There are no more pending tests today.
               </p>
             )}

@@ -24,7 +24,7 @@ const BottomNavigationBar = () => {
         )}
         Library
       </NavLink>
-      <NavLink href="/" active={isActive('/')}>
+      <NavLink href="/library" active={isActive('/')}>
         <Image src={AvantiLogo} alt="Avanti Logo" className="w-12 h-12 absolute bottom-10 md:bottom-14 md:w-16 md:h-16 border-2 rounded-full" />
         <span className="pt-8">Home</span>
       </NavLink>

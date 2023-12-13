@@ -1,28 +1,8 @@
-import { api } from "@/services/url";
 import Link from "next/link";
 import { Report } from "../types";
-import axios from "axios";
 import { useState, useEffect } from "react";
 import Loading from "../loading";
-
-export async function getData() {
-    const apiKey = process.env.NEXT_PUBLIC_AF_REPORTS_DB_API_KEY;
-    // Temporary till we implement tokens in portal
-    const studentId = process.env.NEXT_PUBLIC_STUDENT_ID;
-    const url = `${api.reports.baseUrl}${api.reports.student_reports}${studentId}?format=json`;
-
-    try {
-        const responseData = await axios.get(url, {
-            headers: {
-                accept: "application/json",
-                Authorization: `Bearer ${apiKey}`,
-            },
-        });
-        return responseData.data;
-    } catch (error) {
-        throw error;
-    }
-}
+import { getReports } from "@/api/reporting/reports";
 
 export default function ReportsList() {
     const [responseData, setResponseData] = useState<{ reports: Report[] } | null>(null);
@@ -30,7 +10,7 @@ export default function ReportsList() {
     useEffect(() => {
         async function fetchReportsData() {
             try {
-                const data = await getData();
+                const data = await getReports();
                 setResponseData(data);
             } catch (error) {
                 throw error;
@@ -56,6 +36,5 @@ export default function ReportsList() {
                 </Link>
             ))}
         </div>
-
     );
 }
