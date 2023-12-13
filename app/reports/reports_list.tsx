@@ -3,14 +3,15 @@ import { Report } from "../types";
 import { useState, useEffect } from "react";
 import Loading from "../loading";
 import { getReports } from "@/api/reporting/reports";
+import { ReportsListProps } from "../types";
 
-export default function ReportsList() {
+export default function ReportsList({ userId }: ReportsListProps) {
     const [responseData, setResponseData] = useState<{ reports: Report[] } | null>(null);
 
     useEffect(() => {
         async function fetchReportsData() {
             try {
-                const data = await getReports();
+                const data = await getReports(userId);
                 setResponseData(data);
             } catch (error) {
                 throw error;
@@ -18,7 +19,7 @@ export default function ReportsList() {
         }
 
         fetchReportsData();
-    }, []);
+    }, [userId]);
 
     if (!responseData) {
         return <Loading />;

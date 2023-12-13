@@ -87,4 +87,6 @@ export interface LiveClasses {
   sessionOccurrence: SessionOccurrence;
   sessionDetail: Session;
 }
-
+export interface ReportsListProps {
+  userId: string;
+}
