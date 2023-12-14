@@ -32,6 +32,11 @@ export interface PrimaryButton {
   className?: string;
 }
 
+export interface Curriculum {
+  id: number;
+  name: string;
+}
+
 export interface Subject {
   id: number;
   name: string;
