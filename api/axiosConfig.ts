@@ -1,10 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
+import { AxiosAdditionalHeaders } from '@/app/types';
 
-interface AdditionalHeaders {
-    [key: string]: string;
-}
-
-const getAxiosConfig = (bearerToken: string, additionalHeaders?: AdditionalHeaders): AxiosRequestConfig => {
+const getAxiosConfig = (bearerToken: string, additionalHeaders?: AxiosAdditionalHeaders): AxiosRequestConfig => {
     const defaultHeaders = {
         'Authorization': `Bearer ${bearerToken}`,
         'Accept': 'application/json',

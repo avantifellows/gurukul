@@ -93,3 +93,6 @@ export interface LiveClasses {
   sessionDetail: Session;
 }
 
+export interface AxiosAdditionalHeaders {
+  [key: string]: string;
+}
