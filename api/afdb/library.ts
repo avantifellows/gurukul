@@ -2,11 +2,10 @@
 
 import axios from 'axios';
 import { Curriculum, Subject, Grade, Chapter, Resource, Topic } from '../../app/types'
+import getAxiosConfig from '../axiosConfig';
 
 const url = process.env.AF_DB_SERVICE_URL;
 const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
-
-import getAxiosConfig from '../axiosConfig';
 
 export const getCurriculum = async (curriculumName: string): Promise<Curriculum[]> => {
   try {
