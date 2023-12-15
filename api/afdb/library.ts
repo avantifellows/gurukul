@@ -1,22 +1,18 @@
 "use server"
 
-import axios, { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import { Curriculum, Subject, Grade, Chapter, Resource, Topic } from '../../app/types'
 
 const url = process.env.AF_DB_SERVICE_URL;
-const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN;
+const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
 
-const getAxiosConfig = (): AxiosRequestConfig => ({
-  headers: {
-    'Authorization': `Bearer ${bearerToken}`,
-  },
-});
+import getAxiosConfig from '../axiosConfig';
 
 export const getCurriculum = async (curriculumName: string): Promise<Curriculum[]> => {
   try {
     const response = await axios.get(`${url}/curriculum`, {
       params: { name: curriculumName },
-      ...getAxiosConfig(),
+      ...getAxiosConfig(bearerToken),
     });
     return response.data;
   } catch (error) {
@@ -30,7 +26,7 @@ export const getSubjects = async (subjectName: string): Promise<Subject[]> => {
   try {
     const response = await axios.get(`${url}/subject`, {
       params: { name: subjectName },
-      ...getAxiosConfig(),
+      ...getAxiosConfig(bearerToken),
     });
     return response.data;
   } catch (error) {
@@ -43,7 +39,7 @@ export const getGrades = async (number: number): Promise<Grade[]> => {
   try {
     const response = await axios.get(`${url}/grade`, {
       params: { number: number },
-      ...getAxiosConfig(),
+      ...getAxiosConfig(bearerToken),
     });
     return response.data;
   } catch (error) {
@@ -56,7 +52,7 @@ export const getChapters = async (subjectId?: number, gradeId?: number, id?: num
   try {
     const response = await axios.get(`${url}/chapter`, {
       params: { id: id, subject_id: subjectId, grade_id: gradeId, curriculum_id: curriculumId },
-      ...getAxiosConfig(),
+      ...getAxiosConfig(bearerToken),
     });
     return response.data;
   } catch (error) {
@@ -70,7 +66,7 @@ export const getTopics = async (chapterIds: number[]): Promise<Topic[]> => {
     try {
       const response = await axios.get(`${url}/topic`, {
         params: { chapter_id: chapterId },
-        ...getAxiosConfig(),
+        ...getAxiosConfig(bearerToken),
       });
       return response.data || [];
     } catch (error) {
@@ -87,7 +83,7 @@ export const getSource = async (sourceId: number) => {
   try {
     const response = await axios.get(`${url}/source`, {
       params: { id: sourceId },
-      ...getAxiosConfig(),
+      ...getAxiosConfig(bearerToken),
     });
 
     if (response.data) {
@@ -104,7 +100,7 @@ export const getResourcesWithSource = async (topicIds: number[]): Promise<Resour
     try {
       const response = await axios.get(`${url}/resource`, {
         params: { topic_id: topicId },
-        ...getAxiosConfig(),
+        ...getAxiosConfig(bearerToken),
       });
 
       if (response.data) {

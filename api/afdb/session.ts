@@ -1,16 +1,15 @@
 "use server"
 
 import axios from 'axios';
+import getAxiosConfig from '../axiosConfig';
 
 const url = process.env.AF_DB_SERVICE_URL;
-const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN;
+const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
 
 export const getSessionOccurrences = async () => {
   try {
     const response = await axios.get(`${url}/session-occurrence`, {
-      headers: {
-        'Authorization': `Bearer ${bearerToken}`
-      }
+      ...getAxiosConfig(bearerToken),
     });
     return response.data;
   } catch (error) {
@@ -22,9 +21,7 @@ export const getSessionOccurrences = async () => {
 export const getSessions = async (sessionId: number) => {
   try {
     const response = await axios.get(`${url}/session/${sessionId}`, {
-      headers: {
-        'Authorization': `Bearer ${bearerToken}`
-      }
+      ...getAxiosConfig(bearerToken),
     });
     return response.data;
   } catch (error) {
