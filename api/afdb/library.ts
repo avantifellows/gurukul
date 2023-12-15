@@ -20,7 +20,6 @@ export const getCurriculum = async (curriculumName: string): Promise<Curriculum[
   }
 };
 
-
 export const getSubjects = async (subjectName: string): Promise<Subject[]> => {
   try {
     const response = await axios.get(`${url}/subject`, {
