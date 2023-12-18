@@ -4,15 +4,15 @@ const nextConfig = {
         serverActions: true,
     },
 
-    async redirects() {
-        return [
-            {
-                source: '/',
-                destination: '/library',
-                permanent: false,
-            }
-        ];
-    }
+    // async redirects() {
+    //     return [
+    //         {
+    //             source: '/',
+    //             destination: '/library',
+    //             permanent: false,
+    //         }
+    //     ];
+    // }
 };
 
 module.exports = nextConfig;
