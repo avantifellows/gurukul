@@ -185,10 +185,15 @@ export default function Home() {
                   </div>
                 ))}
               </div>) : (
-              <p className={`${infoMessageClass} pb-40`}>
+              <p className={`${infoMessageClass}`}>
                 Good Job! There are no more pending tests today.
               </p>
             )}
+          </div>
+          <div className="text-blue-500 underline pb-40 bg-heading text-center px-4">
+            <Link href="https://docs.google.com/spreadsheets/d/1zIjYf4KUXkAHLiuWdtHp-l-5xa96obBtbQU0UvuOy7w/edit?usp=sharing" target="_blank">
+              Click on the link to see all upcoming Tests
+            </Link>
           </div>
           <BottomNavigationBar />
         </main>)}

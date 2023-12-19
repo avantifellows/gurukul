@@ -6,7 +6,7 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
-import { getSubjects, getChapters, getResourcesWithSource, getTopics, getGrades } from '../../../api/afdb/library';
+import { getCurriculum, getSubjects, getChapters, getResourcesWithSource, getTopics, getGrades } from '../../../api/afdb/library';
 import { Chapter, Resource, Topic } from '../../types';
 import { useEffect } from 'react';
 import Link from 'next/link';
@@ -16,6 +16,7 @@ import PlayIcon from "../../../assets/play.png";
 import BackIcon from "../../../assets/icon.png";
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
+import { CURRICULUM_NAMES, COURSES } from '@/constants/config';
 
 const ContentLibrary = () => {
     const [activeTab, setActiveTab] = useState('Physics');
@@ -44,16 +45,23 @@ const ContentLibrary = () => {
 
         try {
             const actualTabName = tabName.toLowerCase();
+            const curriculumName =
+                selectedCourse === COURSES.JEE ? CURRICULUM_NAMES.ALC :
+                    (selectedCourse === COURSES.NEET && tabName === 'Biology') ? CURRICULUM_NAMES.SANKALP :
+                        (selectedCourse === COURSES.NEET && (tabName === 'Physics' || tabName === 'Chemistry')) ? CURRICULUM_NAMES.ALC :
+                            CURRICULUM_NAMES.SANKALP;
+            const curriculumData = await getCurriculum(curriculumName);
+            const curriculumId = curriculumData[0].id;
             const subjectData = await getSubjects(actualTabName);
             const gradeData = await getGrades(selectedGrade);
             if (subjectData.length > 0) {
                 const subjectId = subjectData[0].id;
                 const gradeId = gradeData[0].id;
 
-                await fetchChapters(subjectId, gradeId);
+                await fetchChapters(subjectId, gradeId, curriculumId);
                 const chapterData = selectedChapter
-                    ? await getChapters(subjectId, gradeId, selectedChapter)
-                    : await getChapters(subjectId, gradeId);
+                    ? await getChapters(subjectId, gradeId, selectedChapter, curriculumId)
+                    : await getChapters(subjectId, gradeId, undefined, curriculumId);
 
                 if (chapterData.length > 0) {
                     setChapters(chapterData);
@@ -117,8 +125,8 @@ const ContentLibrary = () => {
         setSelectedChapter(null)
     };
 
-    const fetchChapters = async (subjectId: number, gradeId: number) => {
-        const chapterData = await getChapters(subjectId, gradeId);
+    const fetchChapters = async (subjectId: number, gradeId: number, curriculumId: number) => {
+        const chapterData = await getChapters(subjectId, gradeId, undefined, curriculumId);
         setChapterList(chapterData);
     };
 
