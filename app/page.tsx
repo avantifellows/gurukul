@@ -117,82 +117,87 @@ export default function Home() {
 
   return (
     <>
-      {/* {loggedIn ? ( */}
-      {isLoading ? (
-        <div className="max-w-xl mx-auto">
-          <TopBar />
-          <Loading />
-        </div>
+      {loggedIn ? (
+        isLoading ? (
+          <div className="max-w-xl mx-auto">
+            <TopBar />
+            <Loading />
+          </div>
+        ) : (
+          <main className="min-h-screen max-w-xl mx-auto md:mx-auto bg-white">
+            <TopBar />
+            <div className="bg-heading">
+              <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Live Classes</h1>
+              {liveClasses.length > 0 ? (
+                <div className="grid grid-cols-1 gap-4 pb-16">
+                  {liveClasses.map((data, index) => (
+                    <div key={index} className="flex mt-4 items-center" >
+                      <div>
+                        <p className={`${commonTextClass}`}>
+                          {formatSessionTime(data.sessionOccurrence.start_time)}
+                        </p>
+                        <p className={`${commonTextClass}`}>
+                          {formatSessionTime(data.sessionOccurrence.end_time)}
+                        </p>
+                      </div>
+                      <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
+                        <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
+                        <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
+                          <span className="font-normal pr-4">Subject:</span> {data.sessionDetail.meta_data.subject ?? "Science"}
+                          <div className="text-sm md:text-base font-semibold ">
+                            <span className="font-normal pr-7">Batch:</span> {data.sessionDetail.meta_data.batch ?? "Master Batch"}
+                          </div>
+                        </div>
+                        {renderButton(data)}
+                      </div>
+                    </div>
+                  ))}
+                </div>) : (
+                <p className={infoMessageClass}>
+                  Good Job! There are no more pending live classes today.
+                </p>
+              )}
+            </div>
+            <div className="bg-heading">
+              <h1 className="text-primary ml-4 font-semibold text-xl">Tests</h1>
+              {quizzes.length > 0 ? (
+                <div className="grid grid-cols-1 gap-4 pb-40">
+                  {quizzes.map((data, index) => (
+                    <div key={index} className="flex mt-4 items-center" >
+                      <div>
+                        <p className={`${commonTextClass}`}>
+                          {formatSessionTime(data.sessionOccurrence.start_time)}
+                        </p>
+                        <p className={`${commonTextClass}`}>
+                          {formatSessionTime(data.sessionOccurrence.end_time)}
+                        </p>
+                      </div>
+                      <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
+                        <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0  rounded-s-md`}></div>
+                        <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
+                          <span className="font-normal pr-4">Subject:</span> {data.sessionDetail.meta_data.stream}
+                          <div className="text-sm md:text-base font-semibold ">
+                            <span className="font-normal pr-9">Type:</span> {data.sessionDetail.meta_data.test_type}
+                          </div>
+                        </div>
+                        {renderButton(data)}
+                      </div>
+                    </div>
+                  ))}
+                </div>) : (
+                <p className={`${infoMessageClass}`}>
+                  Good Job! There are no more pending tests today.
+                </p>
+              )}
+            </div>
+            <div className="text-blue-500 underline pb-40 bg-heading text-center px-4">
+              <Link href="https://docs.google.com/spreadsheets/d/1zIjYf4KUXkAHLiuWdtHp-l-5xa96obBtbQU0UvuOy7w/edit?usp=sharing" target="_blank">
+                Click on the link to see all upcoming Tests
+              </Link>
+            </div>
+            <BottomNavigationBar />
+          </main>)
       ) : (
-        <main className="min-h-screen max-w-xl mx-auto md:mx-auto bg-white">
-          <TopBar />
-          <div className="bg-heading">
-            <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Live Classes</h1>
-            {liveClasses.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4 pb-16">
-                {liveClasses.map((data, index) => (
-                  <div key={index} className="flex mt-4 items-center" >
-                    <div>
-                      <p className={`${commonTextClass}`}>
-                        {formatSessionTime(data.sessionOccurrence.start_time)}
-                      </p>
-                      <p className={`${commonTextClass}`}>
-                        {formatSessionTime(data.sessionOccurrence.end_time)}
-                      </p>
-                    </div>
-                    <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
-                      <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
-                      <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
-                        <span className="font-normal pr-4">Subject:</span> {data.sessionDetail.meta_data.subject ?? "Science"}
-                        <div className="text-sm md:text-base font-semibold ">
-                          <span className="font-normal pr-7">Batch:</span> {data.sessionDetail.meta_data.batch ?? "Master Batch"}
-                        </div>
-                      </div>
-                      {renderButton(data)}
-                    </div>
-                  </div>
-                ))}
-              </div>) : (
-              <p className={infoMessageClass}>
-                Good Job! There are no more pending live classes today.
-              </p>
-            )}
-          </div>
-          <div className="bg-heading">
-            <h1 className="text-primary ml-4 font-semibold text-xl">Tests</h1>
-            {quizzes.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4 pb-40">
-                {quizzes.map((data, index) => (
-                  <div key={index} className="flex mt-4 items-center" >
-                    <div>
-                      <p className={`${commonTextClass}`}>
-                        {formatSessionTime(data.sessionOccurrence.start_time)}
-                      </p>
-                      <p className={`${commonTextClass}`}>
-                        {formatSessionTime(data.sessionOccurrence.end_time)}
-                      </p>
-                    </div>
-                    <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
-                      <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0  rounded-s-md`}></div>
-                      <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
-                        <span className="font-normal pr-4">Subject:</span> {data.sessionDetail.meta_data.stream}
-                        <div className="text-sm md:text-base font-semibold ">
-                          <span className="font-normal pr-9">Type:</span> {data.sessionDetail.meta_data.test_type}
-                        </div>
-                      </div>
-                      {renderButton(data)}
-                    </div>
-                  </div>
-                ))}
-              </div>) : (
-              <p className={`${infoMessageClass} pb-40`}>
-                Good Job! There are no more pending tests today.
-              </p>
-            )}
-          </div>
-          <BottomNavigationBar />
-        </main>)}
-      {/* ) : (
         <main className="max-w-xl mx-auto bg-white">
           <TopBar />
           <div className="min-h-screen flex flex-col items-center justify-between p-24">
@@ -200,7 +205,7 @@ export default function Home() {
           </div>
           <BottomNavigationBar />
         </main>
-      )} */}
+      )}
     </>
   );
 }
