@@ -27,7 +27,7 @@ export default function ReportsList({ userId }: ReportsListProps) {
 
     return (
         <div className="grid grid-cols-1 gap-4 pb-40">
-            {responseData.reports ? (
+            {responseData.reports.length > 0 ? (
                 <>
                     {responseData.reports.map((report: Report, index: number) => (
                         <Link href={report.report_link} target="_blank" key={index} className="bg-card rounded-lg shadow-lg h-24 mx-4 relative flex items-center my-1 md:my-2">
@@ -40,8 +40,8 @@ export default function ReportsList({ userId }: ReportsListProps) {
                     ))}
                 </>
             ) : (
-                <div className="min-h-screen bg-card flex items-center justify-center text-center mx-4">
-                    Sorry! There are no reports avaiable
+                <div className="mt-20 flex items-center justify-center text-center mx-4">
+                    Sorry! There are no reports avaiable.
                 </div>
             )}
         </div>
