@@ -115,7 +115,7 @@ export default function Home() {
     if (loggedIn) {
       fetchData();
     }
-  }, []);
+  }, [loggedIn]);
 
   return (
     <>
