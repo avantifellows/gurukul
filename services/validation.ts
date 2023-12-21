@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { getCookie, setCookie } from 'cookies-next';
 import { api } from './url';
+import getAxiosConfig from '@/api/axiosConfig';
 
 export async function verifyToken() {
     const accessToken = getCookie('access_token');
@@ -14,19 +15,15 @@ export async function verifyToken() {
 
     try {
         const response = await axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
+            ...getAxiosConfig(accessToken),
         });
 
         return { isValid: true, data: response.data };
     } catch (error: any) {
         if (error.response.data.detail === "Signature has expired" && refreshToken) {
             try {
-                const refreshResponse = await axios.post(refreshUrl, {}, {
-                    headers: {
-                        Authorization: `Bearer ${refreshToken}`,
-                    },
+                const refreshResponse = await axios.post(refreshUrl, {
+                    ...getAxiosConfig(refreshToken),
                 });
 
                 setCookie('access_token', refreshResponse.data.access_token);
