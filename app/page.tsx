@@ -82,7 +82,7 @@ export default function Home() {
         );
       }
     } else if (data.sessionDetail.platform === 'quiz') {
-      generateQuizLink(data.sessionDetail.platform_link, userId || '')
+      generateQuizLink(data.sessionDetail.platform_link, userId!)
         .then((quizLink) => {
           return (
             <Link href={quizLink} target="_blank">

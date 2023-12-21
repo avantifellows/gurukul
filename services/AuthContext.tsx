@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setLoggedIn(true);
                     setUserId(result.data.id);
                     const studentName = await getUserName(result.data.id);
-                    setUserName(studentName || '')
+                    setUserName(studentName)
                 } else {
                     setLoggedIn(false);
                     setUserId(null);

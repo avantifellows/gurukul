@@ -5,7 +5,7 @@ import getAxiosConfig from '../axiosConfig';
 
 export async function getUserName(studentId: string): Promise<string> {
     const url = process.env.AF_DB_SERVICE_URL;
-    const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
+    const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN!;
 
     try {
         const response = await axios.get(`${url}/student`, {
