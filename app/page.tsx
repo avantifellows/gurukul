@@ -18,7 +18,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [quizzes, setQuizzes] = useState<LiveClasses[]>([]);
   const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
-  const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4";
+  const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
 
   const fetchSessionOccurrencesAndDetails = async () => {
     try {
@@ -156,7 +156,7 @@ export default function Home() {
                   ))}
                 </div>) : (
                 <p className={infoMessageClass}>
-                  Good Job! There are no more pending live classes today.
+                  There are no more live classes today. You can relax!
                 </p>
               )}
             </div>
@@ -188,14 +188,9 @@ export default function Home() {
                   ))}
                 </div>) : (
                 <p className={`${infoMessageClass}`}>
-                  Good Job! There are no more pending tests today.
+                  There are no more tests today. You can relax!
                 </p>
               )}
-            </div>
-            <div className="text-blue-500 underline pb-40 bg-heading text-center px-4">
-              <Link href="https://docs.google.com/spreadsheets/d/1zIjYf4KUXkAHLiuWdtHp-l-5xa96obBtbQU0UvuOy7w/edit?usp=sharing" target="_blank">
-                Click on the link to see all upcoming Tests
-              </Link>
             </div>
             <BottomNavigationBar />
           </main>)
