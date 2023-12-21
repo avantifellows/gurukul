@@ -3,7 +3,7 @@
 import axios from 'axios';
 import getAxiosConfig from '../axiosConfig';
 
-export async function getUserName(studentId: string): Promise<string> {
+export const getUserName = async (studentId: string): Promise<string | null> => {
     const url = process.env.AF_DB_SERVICE_URL;
     const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN!;
 
@@ -12,6 +12,11 @@ export async function getUserName(studentId: string): Promise<string> {
             params: { student_id: studentId },
             ...getAxiosConfig(bearerToken),
         });
+
+        if (response.data.length === 0) {
+            console.warn(`No user found for student ID: ${studentId}`);
+            return null;
+        }
 
         const firstName = response.data[0].user.first_name;
         const lastName = response.data[0].user.last_name;
