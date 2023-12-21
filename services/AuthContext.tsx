@@ -5,6 +5,7 @@ import { verifyToken } from '@/services/validation';
 import { useRouter } from 'next/navigation';
 import { AuthContextProps } from '../app/types';
 import { api } from '@/services/url';
+import { getUserName } from '@/api/afdb/userName';
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
@@ -29,11 +30,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (result.isValid) {
                     setLoggedIn(true);
                     setUserId(result.data.id);
-                    setUserName(result.data.data.name)
+                    const studentName = await getUserName(result.data.id);
+                    setUserName(studentName || '')
                 } else {
                     setLoggedIn(false);
                     setUserId(null);
-                    // router.push(`${api.portal.frontend.baseUrl}`);
+                    router.push(`${api.portal.frontend.baseUrl}`);
                 }
             } catch (error) {
                 console.error('Error verifying token:', error);

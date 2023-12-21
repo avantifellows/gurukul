@@ -82,7 +82,7 @@ export default function Home() {
         );
       }
     } else if (data.sessionDetail.platform === 'quiz') {
-      generateQuizLink(data.sessionDetail.platform_link)
+      generateQuizLink(data.sessionDetail.platform_link, userId ? userId : '')
         .then((quizLink) => {
           return (
             <Link href={quizLink} target="_blank">
@@ -99,20 +99,22 @@ export default function Home() {
     return null;
   }
 
-  useEffect(() => {
-    async function fetchData() {
-      setIsLoading(true);
+  const fetchData = async () => {
+    setIsLoading(true);
 
-      try {
-        await fetchSessionOccurrencesAndDetails();
-      } catch (error) {
-        console.log("Error:", error)
-      } finally {
-        setIsLoading(false);
-      }
+    try {
+      await fetchSessionOccurrencesAndDetails();
+    } catch (error) {
+      console.log("Error:", error);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    fetchData();
+  useEffect(() => {
+    if (loggedIn) {
+      fetchData();
+    }
   }, []);
 
   return (
