@@ -22,7 +22,7 @@ export async function verifyToken() {
     } catch (error: any) {
         if (error.response.data.detail === "Signature has expired" && refreshToken) {
             try {
-                const refreshResponse = await axios.post(refreshUrl, {
+                const refreshResponse = await axios.post(refreshUrl, {}, {
                     ...getAxiosConfig(refreshToken),
                 });
 
