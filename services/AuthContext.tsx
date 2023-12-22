@@ -3,8 +3,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { verifyToken } from '@/services/validation';
 import { useRouter } from 'next/navigation';
-import { AuthContextProps } from '../app/types';
+import { AuthContextProps, User } from '../app/types';
 import { api } from '@/services/url';
+import { getUserName } from '@/api/afdb/userName';
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
@@ -20,7 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const [loggedIn, setLoggedIn] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
-    const [userName, setUserName] = useState<string | null>(null);
+    const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
         async function checkToken() {
@@ -29,11 +30,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (result.isValid) {
                     setLoggedIn(true);
                     setUserId(result.data.id);
-                    setUserName(result.data.data.name)
+                    const userData = await getUserName(result.data.id);
+                    setUser(userData);
                 } else {
                     setLoggedIn(false);
                     setUserId(null);
-                    // router.push(`${api.portal.frontend.baseUrl}`);
+                    router.push(`${api.portal.frontend.baseUrl}`);
                 }
             } catch (error) {
                 console.error('Error verifying token:', error);
@@ -44,6 +46,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         checkToken();
     }, []);
+
+    const userName = user ? `${user.first_name} ${user.last_name}` : '';
 
     return (
         <AuthContext.Provider value={{ loggedIn, userId, userName }}>

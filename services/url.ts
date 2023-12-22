@@ -5,11 +5,12 @@ export const api = {
       },
       backend: {
         baseUrl: process.env.NEXT_PUBLIC_AF_PORTAL_BACKEND_URL || '',
-        verify: '/verify',
+        verify: '/auth/verify',
+        refreshToken: '/auth/refresh-token'
       }
     },
     reports: {
       baseUrl: process.env.AF_REPORTS_URL || '',
-      student_reports: '/student_reports/',
+      student_reports: '/reports/student_reports/',
     }
 }

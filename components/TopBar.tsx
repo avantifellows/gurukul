@@ -18,7 +18,7 @@ const TopBar = () => {
   };
 
   const pathname = usePathname();
-  const routeName = routeNames[pathname] || <p>Welcome, <br /> Shagun Panday <br /> </p>;
+  const routeName = routeNames[pathname] || <p>Welcome <br /> {userName} </p>;
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);

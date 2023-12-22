@@ -92,7 +92,16 @@ export interface LiveClasses {
   sessionOccurrence: SessionOccurrence;
   sessionDetail: Session;
 }
+export interface ReportsListProps {
+  userId: string;
 
+}
 export interface AxiosAdditionalHeaders {
   [key: string]: string;
+}
+
+export interface User {
+  id: number;
+  first_name: string;
+  last_name: string;
 }
