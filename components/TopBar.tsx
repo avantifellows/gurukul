@@ -27,6 +27,7 @@ const TopBar = () => {
   const handleLogout = () => {
     deleteCookie("access_token");
     deleteCookie("refresh_token");
+    window.location.reload();
   };
 
   return (
