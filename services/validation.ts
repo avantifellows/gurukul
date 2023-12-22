@@ -27,7 +27,7 @@ export async function verifyToken() {
                 });
 
                 setCookie('access_token', refreshResponse.data.access_token);
-
+                window.location.reload();
                 return { isValid: true };
             } catch (refreshError) {
                 return { isValid: false, message: 'Error refreshing token', refreshError };
