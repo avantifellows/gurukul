@@ -2,8 +2,9 @@
 
 import axios from 'axios';
 import getAxiosConfig from '../axiosConfig';
+import { User } from '@/app/types';
 
-export const getUserName = async (studentId: string): Promise<string | null> => {
+export const getUserName = async (studentId: string): Promise<User | null> => {
     const url = process.env.AF_DB_SERVICE_URL;
     const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN!;
 
@@ -18,9 +19,7 @@ export const getUserName = async (studentId: string): Promise<string | null> => 
             return null;
         }
 
-        const firstName = response.data[0].user.first_name;
-        const lastName = response.data[0].user.last_name;
-        return `${firstName} ${lastName}`;
+        return response.data[0].user;
     } catch (error) {
         console.error('Error fetching student data:', error);
         throw error;

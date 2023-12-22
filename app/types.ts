@@ -99,3 +99,9 @@ export interface ReportsListProps {
 export interface AxiosAdditionalHeaders {
   [key: string]: string;
 }
+
+export interface User {
+  id: number;
+  first_name: string;
+  last_name: string;
+}
