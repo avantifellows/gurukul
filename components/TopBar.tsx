@@ -42,7 +42,7 @@ const TopBar = () => {
             onClick={toggleDropdown}
           />
           {isDropdownOpen && (
-            <div className="absolute top-full right-1 bg-white p-2 shadow-md text-black rounded-lg text-base">
+            <div className="absolute top-full right-1 bg-white p-2 shadow-md text-black rounded-lg text-base w-32 grid grid-cols-1 gap-2">
               <button onClick={handleLogout}>Logout</button>
             </div>
           )}
