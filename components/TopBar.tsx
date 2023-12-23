@@ -13,7 +13,7 @@ const TopBar = () => {
   };
 
   const pathname = usePathname();
-  const routeName = routeNames[pathname] || <p>Welcome, <br /> Shagun Panday <br /> </p>;
+  const routeName = routeNames[pathname] || <p>Welcome <br /> {userName} </p>;
 
   return (
     <div className="max-w-xl mx-auto text-white p-4 h-32 justify-between items-center bg-primary">
