@@ -25,8 +25,8 @@ const TopBar = () => {
   };
 
   const handleLogout = () => {
-    deleteCookie("access_token");
-    deleteCookie("refresh_token");
+    deleteCookie("access_token", { path: '/', domain: '.avantifellows.org' });
+    deleteCookie("refresh_token", { path: '/', domain: '.avantifellows.org' });
     window.location.reload();
   };
 
