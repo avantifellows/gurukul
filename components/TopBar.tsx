@@ -27,6 +27,8 @@ const TopBar = () => {
   const handleLogout = () => {
     deleteCookie("access_token", { path: '/', domain: '.avantifellows.org' });
     deleteCookie("refresh_token", { path: '/', domain: '.avantifellows.org' });
+    deleteCookie("access_token", { path: '/', domain: 'staging-gurukul.avantifellows.org' });
+    deleteCookie("refresh_token", { path: '/', domain: 'staging-gurukul.avantifellows.org' });
     window.location.reload();
   };
 
