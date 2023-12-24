@@ -26,7 +26,7 @@ export async function verifyToken() {
                     ...getAxiosConfig(refreshToken),
                 });
 
-                setCookie('access_token', refreshResponse.data.access_token);
+                setCookie('access_token', refreshResponse.data.access_token, { path: '/', domain: '.avantifellows.org' });
                 window.location.reload();
                 return { isValid: true };
             } catch (refreshError) {
