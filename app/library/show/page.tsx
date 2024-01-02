@@ -17,6 +17,7 @@ import BackIcon from "../../../assets/icon.png";
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { CURRICULUM_NAMES, COURSES } from '@/constants/config';
+import { MixpanelTracking } from '@/services/mixpanel';
 
 const ContentLibrary = () => {
     const [activeTab, setActiveTab] = useState('Physics');
@@ -38,6 +39,7 @@ const ContentLibrary = () => {
 
     const handleTabClick = async (tabName: string) => {
         setActiveTab(tabName);
+        MixpanelTracking.getInstance().trackEvent('Selected Tab: ' + tabName);
         if (activeTab != tabName) {
             setPage(1);
             setSelectedChapter(null)
@@ -100,6 +102,7 @@ const ContentLibrary = () => {
             const topicIds = topicData.map((topic) => topic.id);
             const resourceData = await getResourcesWithSource(topicIds);
             setResources(resourceData);
+            MixpanelTracking.getInstance().trackEvent('Selected chapter: ' + chapterId);
         } catch (error) {
             console.error('Error fetching chapter data:', error);
         }
@@ -123,6 +126,7 @@ const ContentLibrary = () => {
     const handleGradeChange = (grade: number) => {
         setSelectedGrade(grade);
         setSelectedChapter(null)
+        MixpanelTracking.getInstance().trackEvent('Selected grade: ' + grade);
     };
 
     const fetchChapters = async (subjectId: number, gradeId: number, curriculumId: number) => {
