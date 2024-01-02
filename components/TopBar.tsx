@@ -7,6 +7,7 @@ import { useAuth } from "@/services/AuthContext";
 import ProfileIcon from '../assets/profile.png';
 import Image from "next/image";
 import { deleteCookie } from "cookies-next";
+import { MixpanelTracking } from "@/services/mixpanel";
 
 const TopBar = () => {
   const { userName } = useAuth();
@@ -28,6 +29,7 @@ const TopBar = () => {
     deleteCookie("access_token", { path: '/', domain: '.avantifellows.org' });
     deleteCookie("refresh_token", { path: '/', domain: '.avantifellows.org' });
     window.location.reload();
+    MixpanelTracking.getInstance().trackEvent("User logged out");
   };
 
   return (
