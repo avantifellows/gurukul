@@ -110,3 +110,9 @@ export interface GroupUser {
   user_id: number;
   group_type_id: number
 }
+
+export interface Student {
+  id: number;
+  student_id: string;
+  user: User;
+}
