@@ -8,6 +8,7 @@ export interface AuthContextProps {
   loggedIn: boolean;
   userId?: string | null;
   userName?: string | null;
+  userDbId?: number | null;
 }
 
 export interface CurrentTimeProps {
@@ -66,15 +67,6 @@ export interface Topic {
   chapter_id: number;
 }
 
-export interface SessionOccurrence {
-  id: number;
-  name: string;
-  session_id: string;
-  session_fk: number;
-  start_time: string;
-  end_time: string;
-}
-
 export interface Session {
   id: number;
   name: string;
@@ -86,12 +78,15 @@ export interface Session {
     stream: string;
     test_type: string;
   };
+  start_time: string;
+  end_time: string;
+  is_active: boolean;
+  repeat_schedule: {
+    type: string;
+    params: Object[];
+  }
 }
 
-export interface LiveClasses {
-  sessionOccurrence: SessionOccurrence;
-  sessionDetail: Session;
-}
 export interface ReportsListProps {
   userId: string;
 
@@ -104,4 +99,9 @@ export interface User {
   id: number;
   first_name: string;
   last_name: string;
+}
+
+export interface GroupSession {
+  session_id?: number;
+  group_type_id?: number
 }
