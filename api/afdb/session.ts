@@ -8,7 +8,8 @@ const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
 
 export const getGroupUser = async (userDbId: number) => {
   try {
-    const response = await axios.get(`${url}/group-user?user_id=${userDbId}`, {
+    const response = await axios.get(`${url}/group-user`, {
+      params: { user_id: userDbId },
       ...getAxiosConfig(bearerToken),
     });
     return response.data;
@@ -20,7 +21,8 @@ export const getGroupUser = async (userDbId: number) => {
 
 export const getGroupSessions = async (groupTypeId: number) => {
   try {
-    const response = await axios.get(`${url}/group-session?group_type_id=${groupTypeId}`, {
+    const response = await axios.get(`${url}/group-session`, {
+      params: { group_type_id: groupTypeId },
       ...getAxiosConfig(bearerToken),
     });
     return response.data;
