@@ -1,6 +1,5 @@
 "use server"
 
-import axios from 'axios';
 import getFetchConfig from '../fetchConfig';
 
 const url = process.env.AF_DB_SERVICE_URL;

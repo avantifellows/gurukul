@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         checkToken();
     }, []);
 
-    const userName = user ? `${user.first_name} ${user.last_name}` : '';
+    const userName = `${user?.first_name || ''} ${user?.last_name || ''}`.trim();
     const userDbId = user ? user.id : null;
 
     return (

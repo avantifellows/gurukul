@@ -1,20 +1,21 @@
 "use server"
 
 import { api } from "@/services/url";
-import axios from "axios";
+import getFetchConfig from "../fetchConfig";
 
 export async function getReports(userId: string) {
     const apiKey = process.env.AF_REPORTS_DB_API_KEY;
     const url = `${api.reports.baseUrl}${api.reports.student_reports}${userId}?format=json`;
 
     try {
-        const responseData = await axios.get(url, {
-            headers: {
-                accept: "application/json",
-                Authorization: `Bearer ${apiKey}`,
-            },
-        });
-        return responseData.data;
+        const response = await fetch(url, getFetchConfig(apiKey!));
+
+        if (!response.ok) {
+            throw new Error(`Error fetching reports: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
     } catch (error) {
         throw error;
     }

@@ -1,6 +1,5 @@
 "use server"
 
-import axios from 'axios';
 import { Curriculum, Subject, Grade, Chapter, Resource, Topic } from '../../app/types'
 import getFetchConfig from '../fetchConfig';
 
