@@ -5,7 +5,7 @@ import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
 import { getSessions, getGroupUser, getGroupSessions } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
-import { GroupSession, Session } from "./types";
+import { GroupUser, GroupSession, Session } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
@@ -22,20 +22,23 @@ export default function Home() {
 
   const fetchUserSessions = async () => {
     try {
-      const groupUserData = await getGroupUser(userDbId!);
-      const groupSessionData = await getGroupSessions(groupUserData[0].group_type_id);
-
       const currentDay = new Date().getDay();
+      const groupUserData = await getGroupUser(userDbId!);
 
-      const sessionsData = await Promise.all(groupSessionData.map(async (groupSession: GroupSession) => {
-        if (groupSession.session_id !== undefined) {
-          const sessionData = await getSessions(groupSession.session_id);
-          const isActive = sessionData.is_active;
-          const repeatSchedule = sessionData.repeat_schedule;
+      const groupSessions = await Promise.all(groupUserData.map(async (userData: GroupUser) => {
+        const groupSessionData = await getGroupSessions(userData.group_type_id);
+        return groupSessionData;
+      }));
 
-          if (isActive && repeatSchedule && repeatSchedule.type === 'weekly' && repeatSchedule.params.includes(currentDay)) {
-            return sessionData;
-          }
+      const flattenedGroupSessions = groupSessions.flat();
+
+      const sessionsData = await Promise.all(flattenedGroupSessions.map(async (groupSession: GroupSession) => {
+        const sessionData = await getSessions(groupSession.session_id);
+        const isActive = sessionData.is_active;
+        const repeatSchedule = sessionData.repeat_schedule;
+
+        if (isActive && repeatSchedule && repeatSchedule.type === 'weekly' && repeatSchedule.params.includes(currentDay)) {
+          return sessionData;
         }
         return null;
       }));

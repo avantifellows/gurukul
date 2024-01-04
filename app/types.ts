@@ -102,6 +102,11 @@ export interface User {
 }
 
 export interface GroupSession {
-  session_id?: number;
-  group_type_id?: number
+  session_id: number;
+  group_type_id: number
+}
+
+export interface GroupUser {
+  user_id: number;
+  group_type_id: number
 }
