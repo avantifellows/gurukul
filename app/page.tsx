@@ -24,11 +24,26 @@ export default function Home() {
     try {
       const groupUserData = await getGroupUser(userDbId!);
       const groupSessionData = await getGroupSessions(groupUserData[0].group_type_id);
-      const sessionIds = groupSessionData.map((groupSession: GroupSession) => groupSession.session_id);
-      const sessionsData = await Promise.all(sessionIds.map((sessionId: number) => getSessions(sessionId)));
 
-      const liveClassesData = sessionsData.filter((session: Session) => session.platform === 'meet');
-      const quizzesData = sessionsData.filter((session: Session) => session.platform === 'quiz');
+      const currentDay = new Date().getDay();
+
+      const sessionsData = await Promise.all(groupSessionData.map(async (groupSession: GroupSession) => {
+        if (groupSession.session_id !== undefined) {
+          const sessionData = await getSessions(groupSession.session_id);
+          const isActive = sessionData.is_active;
+          const repeatSchedule = sessionData.repeat_schedule;
+
+          if (isActive && repeatSchedule && repeatSchedule.type === 'weekly' && repeatSchedule.params.includes(currentDay)) {
+            return sessionData;
+          }
+        }
+        return null;
+      }));
+
+      const filteredSessions = sessionsData.filter(session => session !== null);
+
+      const liveClassesData = filteredSessions.filter((session: Session) => session.platform === 'meet');
+      const quizzesData = filteredSessions.filter((session: Session) => session.platform === 'quiz');
 
       setLiveClasses(liveClassesData);
       setQuizzes(quizzesData);
