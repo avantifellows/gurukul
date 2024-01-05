@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/mixpanel-browser": "^2.48.1",
     "@types/node": "20.2.5",
     "@types/react": "18.2.8",
     "@types/react-dom": "18.2.4",
@@ -17,6 +18,7 @@
     "cookies-next": "^4.0.0",
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.4",
+    "mixpanel-browser": "^2.48.1",
     "next": "13.4.4",
     "postcss": "8.4.24",
     "react": "18.2.0",
