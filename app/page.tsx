@@ -11,6 +11,7 @@ import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
 import { isSameDay, formatCurrentTime, formatSessionTime } from "@/utils/dateUtils";
 import { generateQuizLink } from "@/utils/quizUtils";
+import { MixpanelTracking } from "@/services/mixpanel";
 
 export default function Home() {
   const { loggedIn, userId } = useAuth();
@@ -51,6 +52,7 @@ export default function Home() {
 
       setLiveClasses(liveClassesToday);
       setQuizzes(quizzesToday);
+      MixpanelTracking.getInstance().identify(userId!);
     } catch (error) {
       console.error("Error in fetching Live Classes:", error);
     }

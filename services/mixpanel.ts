@@ -23,4 +23,8 @@ export class MixpanelTracking {
     public trackEvent = (eventName: string, properties?: Record<string, any>) => {
         mixpanel.track(eventName, properties);
     };
+
+    public identify = (userId: string) => {
+        mixpanel.identify(userId);
+    };
 }
