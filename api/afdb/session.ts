@@ -43,3 +43,16 @@ export const getSessions = async (sessionId: number) => {
     throw error;
   }
 };
+
+export const getGroupTypes = async (groupTypeId: number) => {
+  try {
+    const response = await axios.get(`${url}/group-type`, {
+      params: { id: groupTypeId, type: "batch" },
+      ...getAxiosConfig(bearerToken),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetching Group Types:", error);
+    throw error;
+  }
+};
