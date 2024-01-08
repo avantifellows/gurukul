@@ -1,7 +1,6 @@
-import axios from 'axios';
 import { getCookie, setCookie } from 'cookies-next';
 import { api } from './url';
-import getAxiosConfig from '@/api/axiosConfig';
+import getFetchConfig from '@/api/fetchConfig';
 
 export async function verifyToken() {
     const accessToken = getCookie('access_token');
@@ -14,26 +13,32 @@ export async function verifyToken() {
     }
 
     try {
-        const response = await axios.get(url, {
-            ...getAxiosConfig(accessToken),
-        });
+        const response = await fetch(url, getFetchConfig(accessToken));
+        const data = await response.json();
 
-        return { isValid: true, data: response.data };
-    } catch (error: any) {
-        if (error.response.data.detail === "Signature has expired" && refreshToken) {
-            try {
-                const refreshResponse = await axios.post(refreshUrl, {}, {
-                    ...getAxiosConfig(refreshToken),
+        if (!response.ok) {
+            if (refreshToken && data.detail === "Signature has expired") {
+                const refreshResponse = await fetch(refreshUrl, {
+                    method: 'POST',
+                    ...getFetchConfig(refreshToken),
                 });
 
-                setCookie('access_token', refreshResponse.data.access_token, { path: '/', domain: '.avantifellows.org' });
+                if (!refreshResponse.ok) {
+                    throw new Error(`Error refreshing token: ${refreshResponse.statusText}`);
+                }
+
+                const refreshData = await refreshResponse.json();
+                setCookie('access_token', refreshData.access_token, { path: '/', domain: '.avantifellows.org' });
                 window.location.reload();
                 return { isValid: true };
-            } catch (refreshError) {
-                return { isValid: false, message: 'Error refreshing token', refreshError };
             }
+
+            throw new Error(`Error verifying token: ${response.statusText}`);
         }
 
-        return { isValid: false, message: error };
+        return { isValid: true, data };
+
+    } catch (error) {
+        return { isValid: false, message: error || 'Unknown error occurred' };
     }
 }
