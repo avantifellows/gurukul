@@ -3,7 +3,7 @@
 import { useAuth } from "@/services/AuthContext";
 import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getSessions, getGroupUser, getGroupSessions } from "@/api/afdb/session";
+import { getSessions, getGroupUser, getGroupSessions, getGroupTypes } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
 import { GroupUser, GroupSession, Session } from "./types";
 import Link from "next/link";
@@ -26,8 +26,17 @@ export default function Home() {
       const groupUserData = await getGroupUser(userDbId!);
 
       const groupSessions = await Promise.all(groupUserData.map(async (userData: GroupUser) => {
-        const groupSessionData = await getGroupSessions(userData.group_type_id);
-        return groupSessionData;
+        const groupType = await getGroupTypes(userData.group_type_id);
+
+        const groupTypeIds = groupType.map((type: any) => type.id);
+
+        const groupSessionData = await Promise.all(groupTypeIds.map(async (groupId: number) => {
+          return await getGroupSessions(groupId);
+        }));
+
+        const flattenedGroupSessions = groupSessionData.flat();
+
+        return flattenedGroupSessions;
       }));
 
       const flattenedGroupSessions = groupSessions.flat();

@@ -65,3 +65,23 @@ export const getSessions = async (sessionId: number) => {
   }
 };
 
+export const getGroupTypes = async (groupTypeId: number) => {
+  try {
+    const queryParams = new URLSearchParams({
+      id: groupTypeId.toString(),
+      type: "batch"
+    });
+    const urlWithParams = `${url}/group-type?${queryParams.toString()}`;
+    const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
+
+    if (!response.ok) {
+      throw new Error(`Error in fetching Group Type Details: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error in fetching Group Type Details:", error);
+    throw error;
+  }
+};
