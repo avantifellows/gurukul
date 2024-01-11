@@ -48,9 +48,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const userName = user ? `${user.first_name} ${user.last_name}` : '';
+    const userDbId = user ? user.id : null;
 
     return (
-        <AuthContext.Provider value={{ loggedIn, userId, userName }}>
+        <AuthContext.Provider value={{ loggedIn, userId, userName, userDbId }}>
             {children}
         </AuthContext.Provider>
     );
