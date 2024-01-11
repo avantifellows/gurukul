@@ -20,7 +20,7 @@ export default function ReportsList({ userId }: ReportsListProps) {
         }
 
         fetchReportsData();
-        MixpanelTracking.getInstance().trackEvent("Reports Page View" + userId );
+        MixpanelTracking.getInstance().trackEvent("Reports Page View");
     }, [userId]);
 
     if (!responseData) {
