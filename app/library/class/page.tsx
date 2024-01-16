@@ -22,7 +22,6 @@ const ClassLibrary = () => {
     const [chapters, setChapters] = useState<Chapter[]>([]);
     const [resources, setResources] = useState<Resource[]>([]);
     const [expandedChapters, setExpandedChapters] = useState<Record<number, boolean>>({});
-    const [page, setPage] = useState(1);
     const [selectedGrade, setSelectedGrade] = useState(11);
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const [selectedTeacher, setSelectedTeacher] = useState<number | undefined>(undefined);
@@ -39,7 +38,6 @@ const ClassLibrary = () => {
     const handleTabClick = async (tabName: string) => {
         setActiveTab(tabName);
         if (activeTab != tabName) {
-            setPage(1);
             setSelectedChapter(null)
         }
 
@@ -48,7 +46,7 @@ const ClassLibrary = () => {
             const subjectData = await getSubjects(actualTabName);
             const gradeData = await getGrades(selectedGrade);
             const teacherData = await getTeachers();
-            setTeachers(teacherData || []);
+            setTeachers(teacherData);
             if (subjectData.length > 0) {
                 const subjectId = subjectData[0].id;
                 const gradeId = gradeData[0].id;
@@ -58,12 +56,11 @@ const ClassLibrary = () => {
                     ? await getClassChapters(subjectId, gradeId, selectedChapter, selectedTeacher)
                     : await getClassChapters(subjectId, gradeId, undefined, selectedTeacher);
 
-
                 if (chapterData.length > 0) {
                     setChapters(chapterData);
                 }
                 else {
-                    setPage(page - 1);
+                    setChapters([])
                 }
             } else {
                 console.log("Bad request")
@@ -86,7 +83,7 @@ const ClassLibrary = () => {
         };
 
         fetchData();
-    }, [selectedGrade, page, selectedChapter]);
+    }, [selectedGrade, selectedChapter, selectedTeacher]);
 
     const handleTeacherChange = (selectedTeacherId: number) => {
         setSelectedTeacher(selectedTeacherId);
@@ -194,7 +191,7 @@ const ClassLibrary = () => {
                     <Loading />
                 ) : (
                     <div className="mt-4 pb-40">
-                        {chapters.map((chapter) => (
+                        {chapters.length > 0 ? (chapters.map((chapter) => (
                             <div key={chapter.id} className="mx-5">
                                 <div
                                     className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
@@ -223,7 +220,10 @@ const ClassLibrary = () => {
                                     </ul>
                                 )}
                             </div>
-                        ))}
+                        ))) : <div className="text-center pt-10">
+                            No chapters available
+                        </div>
+                        }
                         <BottomNavigationBar />
                     </div>
                 )}
