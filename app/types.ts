@@ -91,9 +91,6 @@ export interface ReportsListProps {
   userId: string;
 
 }
-export interface AxiosAdditionalHeaders {
-  [key: string]: string;
-}
 
 export interface User {
   id: number;
@@ -109,4 +106,10 @@ export interface GroupSession {
 export interface GroupUser {
   user_id: number;
   group_type_id: number
+}
+
+export interface Student {
+  id: number;
+  student_id: string;
+  user: User;
 }
