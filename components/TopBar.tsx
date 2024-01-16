@@ -14,7 +14,8 @@ const TopBar = () => {
   const routeNames: { [key: string]: string } = {
     '/reports': 'Report',
     '/library': 'Library',
-    '/library/show': 'Library',
+    '/library/content': 'Library',
+    '/library/class': 'Library',
   };
 
   const pathname = usePathname();

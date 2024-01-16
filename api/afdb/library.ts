@@ -1,60 +1,39 @@
 "use server"
 
-import { Curriculum, Subject, Grade, Chapter, Resource, Topic } from '../../app/types'
+import { Curriculum, Subject, Grade, Chapter, Resource, Topic, Teacher } from '../../app/types';
 import getFetchConfig from '../fetchConfig';
 
 const baseUrl = process.env.AF_DB_SERVICE_URL;
 const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
 
-export const getCurriculum = async (curriculumName: string): Promise<Curriculum[]> => {
-  try {
-    const url = `${baseUrl}/curriculum?name=${encodeURIComponent(curriculumName)}`;
-    const response = await fetch(url, getFetchConfig(bearerToken),);
+const fetchData = async (url: string) => {
+  const response = await fetch(url, getFetchConfig(bearerToken));
 
-    if (!response.ok) {
-      throw new Error(`Error in fetching curriculumId for ${curriculumName}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`Error in fetching curriculumId for ${curriculumName}:`, error);
-    throw error;
+  if (!response.ok) {
+    throw new Error(`Error: ${response.statusText}`);
   }
+
+  return response.json();
+};
+
+const fetchWithParams = async (endpoint: string, queryParams: URLSearchParams) => {
+  const urlWithParams = `${baseUrl}/${endpoint}?${queryParams.toString()}`;
+  return fetchData(urlWithParams);
+};
+
+export const getCurriculum = async (curriculumName: string): Promise<Curriculum[]> => {
+  const url = `${baseUrl}/curriculum?name=${encodeURIComponent(curriculumName)}`;
+  return fetchData(url);
 };
 
 export const getSubjects = async (subjectName: string): Promise<Subject[]> => {
-  try {
-    const url = `${baseUrl}/subject?name=${encodeURIComponent(subjectName)}`;
-    const response = await fetch(url, getFetchConfig(bearerToken));
-
-    if (!response.ok) {
-      throw new Error(`Error in fetching subjects for ${subjectName}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`Error in fetching subjects for ${subjectName}:`, error);
-    throw error;
-  }
+  const url = `${baseUrl}/subject?name=${encodeURIComponent(subjectName)}`;
+  return fetchData(url);
 };
 
 export const getGrades = async (number: number): Promise<Grade[]> => {
-  try {
-    const url = `${baseUrl}/grade?number=${number}`;
-    const response = await fetch(url, getFetchConfig(bearerToken));
-
-    if (!response.ok) {
-      throw new Error(`Error in fetching grades for ${number}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`Error in fetching grades for ${number}:`, error);
-    throw error;
-  }
+  const url = `${baseUrl}/grade?number=${number}`;
+  return fetchData(url);
 };
 
 export const getChapters = async (
@@ -63,48 +42,19 @@ export const getChapters = async (
   id?: number,
   curriculumId?: number
 ): Promise<Chapter[]> => {
-  try {
-    const queryParams = new URLSearchParams();
-    if (id !== undefined) queryParams.append('id', id.toString());
-    if (subjectId !== undefined) queryParams.append('subject_id', subjectId.toString());
-    if (gradeId !== undefined) queryParams.append('grade_id', gradeId.toString());
-    if (curriculumId !== undefined) queryParams.append('curriculum_id', curriculumId.toString());
+  const queryParams = new URLSearchParams();
+  if (id !== undefined) queryParams.append('id', id.toString());
+  if (subjectId !== undefined) queryParams.append('subject_id', subjectId.toString());
+  if (gradeId !== undefined) queryParams.append('grade_id', gradeId.toString());
+  if (curriculumId !== undefined) queryParams.append('curriculum_id', curriculumId.toString());
 
-    const urlWithParams = `${baseUrl}/chapter?${queryParams.toString()}`;
-    const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
-
-    if (!response.ok) {
-      throw new Error(`Error in fetching chapters: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error in fetching chapters:", error);
-    throw error;
-  }
+  return fetchWithParams('chapter', queryParams);
 };
 
 export const getTopics = async (chapterIds: number[]): Promise<Topic[]> => {
   const topicPromises = chapterIds.map(async (chapterId) => {
-    try {
-      const queryParams = new URLSearchParams({
-        chapter_id: chapterId.toString(),
-      });
-
-      const urlWithParams = `${baseUrl}/topic?${queryParams.toString()}`;
-      const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
-
-      if (!response.ok) {
-        throw new Error(`Error in fetching topics for chapterId ${chapterId}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data || [];
-    } catch (error) {
-      console.error(`Error in fetching topics for chapterId ${chapterId}:`, error);
-      return [];
-    }
+    const queryParams = new URLSearchParams({ chapter_id: chapterId.toString() });
+    return fetchWithParams('topic', queryParams);
   });
 
   const topicResponses = await Promise.all(topicPromises);
@@ -112,61 +62,89 @@ export const getTopics = async (chapterIds: number[]): Promise<Topic[]> => {
 };
 
 export const getSource = async (sourceId: number) => {
-  try {
-    const queryParams = new URLSearchParams({
-      id: sourceId.toString(),
-    });
-
-    const urlWithParams = `${baseUrl}/source?${queryParams.toString()}`;
-    const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
-
-    if (!response.ok) {
-      throw new Error(`Error in fetching source for sourceId ${sourceId}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data || null;
-  } catch (error) {
-    console.error(`Error in fetching source for sourceId ${sourceId}:`, error);
-    return null;
-  }
+  const queryParams = new URLSearchParams({ id: sourceId.toString() });
+  return fetchWithParams('source', queryParams);
 };
-
 
 export const getResourcesWithSource = async (topicIds: number[]): Promise<Resource[]> => {
   const resourcePromises = topicIds.map(async (topicId) => {
-    try {
-      const queryParams = new URLSearchParams({
-        topic_id: topicId.toString(),
-      });
+    const queryParams = new URLSearchParams({ topic_id: topicId.toString() });
+    const chapterResources: Resource[] = await fetchWithParams('resource', queryParams);
 
-      const urlWithParams = `${baseUrl}/resource?${queryParams.toString()}`;
-      const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
-
-      if (!response.ok) {
-        throw new Error(`Error in fetching resources for topicId ${topicId}: ${response.statusText}`);
-      }
-
-      const chapterResources: Resource[] = await response.json();
-
-      const sourcePromises = chapterResources.map(async (resource) => {
-        if (resource.source_id) {
-          const sourceData = await getSource(resource.source_id);
-          if (sourceData) {
-            resource.link = sourceData[0].link;
-          }
+    const sourcePromises = chapterResources.map(async (resource) => {
+      if (resource.source_id) {
+        const sourceData = await getSource(resource.source_id);
+        if (sourceData) {
+          resource.link = sourceData[0].link;
         }
-        return resource;
-      });
+      }
+      return resource;
+    });
 
-      const resourcesWithSource = await Promise.all(sourcePromises);
-      return resourcesWithSource;
-    } catch (error) {
-      console.error("Error in fetching resources for topicId", topicId, ":", error);
-      return [];
-    }
+    const resourcesWithSource = await Promise.all(sourcePromises);
+    return resourcesWithSource;
   });
 
   const resourceResponses = await Promise.all(resourcePromises);
   return resourceResponses.flat();
+};
+
+export const getTeachers = async (id?: number): Promise<Teacher[]> => {
+  const queryParams = new URLSearchParams();
+  if (id !== undefined) queryParams.append('id', id.toString());
+
+  return fetchWithParams('teacher', queryParams);
+};
+
+export const getResourcesOfChapter = async (chapterId: number, teacherId?: number): Promise<Resource[]> => {
+  const queryParams = new URLSearchParams();
+  if (chapterId !== undefined) queryParams.append('chapter_id', chapterId.toString());
+  queryParams.append('type', 'class');
+  if (teacherId !== undefined) queryParams.append('teacher_id', teacherId.toString());
+
+  const chapterResources: Resource[] = await fetchWithParams('resource', queryParams);
+
+  const sourcePromises = chapterResources.map(async (resource) => {
+    if (resource.source_id) {
+      const sourceData = await getSource(resource.source_id);
+      if (sourceData) {
+        resource.link = sourceData[0].link;
+      }
+    }
+    return resource;
+  });
+
+  const resourcesWithSource = await Promise.all(sourcePromises);
+  return resourcesWithSource;
+};
+
+
+export const getClassChapters = async (
+  subjectId?: number,
+  gradeId?: number,
+  id?: number,
+  teacherId?: number
+): Promise<Chapter[]> => {
+  const queryParams = new URLSearchParams();
+  if (id !== undefined) queryParams.append('id', id.toString());
+  if (subjectId !== undefined) queryParams.append('subject_id', subjectId.toString());
+  if (gradeId !== undefined) queryParams.append('grade_id', gradeId.toString());
+
+  const chapterData: Chapter[] = await fetchWithParams('chapter', queryParams);
+
+  const filteredChapters = await Promise.all(
+    chapterData.map(async (chapter) => {
+      const chapterResources = await getResourcesOfChapter(chapter.id, teacherId);
+
+      if (chapterResources.some((resource: any) => resource.type === 'class')) {
+        return chapter;
+      } else {
+        return null;
+      }
+    })
+  );
+
+  const validChapters: Chapter[] = filteredChapters.filter((chapter): chapter is Chapter => chapter !== null);
+
+  return validChapters;
 };
