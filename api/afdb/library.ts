@@ -89,9 +89,10 @@ export const getResourcesWithSource = async (topicIds: number[]): Promise<Resour
   return resourceResponses.flat();
 };
 
-export const getTeachers = async (id?: number): Promise<Teacher[]> => {
+export const getTeachers = async (id?: number, subject?: string): Promise<Teacher[]> => {
   const queryParams = new URLSearchParams();
   if (id !== undefined) queryParams.append('id', id.toString());
+  if (subject !== undefined) queryParams.append('subject', subject.toString());
 
   return fetchWithParams('teacher', queryParams);
 };
