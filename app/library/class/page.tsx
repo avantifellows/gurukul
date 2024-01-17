@@ -91,7 +91,7 @@ const ClassLibrary = () => {
 
     const handleChapterClick = async (chapterId: number) => {
         try {
-            const resourceData = await getResourcesOfChapter(chapterId);
+            const resourceData = await getResourcesOfChapter(chapterId, selectedTeacher);
             setResources(resourceData);
         } catch (error) {
             console.error('Error fetching chapter data:', error);
