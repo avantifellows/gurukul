@@ -140,7 +140,7 @@ const ClassLibrary = () => {
                 <div className="bg-heading text-primary h-20 flex flex-col">
                     <div className='flex items-center mx-4 mt-4'>
                         <Image src={BackIcon} onClick={handleBackClick} alt="Play" className="w-5 h-5" />
-                        <h1 className="font-semibold ml-4 text-xl pt-1">{selectedCourse === 'NEET Classes' ? "NEET Course" : "JEE Course"}<br /></h1>
+                        <h1 className="font-semibold ml-4 text-xl pt-1">{selectedCourse === 'NEET Classes' ? "NEET Classes" : "JEE Classes"}<br /></h1>
                     </div>
                     <span className="text-sm ml-[52px] font-normal">Class Library</span>
                 </div>
