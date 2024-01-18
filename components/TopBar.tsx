@@ -13,11 +13,11 @@ const TopBar = () => {
   const formatUserName = (userName: string) => {
     const names = userName.split(' ');
 
-    const formattedFirstName = names[0].charAt(0).toUpperCase() + names[0].slice(1).toLowerCase();
+    const formattedNames = names.map(name =>
+      name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+    );
 
-    const formattedLastName = names.length > 1 ? names[1].charAt(0).toUpperCase() + names[1].slice(1).toLowerCase() : '';
-
-    const formattedName = `${formattedFirstName} ${formattedLastName}`;
+    const formattedName = formattedNames.join(' ');
 
     return formattedName;
   };
