@@ -164,7 +164,7 @@ export default function Home() {
                 ))}
               </div>) : (
               <p className={infoMessageClass}>
-                There are no more live classes today. You can relax!
+                No more live classes are scheduled for today!
               </p>
             )}
           </div>
@@ -196,7 +196,7 @@ export default function Home() {
                 ))}
               </div>) : (
               <p className={`${infoMessageClass}`}>
-                There are no more tests today. You can relax!
+                No more tests are scheduled for today!
               </p>
             )}
           </div>

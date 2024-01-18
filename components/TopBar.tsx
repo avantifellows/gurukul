@@ -10,6 +10,19 @@ import { deleteCookie } from "cookies-next";
 
 const TopBar = () => {
   const { userName } = useAuth();
+  const formatUserName = (userName: string) => {
+    const names = userName.split(' ');
+
+    const formattedFirstName = names[0].charAt(0).toUpperCase() + names[0].slice(1).toLowerCase();
+
+    const formattedLastName = names.length > 1 ? names[1].charAt(0).toUpperCase() + names[1].slice(1).toLowerCase() : '';
+
+    const formattedName = `${formattedFirstName} ${formattedLastName}`;
+
+    return formattedName;
+  };
+
+  const formattedUserName = formatUserName(userName!);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const routeNames: { [key: string]: string } = {
     '/reports': 'Report',
@@ -19,7 +32,7 @@ const TopBar = () => {
   };
 
   const pathname = usePathname();
-  const routeName = routeNames[pathname] || <p>Welcome <br /> {userName} </p>;
+  const routeName = routeNames[pathname] || <p>Welcome <br /> {formattedUserName} </p>;
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
