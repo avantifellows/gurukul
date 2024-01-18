@@ -39,6 +39,7 @@ const ClassLibrary = () => {
         setActiveTab(tabName);
         if (activeTab != tabName) {
             setSelectedChapter(null)
+            setSelectedTeacher(undefined)
         }
 
         try {
