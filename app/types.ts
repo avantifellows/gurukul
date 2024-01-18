@@ -59,6 +59,8 @@ export interface Resource {
   topic_id: number;
   source_id: number;
   link: string;
+  chapter_id: number;
+  type: string;
 }
 
 export interface Topic {
@@ -112,4 +114,13 @@ export interface Student {
   id: number;
   student_id: string;
   user: User;
+}
+
+export interface Teacher {
+  id: number,
+  teacher_id: string,
+  user: {
+    first_name: string,
+    last_name: string
+  }
 }

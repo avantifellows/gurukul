@@ -128,7 +128,7 @@ export default function Home() {
 
   return (
     <>
-      {isLoading && loggedIn ? (
+      {isLoading ? (
         <div className="max-w-xl mx-auto">
           <TopBar />
           <Loading />
