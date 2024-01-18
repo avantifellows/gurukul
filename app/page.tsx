@@ -78,7 +78,7 @@ export default function Home() {
         return (
           <Link href={data.platform_link} target="_blank">
             <PrimaryButton
-              className="bg-primary text-white text-sm rounded-lg w-14 h-8 mr-4 shadow-md shadow-slate-400">JOIN</PrimaryButton>
+              className="bg-primary text-white text-sm rounded-lg w-12 h-8 mr-4 shadow-md shadow-slate-400">JOIN</PrimaryButton>
           </Link>
         );
       } else {
