@@ -124,3 +124,17 @@ export interface Teacher {
     last_name: string
   }
 }
+
+export interface Quiz {
+  batch: string,
+  end_date: string,
+  end_time: string,
+  redirectPlatformParams: {
+    id: string
+  }
+  start_date: string,
+  start_time: string,
+  name: string,
+  subject: string,
+  redirectPlatform: string
+}

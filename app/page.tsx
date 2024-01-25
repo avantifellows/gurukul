@@ -5,20 +5,23 @@ import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
 import { getSessions, getGroupUser, getGroupSessions, getGroupTypes } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
-import { GroupUser, GroupSession, Session } from "./types";
+import { GroupUser, GroupSession, Session, Quiz } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
 import { formatCurrentTime, formatSessionTime } from "@/utils/dateUtils";
-import { generateQuizLink } from "@/utils/quizUtils";
+import { getDocs, collection, query, where } from "firebase/firestore";
+import { db } from "@/app/firebaseConfig";
 
 export default function Home() {
   const { loggedIn, userId, userDbId } = useAuth();
   const [liveClasses, setLiveClasses] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [quizzes, setQuizzes] = useState<Session[]>([]);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
+  const quizBaseUrl = process.env.NEXT_PUBLIC_AF_QUIZ_URL;
+  const apiKey = process.env.NEXT_PUBLIC_AF_QUIZ_API_KEY;
 
   const fetchUserSessions = async () => {
     try {
@@ -55,12 +58,50 @@ export default function Home() {
       const filteredSessions = sessionsData.filter(session => session !== null);
 
       const liveClassesData = filteredSessions.filter((session: Session) => session.platform === 'meet');
-      const quizzesData = filteredSessions.filter((session: Session) => session.platform === 'quiz');
-
+      const quizzesData = await Promise.all(filteredSessions.map(async (groupSession: GroupSession) => {
+        const quizLinksArray = await generateQuizLinks("DL-11-Photon-Eng-23");
+        return quizLinksArray;
+      }
+      ));
       setLiveClasses(liveClassesData);
-      setQuizzes(quizzesData);
+      setQuizzes(quizzesData.flat());
     } catch (error) {
       console.error("Error fetching user sessions:", error);
+    }
+  };
+
+  const generateQuizLinks = async (batchId: string): Promise<Quiz[]> => {
+    const sessionsCollection = collection(db, "Sessions");
+    const batchQuery = query(sessionsCollection, where("batch", "==", batchId));
+
+    try {
+      const querySnapshot = await getDocs(batchQuery);
+      const sessionsData = querySnapshot.docs.map((doc) => doc.data());
+      console.log(sessionsData, "sessionData.")
+
+      const quizObjectsArray = sessionsData.map((sessionData: any) => {
+        const redirectParams = sessionData.redirectPlatformParams;
+        if (redirectParams && redirectParams.id) {
+          return {
+            batch: sessionData.batch,
+            end_date: sessionData.endDate,
+            end_time: sessionData.endTime,
+            redirectPlatformParams: {
+              id: redirectParams.id,
+            },
+            start_date: sessionData.startDate,
+            start_time: sessionData.startTime,
+            redirectPlatform: sessionData.redirectPlatform,
+            name: sessionData.name
+          };
+        }
+        return null;
+      }).filter((quizObject) => quizObject !== null) as Quiz[];
+
+      return quizObjectsArray;
+    } catch (error) {
+      console.error("Error fetching quiz data from Firestore:", error);
+      throw error;
     }
   };
 
@@ -89,20 +130,14 @@ export default function Home() {
           </p>
         );
       }
-    } else if (data.platform === 'quiz') {
-      generateQuizLink(data.platform_link, userId!)
-        .then((quizLink) => {
-          return (
-            <Link href={quizLink} target="_blank">
-              <PrimaryButton
-                className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
-            </Link>
-          );
-        })
-        .catch((error) => {
-          console.error("Error generating quiz link:", error);
-          return null;
-        });
+    }
+    else if (data.redirectPlatform === 'quiz') {
+      return (
+        <Link href={`${quizBaseUrl}${data.redirectPlatformParams.id}?apiKey=${apiKey}&userId=${userId}`} target="_blank">
+          <PrimaryButton
+            className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
+        </Link>
+      );
     }
     return null;
   }
@@ -185,9 +220,9 @@ export default function Home() {
                     <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
                       <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0  rounded-s-md`}></div>
                       <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
-                        <span className="font-normal pr-4">Subject:</span> {data.meta_data.stream}
+                        <span className="font-normal pr-4">Subject:</span> {data.name}
                         <div className="text-sm md:text-base font-semibold ">
-                          <span className="font-normal pr-9">Type:</span> {data.meta_data.test_type}
+                          <span className="font-normal pr-9">Type:</span> {data.subject}
                         </div>
                       </div>
                       {renderButton(data)}
