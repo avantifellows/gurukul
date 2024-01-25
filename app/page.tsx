@@ -9,7 +9,7 @@ import { GroupUser, GroupSession, Session, Quiz } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
-import { formatCurrentTime, formatSessionTime } from "@/utils/dateUtils";
+import { formatCurrentTime, formatSessionTime, formatQuizSessionTime } from "@/utils/dateUtils";
 import { getDocs, collection, query, where } from "firebase/firestore";
 import { db } from "@/app/firebaseConfig";
 
@@ -58,11 +58,7 @@ export default function Home() {
       const filteredSessions = sessionsData.filter(session => session !== null);
 
       const liveClassesData = filteredSessions.filter((session: Session) => session.platform === 'meet');
-      const quizzesData = await Promise.all(filteredSessions.map(async (groupSession: GroupSession) => {
-        const quizLinksArray = await generateQuizLinks("DL-11-Photon-Eng-23");
-        return quizLinksArray;
-      }
-      ));
+      const quizzesData = await generateQuizLinks("DL-11-Photon-Eng-23");
       setLiveClasses(liveClassesData);
       setQuizzes(quizzesData.flat());
     } catch (error) {
@@ -211,10 +207,10 @@ export default function Home() {
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
                       <p className={`${commonTextClass}`}>
-                        {formatSessionTime(data.start_time)}
+                        {formatQuizSessionTime(data.start_time)}
                       </p>
                       <p className={`${commonTextClass}`}>
-                        {formatSessionTime(data.end_time)}
+                        {formatQuizSessionTime(data.end_time)}
                       </p>
                     </div>
                     <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
@@ -222,7 +218,7 @@ export default function Home() {
                       <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
                         <span className="font-normal pr-4">Subject:</span> {data.name}
                         <div className="text-sm md:text-base font-semibold ">
-                          <span className="font-normal pr-9">Type:</span> {data.subject}
+                          <span className="font-normal pr-9">Type:</span> {data.subject ?? "Science"}
                         </div>
                       </div>
                       {renderButton(data)}
