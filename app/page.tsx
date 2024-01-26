@@ -3,7 +3,7 @@
 import { useAuth } from "@/services/AuthContext";
 import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getSessions, getGroupUser, getGroupSessions, getGroupTypes } from "@/api/afdb/session";
+import { getSessions, getGroupUser, getGroupSessions, getGroupTypes, getQuizBatchData } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
 import { GroupUser, GroupSession, Session, Quiz } from "./types";
 import Link from "next/link";
@@ -33,11 +33,20 @@ export default function Home() {
 
         const groupTypeIds = groupType.map((type: any) => type.id);
 
+        const quizIds = groupType.map((quiz: any) => quiz.child_id.parent_id)
+
         const groupSessionData = await Promise.all(groupTypeIds.map(async (groupId: number) => {
           return await getGroupSessions(groupId);
         }));
 
+        const quizData = await Promise.all(quizIds.map(async (quizId: number) => {
+          return await getQuizBatchData(quizId);
+        }));
+
         const flattenedGroupSessions = groupSessionData.flat();
+        const flattenedQuizData = quizData.flat();
+        const quizzesData = await generateQuizLinks(flattenedQuizData);
+        setQuizzes(quizzesData);
 
         return flattenedGroupSessions;
       }));
@@ -58,43 +67,48 @@ export default function Home() {
       const filteredSessions = sessionsData.filter(session => session !== null);
 
       const liveClassesData = filteredSessions.filter((session: Session) => session.platform === 'meet');
-      const quizzesData = await generateQuizLinks("DL-11-Photon-Eng-23");
       setLiveClasses(liveClassesData);
-      setQuizzes(quizzesData.flat());
     } catch (error) {
       console.error("Error fetching user sessions:", error);
     }
   };
 
-  const generateQuizLinks = async (batchId: string): Promise<Quiz[]> => {
-    const sessionsCollection = collection(db, "Sessions");
-    const batchQuery = query(sessionsCollection, where("batch", "==", batchId));
-
+  const generateQuizLinks = async (batchData: any): Promise<Quiz[]> => {
     try {
-      const querySnapshot = await getDocs(batchQuery);
-      const sessionsData = querySnapshot.docs.map((doc) => doc.data());
-      console.log(sessionsData, "sessionData.")
+      const sessionsCollection = collection(db, "Sessions");
 
-      const quizObjectsArray = sessionsData.map((sessionData: any) => {
-        const redirectParams = sessionData.redirectPlatformParams;
-        if (redirectParams && redirectParams.id) {
-          return {
-            batch: sessionData.batch,
-            end_date: sessionData.endDate,
-            end_time: sessionData.endTime,
-            redirectPlatformParams: {
-              id: redirectParams.id,
-            },
-            start_date: sessionData.startDate,
-            start_time: sessionData.startTime,
-            redirectPlatform: sessionData.redirectPlatform,
-            name: sessionData.name
-          };
-        }
-        return null;
-      }).filter((quizObject) => quizObject !== null) as Quiz[];
+      const quizObjectsArray = await Promise.all(batchData.map(async (batchItem: any) => {
+        const batchId = batchItem.batch_id;
 
-      return quizObjectsArray;
+        const batchQuery = query(sessionsCollection, where("batch", "==", batchId));
+        const querySnapshot = await getDocs(batchQuery);
+        const sessionsDataArray = querySnapshot.docs.map((doc) => doc.data());
+
+        const quizObject = sessionsDataArray.map((sessionData: any) => {
+          const redirectParams = sessionData.redirectPlatformParams;
+          if (redirectParams && redirectParams.id) {
+            return {
+              batch: sessionData.batch,
+              end_date: sessionData.endDate,
+              end_time: sessionData.endTime,
+              redirectPlatformParams: {
+                id: redirectParams.id,
+              },
+              start_date: sessionData.startDate,
+              start_time: sessionData.startTime,
+              redirectPlatform: sessionData.redirectPlatform,
+              name: sessionData.name,
+            };
+          }
+          return null;
+        }).filter((quizObject) => quizObject !== null) as Quiz[];
+
+        return quizObject;
+      }));
+
+      const flattenedQuizObjectsArray = quizObjectsArray.flat();
+
+      return flattenedQuizObjectsArray;
     } catch (error) {
       console.error("Error fetching quiz data from Firestore:", error);
       throw error;
