@@ -25,7 +25,7 @@ export default function Home() {
 
   const fetchUserSessions = async () => {
     try {
-      const currentDay = new Date().getDay();
+      const currentDay = (new Date().getDay() + 6) % 7 + 1;
       const groupUserData = await getGroupUser(userDbId!);
 
       const groupSessions = await Promise.all(groupUserData.map(async (userData: GroupUser) => {
@@ -84,24 +84,29 @@ export default function Home() {
         const querySnapshot = await getDocs(batchQuery);
         const sessionsDataArray = querySnapshot.docs.map((doc) => doc.data());
 
-        const quizObject = sessionsDataArray.map((sessionData: any) => {
-          const redirectParams = sessionData.redirectPlatformParams;
-          if (redirectParams && redirectParams.id) {
-            return {
-              batch: sessionData.batch,
-              end_date: sessionData.endDate,
-              end_time: sessionData.endTime,
-              redirectPlatformParams: {
-                id: redirectParams.id,
-              },
-              start_date: sessionData.startDate,
-              start_time: sessionData.startTime,
-              redirectPlatform: sessionData.redirectPlatform,
-              name: sessionData.name,
-            };
-          }
-          return null;
-        }).filter((quizObject) => quizObject !== null) as Quiz[];
+        const today = new Date().toISOString().split("T")[0];
+
+        const quizObject = sessionsDataArray
+          .filter((sessionData: any) => sessionData.startDate === today)
+          .map((sessionData: any) => {
+            const redirectParams = sessionData.redirectPlatformParams;
+            if (redirectParams && redirectParams.id) {
+              return {
+                batch: sessionData.batch,
+                end_date: sessionData.endDate,
+                end_time: sessionData.endTime,
+                redirectPlatformParams: {
+                  id: redirectParams.id,
+                },
+                start_date: sessionData.startDate,
+                start_time: sessionData.startTime,
+                redirectPlatform: sessionData.redirectPlatform,
+                name: sessionData.name,
+              };
+            }
+            return null;
+          })
+          .filter((quizObject) => quizObject !== null) as Quiz[];
 
         return quizObject;
       }));
