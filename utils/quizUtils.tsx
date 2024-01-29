@@ -1,8 +1,8 @@
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/app/firebaseConfig";
-import { Quiz } from "@/app/types";
+import { QuizSession } from "@/app/types";
 
-export const generateQuizLinks = async (batchData: any): Promise<Quiz[]> => {
+export const generateQuizLinks = async (batchData: any): Promise<QuizSession[]> => {
     try {
         const sessionsCollection = collection(db, "Sessions");
 
@@ -15,7 +15,7 @@ export const generateQuizLinks = async (batchData: any): Promise<Quiz[]> => {
 
             const today = new Date().toISOString().split("T")[0];
 
-            const quizObject = sessionsDataArray
+            const quizSessionObject = sessionsDataArray
                 .filter((sessionData: any) => sessionData.startDate === today)
                 .map((sessionData: any) => {
                     const redirectParams = sessionData.redirectPlatformParams;
@@ -35,9 +35,9 @@ export const generateQuizLinks = async (batchData: any): Promise<Quiz[]> => {
                     }
                     return null;
                 })
-                .filter((quizObject) => quizObject !== null) as Quiz[];
+                .filter((quizSessionObject) => quizSessionObject !== null) as QuizSession[];
 
-            return quizObject;
+            return quizSessionObject;
         }));
 
         const flattenedQuizObjectsArray = quizObjectsArray.flat();

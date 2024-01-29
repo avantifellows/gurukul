@@ -125,7 +125,7 @@ export interface Teacher {
   }
 }
 
-export interface Quiz {
+export interface QuizSession {
   batch: string,
   end_date: string,
   end_time: string,

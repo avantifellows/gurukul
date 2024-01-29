@@ -5,7 +5,7 @@ import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
 import { getSessions, getGroupUser, getGroupSessions, getGroupTypes, getQuizBatchData } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
-import { GroupUser, GroupSession, Session, Quiz } from "./types";
+import { GroupUser, GroupSession, Session, QuizSession } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
@@ -16,7 +16,7 @@ export default function Home() {
   const { loggedIn, userId, userDbId } = useAuth();
   const [liveClasses, setLiveClasses] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
   const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
   const quizBaseUrl = process.env.NEXT_PUBLIC_AF_QUIZ_URL;
