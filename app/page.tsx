@@ -80,7 +80,7 @@ export default function Home() {
         return (
           <Link href={data.platform_link} target="_blank">
             <PrimaryButton
-              className="bg-primary text-white text-sm rounded-lg w-14 h-8 mr-4 shadow-md shadow-slate-400">JOIN</PrimaryButton>
+              className="bg-primary text-white text-sm rounded-lg w-12 h-8 mr-4 shadow-md shadow-slate-400">JOIN</PrimaryButton>
           </Link>
         );
       } else {
@@ -130,7 +130,7 @@ export default function Home() {
 
   return (
     <>
-      {isLoading && loggedIn ? (
+      {isLoading ? (
         <div className="max-w-xl mx-auto">
           <TopBar />
           <Loading />
@@ -166,7 +166,7 @@ export default function Home() {
                 ))}
               </div>) : (
               <p className={infoMessageClass}>
-                There are no more live classes today. You can relax!
+                No more live classes are scheduled for today!
               </p>
             )}
           </div>
@@ -198,7 +198,7 @@ export default function Home() {
                 ))}
               </div>) : (
               <p className={`${infoMessageClass}`}>
-                There are no more tests today. You can relax!
+                No more tests are scheduled for today!
               </p>
             )}
           </div>

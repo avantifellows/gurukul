@@ -59,6 +59,8 @@ export interface Resource {
   topic_id: number;
   source_id: number;
   link: string;
+  chapter_id: number;
+  type: string;
 }
 
 export interface Topic {
@@ -91,9 +93,6 @@ export interface ReportsListProps {
   userId: string;
 
 }
-export interface AxiosAdditionalHeaders {
-  [key: string]: string;
-}
 
 export interface User {
   id: number;
@@ -109,4 +108,19 @@ export interface GroupSession {
 export interface GroupUser {
   user_id: number;
   group_type_id: number
+}
+
+export interface Student {
+  id: number;
+  student_id: string;
+  user: User;
+}
+
+export interface Teacher {
+  id: number,
+  teacher_id: string,
+  user: {
+    first_name: string,
+    last_name: string
+  }
 }

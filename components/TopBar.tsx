@@ -11,15 +11,29 @@ import { MixpanelTracking } from "@/services/mixpanel";
 
 const TopBar = () => {
   const { userName } = useAuth();
+  const formatUserName = (userName: string) => {
+    const names = userName.split(' ');
+
+    const formattedNames = names.map(name =>
+      name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+    );
+
+    const formattedName = formattedNames.join(' ');
+
+    return formattedName;
+  };
+
+  const formattedUserName = formatUserName(userName!);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const routeNames: { [key: string]: string } = {
     '/reports': 'Report',
     '/library': 'Library',
-    '/library/show': 'Library',
+    '/library/content': 'Library',
+    '/library/class': 'Library',
   };
 
   const pathname = usePathname();
-  const routeName = routeNames[pathname] || <p>Welcome <br /> {userName} </p>;
+  const routeName = routeNames[pathname] || <p>Welcome <br /> {formattedUserName} </p>;
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);

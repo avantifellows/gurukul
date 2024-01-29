@@ -21,7 +21,10 @@ const Page: React.FC = () => {
 
   useEffect(() => {
     if (selectedLibrary === 'NEET Content' || selectedLibrary === 'JEE Content') {
-      push(`/library/show?course=${selectedLibrary}`);
+      push(`/library/content?course=${selectedLibrary}`);
+    }
+    if (selectedLibrary === 'NEET Classes' || selectedLibrary === 'JEE Classes') {
+      push(`/library/class?course=${selectedLibrary}`);
     }
   }, [selectedLibrary, push]);
 
