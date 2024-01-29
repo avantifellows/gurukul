@@ -18,6 +18,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { CURRICULUM_NAMES, COURSES } from '@/constants/config';
 import { MixpanelTracking } from '@/services/mixpanel';
+import { MIXPANEL_EVENT } from '@/constants/config';
 
 const ContentLibrary = () => {
     const [activeTab, setActiveTab] = useState('Physics');
@@ -39,7 +40,7 @@ const ContentLibrary = () => {
 
     const handleTabClick = async (tabName: string) => {
         setActiveTab(tabName);
-        MixpanelTracking.getInstance().trackEvent('Selected Tab: ' + tabName);
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_TAB + ": " + tabName);
         if (activeTab != tabName) {
             setPage(1);
             setSelectedChapter(null)
@@ -102,7 +103,7 @@ const ContentLibrary = () => {
             const topicIds = topicData.map((topic) => topic.id);
             const resourceData = await getResourcesWithSource(topicIds);
             setResources(resourceData);
-            MixpanelTracking.getInstance().trackEvent('Selected chapter: ' + chapterName);
+            MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER + ": " + chapterName);
         } catch (error) {
             console.error('Error fetching chapter data:', error);
         }
@@ -135,7 +136,7 @@ const ContentLibrary = () => {
     };
 
     const handleResourceTracking = (resourceName: any) => {
-        MixpanelTracking.getInstance().trackEvent('Selected resource: '+ resourceName)
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_RESOURCE + ": " + resourceName)
     }
 
     const generateSubjectButton = (subject: string, label: string) => (

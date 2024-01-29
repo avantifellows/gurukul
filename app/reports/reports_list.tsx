@@ -5,6 +5,7 @@ import Loading from "../loading";
 import { getReports } from "@/api/reporting/reports";
 import { ReportsListProps } from "../types";
 import { MixpanelTracking } from "@/services/mixpanel";
+import { MIXPANEL_EVENT } from "@/constants/config";
 
 export default function ReportsList({ userId }: ReportsListProps) {
     const [responseData, setResponseData] = useState<{ reports: Report[] } | null>(null);
@@ -20,7 +21,7 @@ export default function ReportsList({ userId }: ReportsListProps) {
         }
 
         fetchReportsData();
-        MixpanelTracking.getInstance().trackEvent("Reports Page View");
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.REPORTS_PAGE_VIEW);
     }, [userId]);
 
     if (!responseData) {
