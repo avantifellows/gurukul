@@ -101,7 +101,7 @@ export default function Home() {
     }
     else if (data.redirectPlatform === 'quiz') {
       return (
-        <Link href={`${quizBaseUrl}${data.redirectPlatformParams.id}?apiKey=${apiKey}&userId=${userId}`} target="_blank">
+        <Link href={`${portalBaseUrl}/?sessionId=${data.id}`} target="_blank">
           <PrimaryButton
             className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
         </Link>
