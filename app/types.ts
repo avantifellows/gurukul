@@ -136,5 +136,6 @@ export interface QuizSession {
   start_time: string,
   name: string,
   subject: string,
-  redirectPlatform: string
+  redirectPlatform: string,
+  stream: string
 }
