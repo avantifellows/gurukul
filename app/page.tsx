@@ -11,6 +11,7 @@ import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
 import { formatCurrentTime, formatSessionTime, formatQuizSessionTime } from "@/utils/dateUtils";
 import { generateQuizLinks } from "@/utils/quizUtils";
+import { api } from "@/services/url";
 
 export default function Home() {
   const { loggedIn, userId, userDbId } = useAuth();
@@ -19,9 +20,7 @@ export default function Home() {
   const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
   const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
-  const quizBaseUrl = process.env.NEXT_PUBLIC_AF_QUIZ_URL;
-  const apiKey = process.env.NEXT_PUBLIC_AF_QUIZ_API_KEY;
-  const portalBaseUrl = process.env.NEXT_PUBLIC_AF_PORTAL_FRONTEND_URL;
+  const portalBaseUrl = api.portal.frontend.baseUrl;
 
   const fetchUserSessions = async () => {
     try {
