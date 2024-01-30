@@ -21,6 +21,7 @@ export default function Home() {
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
   const quizBaseUrl = process.env.NEXT_PUBLIC_AF_QUIZ_URL;
   const apiKey = process.env.NEXT_PUBLIC_AF_QUIZ_API_KEY;
+  const portalBaseUrl = process.env.NEXT_PUBLIC_AF_PORTAL_FRONTEND_URL;
 
   const fetchUserSessions = async () => {
     try {
@@ -84,7 +85,7 @@ export default function Home() {
     if (data.platform === 'meet') {
       if (timeDifference <= 5) {
         return (
-          <Link href={data.platform_link} target="_blank">
+          <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
             <PrimaryButton
               className="bg-primary text-white text-sm rounded-lg w-12 h-8 mr-4 shadow-md shadow-slate-400">JOIN</PrimaryButton>
           </Link>
