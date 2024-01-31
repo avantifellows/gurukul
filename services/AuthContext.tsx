@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 } else {
                     setLoggedIn(false);
                     setUserId(null);
-                    router.push(`${api.portal.frontend.baseUrl}`);
+                    router.push(`${api.portal.frontend.baseUrl}/?group=DelhiStudents&platform=gurukul`);
                 }
             } catch (error) {
                 console.error('Error verifying token:', error);
