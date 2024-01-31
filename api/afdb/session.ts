@@ -85,3 +85,20 @@ export const getGroupTypes = async (groupTypeId: number) => {
     throw error;
   }
 };
+
+export const getQuizBatchData = async (id: number) => {
+  try {
+    const urlWithParams = `${url}/batch/${id}`;
+    const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
+
+    if (!response.ok) {
+      throw new Error(`Error in fetching Batch Details: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error in fetching Batch Details:", error);
+    throw error;
+  }
+};
