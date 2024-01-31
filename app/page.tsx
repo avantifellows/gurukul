@@ -11,6 +11,7 @@ import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
 import { formatCurrentTime, formatSessionTime, formatQuizSessionTime } from "@/utils/dateUtils";
 import { generateQuizLinks } from "@/utils/quizUtils";
+import { api } from "@/services/url";
 
 export default function Home() {
   const { loggedIn, userId, userDbId } = useAuth();
@@ -19,8 +20,7 @@ export default function Home() {
   const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
   const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
-  const quizBaseUrl = process.env.NEXT_PUBLIC_AF_QUIZ_URL;
-  const apiKey = process.env.NEXT_PUBLIC_AF_QUIZ_API_KEY;
+  const portalBaseUrl = api.portal.frontend.baseUrl;
 
   const fetchUserSessions = async () => {
     try {
@@ -84,7 +84,7 @@ export default function Home() {
     if (data.platform === 'meet') {
       if (timeDifference <= 5) {
         return (
-          <Link href={data.platform_link} target="_blank">
+          <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
             <PrimaryButton
               className="bg-primary text-white text-sm rounded-lg w-12 h-8 mr-4 shadow-md shadow-slate-400">JOIN</PrimaryButton>
           </Link>
@@ -100,7 +100,7 @@ export default function Home() {
     }
     else if (data.redirectPlatform === 'quiz') {
       return (
-        <Link href={`${quizBaseUrl}${data.redirectPlatformParams.id}?apiKey=${apiKey}&userId=${userId}`} target="_blank">
+        <Link href={`${portalBaseUrl}/?sessionId=${data.id}`} target="_blank">
           <PrimaryButton
             className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
         </Link>
