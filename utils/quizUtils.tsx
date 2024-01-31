@@ -32,6 +32,7 @@ export const generateQuizLinks = async (batchData: any): Promise<QuizSession[]> 
                             redirectPlatform: sessionData.redirectPlatform,
                             name: sessionData.name,
                             stream: sessionData.stream,
+                            id: sessionData.id
                         };
                     }
                     return null;
