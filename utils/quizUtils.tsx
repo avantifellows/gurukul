@@ -16,7 +16,7 @@ export const generateQuizLinks = async (batchData: any): Promise<QuizSession[]> 
             const today = new Date().toISOString().split("T")[0];
 
             const quizSessionObject = sessionsDataArray
-                .filter((sessionData: any) => sessionData.startDate === today)
+                .filter((sessionData: any) => today >= sessionData.startDate && today <= sessionData.endDate)
                 .map((sessionData: any) => {
                     const redirectParams = sessionData.redirectPlatformParams;
                     if (redirectParams && redirectParams.id) {
