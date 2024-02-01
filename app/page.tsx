@@ -152,7 +152,7 @@ export default function Home() {
                         {formatSessionTime(data.end_time)}
                       </p>
                     </div>
-                    <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
+                    <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
                       <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
                       <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
                         <span className="font-normal pr-4">Subject:</span> {data.meta_data.subject ?? "Science"}
@@ -184,7 +184,7 @@ export default function Home() {
                         {formatQuizSessionTime(data.end_time)}
                       </p>
                     </div>
-                    <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
+                    <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
                       <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0  rounded-s-md`}></div>
                       <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
                         <span className="font-normal pr-8">Name:</span> {data.name}
