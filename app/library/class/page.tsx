@@ -89,8 +89,10 @@ const ClassLibrary = () => {
         fetchData();
     }, [selectedGrade, selectedChapter, selectedTeacher]);
 
-    const handleTeacherChange = (selectedTeacherId: number) => {
+    const handleTeacherChange = async (selectedTeacherId: number) => {
         setSelectedTeacher(selectedTeacherId);
+        const teacherName = await getTeachers(selectedTeacherId);
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_TEACHER + ": " + teacherName[0].user.first_name);
     };
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {

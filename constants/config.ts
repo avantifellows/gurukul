@@ -15,5 +15,6 @@ export const MIXPANEL_EVENT = {
     SELECTED_CHAPTER: "Selected Chapter",
     SELECTED_GRADE: "Selected Grade",
     SELECTED_RESOURCE: "Selected Resource",
-    LOGOUT: "User logged out"
+    LOGOUT: "User logged out",
+    SELECTED_TEACHER: "Selected Teacher"
 };
