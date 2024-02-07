@@ -3,27 +3,29 @@
 import { useAuth } from "@/services/AuthContext";
 import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getSessions, getGroupUser, getGroupSessions, getGroupTypes } from "@/api/afdb/session";
+import { getSessions, getGroupUser, getGroupSessions, getGroupTypes, getQuizBatchData } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
-import { GroupUser, GroupSession, Session } from "./types";
+import { GroupUser, GroupSession, Session, QuizSession } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
-import { formatCurrentTime, formatSessionTime } from "@/utils/dateUtils";
-import { generateQuizLink } from "@/utils/quizUtils";
+import { formatCurrentTime, formatSessionTime, formatQuizSessionTime } from "@/utils/dateUtils";
+import { generateQuizLinks } from "@/utils/quizUtils";
+import { api } from "@/services/url";
 import { MixpanelTracking } from "@/services/mixpanel";
 
 export default function Home() {
   const { loggedIn, userId, userDbId } = useAuth();
   const [liveClasses, setLiveClasses] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [quizzes, setQuizzes] = useState<Session[]>([]);
+  const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
   const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
+  const portalBaseUrl = api.portal.frontend.baseUrl;
 
   const fetchUserSessions = async () => {
     try {
-      const currentDay = new Date().getDay();
+      const currentDay = (new Date().getDay() + 6) % 7 + 1;
       const groupUserData = await getGroupUser(userDbId!);
 
       const groupSessions = await Promise.all(groupUserData.map(async (userData: GroupUser) => {
@@ -31,11 +33,20 @@ export default function Home() {
 
         const groupTypeIds = groupType.map((type: any) => type.id);
 
+        const quizIds = groupType.map((quiz: any) => quiz.child_id.parent_id)
+
         const groupSessionData = await Promise.all(groupTypeIds.map(async (groupId: number) => {
           return await getGroupSessions(groupId);
         }));
 
+        const quizData = await Promise.all(quizIds.map(async (quizId: number) => {
+          return await getQuizBatchData(quizId);
+        }));
+
         const flattenedGroupSessions = groupSessionData.flat();
+        const flattenedQuizData = quizData.flat();
+        const quizzesData = await generateQuizLinks(flattenedQuizData);
+        setQuizzes(quizzesData);
 
         return flattenedGroupSessions;
       }));
@@ -56,10 +67,7 @@ export default function Home() {
       const filteredSessions = sessionsData.filter(session => session !== null);
 
       const liveClassesData = filteredSessions.filter((session: Session) => session.platform === 'meet');
-      const quizzesData = filteredSessions.filter((session: Session) => session.platform === 'quiz');
-
       setLiveClasses(liveClassesData);
-      setQuizzes(quizzesData);
       MixpanelTracking.getInstance().identify(userId!);
     } catch (error) {
       console.error("Error fetching user sessions:", error);
@@ -78,7 +86,7 @@ export default function Home() {
     if (data.platform === 'meet') {
       if (timeDifference <= 5) {
         return (
-          <Link href={data.platform_link} target="_blank">
+          <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
             <PrimaryButton
               className="bg-primary text-white text-sm rounded-lg w-12 h-8 mr-4 shadow-md shadow-slate-400">JOIN</PrimaryButton>
           </Link>
@@ -91,20 +99,14 @@ export default function Home() {
           </p>
         );
       }
-    } else if (data.platform === 'quiz') {
-      generateQuizLink(data.platform_link, userId!)
-        .then((quizLink) => {
-          return (
-            <Link href={quizLink} target="_blank">
-              <PrimaryButton
-                className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
-            </Link>
-          );
-        })
-        .catch((error) => {
-          console.error("Error generating quiz link:", error);
-          return null;
-        });
+    }
+    else if (data.redirectPlatform === 'quiz') {
+      return (
+        <Link href={`${portalBaseUrl}/?sessionId=${data.id}`} target="_blank">
+          <PrimaryButton
+            className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
+        </Link>
+      );
     }
     return null;
   }
@@ -152,7 +154,7 @@ export default function Home() {
                         {formatSessionTime(data.end_time)}
                       </p>
                     </div>
-                    <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
+                    <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
                       <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
                       <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
                         <span className="font-normal pr-4">Subject:</span> {data.meta_data.subject ?? "Science"}
@@ -178,18 +180,18 @@ export default function Home() {
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
                       <p className={`${commonTextClass}`}>
-                        {formatSessionTime(data.start_time)}
+                        {formatQuizSessionTime(data.start_time)}
                       </p>
                       <p className={`${commonTextClass}`}>
-                        {formatSessionTime(data.end_time)}
+                        {formatQuizSessionTime(data.end_time)}
                       </p>
                     </div>
-                    <div className="bg-card rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
+                    <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
                       <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0  rounded-s-md`}></div>
                       <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
-                        <span className="font-normal pr-4">Subject:</span> {data.meta_data.stream}
+                        <span className="font-normal pr-8">Name:</span> {data.name}
                         <div className="text-sm md:text-base font-semibold ">
-                          <span className="font-normal pr-9">Type:</span> {data.meta_data.test_type}
+                          <span className="font-normal pr-6">Stream:</span> {data.stream}
                         </div>
                       </div>
                       {renderButton(data)}
