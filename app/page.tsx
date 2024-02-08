@@ -187,9 +187,11 @@ export default function Home() {
                     <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
                       <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0  rounded-s-md`}></div>
                       <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
-                        <span className="font-normal pr-8">Name:</span> {data.name}
+                        <div className="flex">
+                          <span className="font-normal pr-8">Name:</span> <span>{data.name}</span>
+                        </div>
                         <div className="text-sm md:text-base font-semibold ">
-                          <span className="font-normal pr-6">Stream:</span> {data.stream}
+                          <span className="font-normal pr-5">Stream:</span> <span>{data.stream}</span>
                         </div>
                       </div>
                       {renderButton(data)}
