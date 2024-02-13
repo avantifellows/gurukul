@@ -1,11 +1,3 @@
-export function isSameDay(date1: Date, date2: Date): boolean {
-    return (
-        date1.getDate() === date2.getDate() &&
-        date1.getMonth() === date2.getMonth() &&
-        date1.getFullYear() === date2.getFullYear()
-    );
-}
-
 export function formatSessionTime(dateTimeStr: string) {
     const date = new Date(dateTimeStr);
     const hours = String(date.getUTCHours()).padStart(2, "0");
@@ -31,4 +23,9 @@ export function formatQuizSessionTime(dateTimeStr: string) {
 
     const formattedTime = `${String(hours24).padStart(2, "0")}:${minutes}`;
     return formattedTime;
+}
+
+export function formatTime(dateTimeStr: string) {
+    const [hours, minutes] = dateTimeStr.split(':');
+    return `${hours}:${minutes}`;
 }
