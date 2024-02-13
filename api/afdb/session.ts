@@ -65,9 +65,12 @@ export const getSessions = async (sessionId: number) => {
   }
 };
 
-export const getSessionSchedule = async (sessionId: number) => {
+export const getSessionSchedule = async (sessionId: number, batchId?: number) => {
   try {
-    const urlWithParams = `${url}/session-schedule?session_id=${sessionId}`;
+    const queryParams = new URLSearchParams();
+    if (sessionId !== undefined) queryParams.append('session_id', sessionId.toString());
+    if (batchId !== undefined) queryParams.append('batch_id', batchId.toString());
+    const urlWithParams = `${url}/session-schedule?${queryParams.toString()}`;
     const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
 
     if (!response.ok) {

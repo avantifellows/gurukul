@@ -9,7 +9,7 @@ import { GroupUser, GroupSession, QuizSession, SessionSchedule } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
-import { formatCurrentTime, formatSessionTime, formatQuizSessionTime } from "@/utils/dateUtils";
+import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime } from "@/utils/dateUtils";
 import { generateQuizLinks } from "@/utils/quizUtils";
 import { api } from "@/services/url";
 
@@ -21,6 +21,7 @@ export default function Home() {
   const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
   const portalBaseUrl = api.portal.frontend.baseUrl;
+  const [batchId, setBatchId] = useState();
 
   const fetchUserSessions = async () => {
     try {
@@ -33,6 +34,9 @@ export default function Home() {
         const groupTypeIds = groupType.map((type: any) => type.id);
 
         const quizIds = groupType.map((quiz: any) => quiz.child_id.parent_id)
+
+        const batchId = groupType.map((groupTypeData: any) => groupTypeData.child_id.id)
+        setBatchId(batchId[0])
 
         const groupSessionData = await Promise.all(groupTypeIds.map(async (groupId: number) => {
           return await getGroupSessions(groupId);
@@ -53,7 +57,7 @@ export default function Home() {
       const flattenedGroupSessions = groupSessions.flat();
 
       const sessionsData = await Promise.all(flattenedGroupSessions.map(async (groupSession: GroupSession) => {
-        const sessionData = await getSessionSchedule(groupSession.session_id);
+        const sessionData = await getSessionSchedule(groupSession.session_id, batchId);
         if (!sessionData) {
           return null;
         }
@@ -149,10 +153,10 @@ export default function Home() {
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
                       <p className={`${commonTextClass}`}>
-                        {data.start_time}
+                        {formatTime(data.start_time)}
                       </p>
                       <p className={`${commonTextClass}`}>
-                        {data.end_time}
+                        {formatTime(data.end_time)}
                       </p>
                     </div>
                     <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
