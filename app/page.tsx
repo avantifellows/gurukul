@@ -9,7 +9,7 @@ import { GroupUser, GroupSession, QuizSession, SessionSchedule } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
-import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime } from "@/utils/dateUtils";
+import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime, isSessionActive } from "@/utils/dateUtils";
 import { generateQuizLinks } from "@/utils/quizUtils";
 import { api } from "@/services/url";
 
@@ -160,7 +160,7 @@ export default function Home() {
             <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Live Classes</h1>
             {liveClasses.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 pb-16">
-                {liveClasses.map((data, index) => (
+                {liveClasses.map((data, index) => (isSessionActive(formatSessionTime(data.end_time)) &&
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
                       <p className={`${commonTextClass}`}>
@@ -192,7 +192,7 @@ export default function Home() {
             <h1 className="text-primary ml-4 font-semibold text-xl">Tests</h1>
             {quizzes.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 pb-40">
-                {quizzes.map((data, index) => (
+                {quizzes.map((data, index) => (isSessionActive(formatSessionTime(data.end_time)) &&
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
                       <p className={`${commonTextClass}`}>

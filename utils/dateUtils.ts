@@ -46,3 +46,11 @@ export function formatTime(dateTimeStr: string) {
     const [hours, minutes] = dateTimeStr.split(':');
     return `${hours}:${minutes}`;
 }
+
+export function isSessionActive(endTime: string): boolean {
+    const currentTime = new Date();
+    const currentTimeStr = formatCurrentTime(currentTime.toISOString());
+    const sessionEndTime = new Date(`2000-01-01T${endTime}`);
+    const currentTimeObj = new Date(`2000-01-01T${currentTimeStr}`);
+    return sessionEndTime.getTime() > currentTimeObj.getTime();
+}
