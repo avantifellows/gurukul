@@ -65,6 +65,23 @@ export const getSessions = async (sessionId: number) => {
   }
 };
 
+export const getSessionSchedule = async (sessionId: number) => {
+  try {
+    const urlWithParams = `${url}/session-schedule?session_id=${sessionId}`;
+    const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
+
+    if (!response.ok) {
+      throw new Error(`Error in fetching Session Schedule Details: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data[0];
+  } catch (error) {
+    console.error("Error in fetching Session Schedule Details:", error);
+    throw error;
+  }
+};
+
 export const getGroupTypes = async (groupTypeId: number) => {
   try {
     const queryParams = new URLSearchParams({

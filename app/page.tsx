@@ -3,9 +3,9 @@
 import { useAuth } from "@/services/AuthContext";
 import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getSessions, getGroupUser, getGroupSessions, getGroupTypes, getQuizBatchData } from "@/api/afdb/session";
+import { getGroupUser, getGroupSessions, getGroupTypes, getQuizBatchData, getSessionSchedule } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
-import { GroupUser, GroupSession, Session, QuizSession } from "./types";
+import { GroupUser, GroupSession, QuizSession, SessionSchedule } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
@@ -15,7 +15,7 @@ import { api } from "@/services/url";
 
 export default function Home() {
   const { loggedIn, userId, userDbId } = useAuth();
-  const [liveClasses, setLiveClasses] = useState<Session[]>([]);
+  const [liveClasses, setLiveClasses] = useState<SessionSchedule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
   const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
@@ -53,9 +53,12 @@ export default function Home() {
       const flattenedGroupSessions = groupSessions.flat();
 
       const sessionsData = await Promise.all(flattenedGroupSessions.map(async (groupSession: GroupSession) => {
-        const sessionData = await getSessions(groupSession.session_id);
-        const isActive = sessionData.is_active;
-        const repeatSchedule = sessionData.repeat_schedule;
+        const sessionData = await getSessionSchedule(groupSession.session_id);
+        if (!sessionData) {
+          return null;
+        }
+        const isActive = sessionData.session.is_active;
+        const repeatSchedule = sessionData.session.repeat_schedule;
 
         if (isActive && repeatSchedule && repeatSchedule.type === 'weekly' && repeatSchedule.params.includes(currentDay)) {
           return sessionData;
@@ -65,7 +68,7 @@ export default function Home() {
 
       const filteredSessions = sessionsData.filter(session => session !== null);
 
-      const liveClassesData = filteredSessions.filter((session: Session) => session.platform === 'meet');
+      const liveClassesData = filteredSessions.filter((sessionSchedule: SessionSchedule) => sessionSchedule.session.platform === 'meet');
       setLiveClasses(liveClassesData);
     } catch (error) {
       console.error("Error fetching user sessions:", error);
@@ -146,21 +149,21 @@ export default function Home() {
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
                       <p className={`${commonTextClass}`}>
-                        {formatSessionTime(data.start_time)}
+                        {data.start_time}
                       </p>
                       <p className={`${commonTextClass}`}>
-                        {formatSessionTime(data.end_time)}
+                        {data.end_time}
                       </p>
                     </div>
                     <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
                       <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
                       <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
-                        <span className="font-normal pr-4">Subject:</span> {data.meta_data.subject ?? "Science"}
+                        <span className="font-normal pr-4">Subject:</span> {data.session.meta_data.subject ?? "Science"}
                         <div className="text-sm md:text-base font-semibold ">
-                          <span className="font-normal pr-7">Batch:</span> {data.meta_data.batch ?? "Master Batch"}
+                          <span className="font-normal pr-7">Batch:</span> {data.session.meta_data.batch ?? "Science Batch"}
                         </div>
                       </div>
-                      {renderButton(data)}
+                      {renderButton(data.session)}
                     </div>
                   </div>
                 ))}
