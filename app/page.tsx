@@ -82,16 +82,18 @@ export default function Home() {
   function renderButton(data: any) {
     const currentTime = new Date();
     const sessionTimeStr = formatSessionTime(data.start_time);
+    const sessionEndTimeStr = formatSessionTime(data.end_time);
     const currentTimeStr = formatCurrentTime(currentTime.toISOString());
 
     const sessionTime = new Date(`2000-01-01T${sessionTimeStr}`);
+    const sessionEndTime = new Date(`2000-01-01T${sessionEndTimeStr}`);
     const currentTimeObj = new Date(`2000-01-01T${currentTimeStr}`);
     const timeDifference = (sessionTime.getTime() - currentTimeObj.getTime()) / (1000 * 60);
 
-    if (data.platform === 'meet') {
-      if (timeDifference <= 5) {
+    if (data.session && data.session.platform === 'meet') {
+      if (timeDifference <= 5 && sessionEndTime.getTime() > currentTimeObj.getTime()) {
         return (
-          <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
+          <Link href={`${portalBaseUrl}/?sessionId=${data.session.session_id}`} target="_blank">
             <PrimaryButton
               className="bg-primary text-white text-sm rounded-lg w-12 h-8 mr-4 shadow-md shadow-slate-400">JOIN</PrimaryButton>
           </Link>
@@ -106,11 +108,20 @@ export default function Home() {
       }
     }
     else if (data.redirectPlatform === 'quiz') {
+      if (timeDifference <= 5 && sessionEndTime.getTime() > currentTimeObj.getTime()) {
+        return (
+          <Link href={`${portalBaseUrl}/?sessionId=${data.id}`} target="_blank">
+            <PrimaryButton
+              className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
+          </Link>
+        );
+      }
+    } else {
       return (
-        <Link href={`${portalBaseUrl}/?sessionId=${data.id}`} target="_blank">
-          <PrimaryButton
-            className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
-        </Link>
+        <p className="text-sm italic font-normal mr-6">
+          Starts at <br />
+          {sessionTimeStr}
+        </p>
       );
     }
     return null;
@@ -167,7 +178,7 @@ export default function Home() {
                           <span className="font-normal pr-7">Batch:</span> {data.session.meta_data.batch ?? "Science Batch"}
                         </div>
                       </div>
-                      {renderButton(data.session)}
+                      {renderButton(data)}
                     </div>
                   </div>
                 ))}
