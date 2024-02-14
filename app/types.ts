@@ -146,5 +146,6 @@ export interface SessionSchedule {
   session_id: number,
   start_time: string,
   end_time: string,
+  batch_id: number,
   session: Session
 }

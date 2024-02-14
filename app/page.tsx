@@ -57,15 +57,15 @@ export default function Home() {
       const flattenedGroupSessions = groupSessions.flat();
 
       const sessionsData = await Promise.all(flattenedGroupSessions.map(async (groupSession: GroupSession) => {
-        const sessionData = await getSessionSchedule(groupSession.session_id, batchId);
-        if (!sessionData) {
+        const sessionScheduleData = await getSessionSchedule(groupSession.session_id, batchId);
+        if (!sessionScheduleData) {
           return null;
         }
-        const isActive = sessionData.session.is_active;
-        const repeatSchedule = sessionData.session.repeat_schedule;
+        const isActive = sessionScheduleData.session.is_active;
+        const repeatSchedule = sessionScheduleData.session.repeat_schedule;
 
         if (isActive && repeatSchedule && repeatSchedule.type === 'weekly' && repeatSchedule.params.includes(currentDay)) {
-          return sessionData;
+          return sessionScheduleData;
         }
         return null;
       }));
@@ -81,17 +81,18 @@ export default function Home() {
 
   function renderButton(data: any) {
     const currentTime = new Date();
-    const sessionTimeStr = formatSessionTime(data.start_time);
+    const sessionStartTimeStr = formatSessionTime(data.start_time);
     const sessionEndTimeStr = formatSessionTime(data.end_time);
     const currentTimeStr = formatCurrentTime(currentTime.toISOString());
 
-    const sessionTime = new Date(`2000-01-01T${sessionTimeStr}`);
+    const sessionTime = new Date(`2000-01-01T${sessionStartTimeStr}`);
     const sessionEndTime = new Date(`2000-01-01T${sessionEndTimeStr}`);
     const currentTimeObj = new Date(`2000-01-01T${currentTimeStr}`);
-    const timeDifference = (sessionTime.getTime() - currentTimeObj.getTime()) / (1000 * 60);
+    const minutesUntilSessionStart = (sessionTime.getTime() - currentTimeObj.getTime()) / (1000 * 60);
+    const hasSessionNotEnded = sessionEndTime.getTime() > currentTimeObj.getTime()
 
     if (data.session && data.session.platform === 'meet') {
-      if (timeDifference <= 5 && sessionEndTime.getTime() > currentTimeObj.getTime()) {
+      if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
         return (
           <Link href={`${portalBaseUrl}/?sessionId=${data.session.session_id}`} target="_blank">
             <PrimaryButton
@@ -102,13 +103,13 @@ export default function Home() {
         return (
           <p className="text-sm italic font-normal mr-6">
             Starts at <br />
-            {sessionTimeStr}
+            {sessionStartTimeStr}
           </p>
         );
       }
     }
     else if (data.redirectPlatform === 'quiz') {
-      if (timeDifference <= 5 && sessionEndTime.getTime() > currentTimeObj.getTime()) {
+      if (minutesUntilSessionStart <= 5 && sessionEndTime.getTime() > currentTimeObj.getTime()) {
         return (
           <Link href={`${portalBaseUrl}/?sessionId=${data.id}`} target="_blank">
             <PrimaryButton
@@ -120,7 +121,7 @@ export default function Home() {
       return (
         <p className="text-sm italic font-normal mr-6">
           Starts at <br />
-          {sessionTimeStr}
+          {sessionStartTimeStr}
         </p>
       );
     }
