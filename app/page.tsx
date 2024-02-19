@@ -3,24 +3,25 @@
 import { useAuth } from "@/services/AuthContext";
 import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getSessions, getGroupUser, getGroupSessions, getGroupTypes, getQuizBatchData } from "@/api/afdb/session";
+import { getGroupUser, getGroupSessions, getGroupTypes, getQuizBatchData, getSessionSchedule } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
-import { GroupUser, GroupSession, Session, QuizSession } from "./types";
+import { GroupUser, GroupSession, QuizSession, SessionSchedule } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
-import { formatCurrentTime, formatSessionTime, formatQuizSessionTime } from "@/utils/dateUtils";
+import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime, isSessionActive } from "@/utils/dateUtils";
 import { generateQuizLinks } from "@/utils/quizUtils";
 import { api } from "@/services/url";
 
 export default function Home() {
   const { loggedIn, userId, userDbId } = useAuth();
-  const [liveClasses, setLiveClasses] = useState<Session[]>([]);
+  const [liveClasses, setLiveClasses] = useState<SessionSchedule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
   const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
   const portalBaseUrl = api.portal.frontend.baseUrl;
+  const [batchId, setBatchId] = useState();
 
   const fetchUserSessions = async () => {
     try {
@@ -33,6 +34,9 @@ export default function Home() {
         const groupTypeIds = groupType.map((type: any) => type.id);
 
         const quizIds = groupType.map((quiz: any) => quiz.child_id.parent_id)
+
+        const batchId = groupType.map((groupTypeData: any) => groupTypeData.child_id.id)
+        setBatchId(batchId[0])
 
         const groupSessionData = await Promise.all(groupTypeIds.map(async (groupId: number) => {
           return await getGroupSessions(groupId);
@@ -53,19 +57,22 @@ export default function Home() {
       const flattenedGroupSessions = groupSessions.flat();
 
       const sessionsData = await Promise.all(flattenedGroupSessions.map(async (groupSession: GroupSession) => {
-        const sessionData = await getSessions(groupSession.session_id);
-        const isActive = sessionData.is_active;
-        const repeatSchedule = sessionData.repeat_schedule;
+        const sessionScheduleData = await getSessionSchedule(groupSession.session_id, batchId);
+        if (!sessionScheduleData) {
+          return null;
+        }
+        const isActive = sessionScheduleData.session.is_active;
+        const repeatSchedule = sessionScheduleData.session.repeat_schedule;
 
         if (isActive && repeatSchedule && repeatSchedule.type === 'weekly' && repeatSchedule.params.includes(currentDay)) {
-          return sessionData;
+          return sessionScheduleData;
         }
         return null;
       }));
 
       const filteredSessions = sessionsData.filter(session => session !== null);
 
-      const liveClassesData = filteredSessions.filter((session: Session) => session.platform === 'meet');
+      const liveClassesData = filteredSessions.filter((sessionSchedule: SessionSchedule) => sessionSchedule.session.platform === 'meet');
       setLiveClasses(liveClassesData);
     } catch (error) {
       console.error("Error fetching user sessions:", error);
@@ -74,17 +81,20 @@ export default function Home() {
 
   function renderButton(data: any) {
     const currentTime = new Date();
-    const sessionTimeStr = formatSessionTime(data.start_time);
+    const sessionStartTimeStr = formatSessionTime(data.start_time);
+    const sessionEndTimeStr = formatSessionTime(data.end_time);
     const currentTimeStr = formatCurrentTime(currentTime.toISOString());
 
-    const sessionTime = new Date(`2000-01-01T${sessionTimeStr}`);
+    const sessionTime = new Date(`2000-01-01T${sessionStartTimeStr}`);
+    const sessionEndTime = new Date(`2000-01-01T${sessionEndTimeStr}`);
     const currentTimeObj = new Date(`2000-01-01T${currentTimeStr}`);
-    const timeDifference = (sessionTime.getTime() - currentTimeObj.getTime()) / (1000 * 60);
+    const minutesUntilSessionStart = (sessionTime.getTime() - currentTimeObj.getTime()) / (1000 * 60);
+    const hasSessionNotEnded = sessionEndTime.getTime() > currentTimeObj.getTime()
 
-    if (data.platform === 'meet') {
-      if (timeDifference <= 5) {
+    if (data.session && data.session.platform === 'meet') {
+      if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
         return (
-          <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
+          <Link href={`${portalBaseUrl}/?sessionId=${data.session.session_id}`} target="_blank">
             <PrimaryButton
               className="bg-primary text-white text-sm rounded-lg w-12 h-8 mr-4 shadow-md shadow-slate-400">JOIN</PrimaryButton>
           </Link>
@@ -93,17 +103,26 @@ export default function Home() {
         return (
           <p className="text-sm italic font-normal mr-6">
             Starts at <br />
-            {sessionTimeStr}
+            {sessionStartTimeStr}
           </p>
         );
       }
     }
     else if (data.redirectPlatform === 'quiz') {
+      if (minutesUntilSessionStart <= 5 && sessionEndTime.getTime() > currentTimeObj.getTime()) {
+        return (
+          <Link href={`${portalBaseUrl}/?sessionId=${data.id}`} target="_blank">
+            <PrimaryButton
+              className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
+          </Link>
+        );
+      }
+    } else {
       return (
-        <Link href={`${portalBaseUrl}/?sessionId=${data.id}`} target="_blank">
-          <PrimaryButton
-            className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
-        </Link>
+        <p className="text-sm italic font-normal mr-6">
+          Starts at <br />
+          {sessionStartTimeStr}
+        </p>
       );
     }
     return null;
@@ -142,22 +161,22 @@ export default function Home() {
             <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Live Classes</h1>
             {liveClasses.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 pb-16">
-                {liveClasses.map((data, index) => (
+                {liveClasses.map((data, index) => (isSessionActive(formatSessionTime(data.end_time)) &&
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
                       <p className={`${commonTextClass}`}>
-                        {formatSessionTime(data.start_time)}
+                        {formatTime(data.start_time)}
                       </p>
                       <p className={`${commonTextClass}`}>
-                        {formatSessionTime(data.end_time)}
+                        {formatTime(data.end_time)}
                       </p>
                     </div>
                     <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
                       <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
                       <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
-                        <span className="font-normal pr-4">Subject:</span> {data.meta_data.subject ?? "Science"}
+                        <span className="font-normal pr-4">Subject:</span> {data.session.meta_data.subject ?? "Science"}
                         <div className="text-sm md:text-base font-semibold ">
-                          <span className="font-normal pr-7">Batch:</span> {data.meta_data.batch ?? "Master Batch"}
+                          <span className="font-normal pr-7">Batch:</span> {data.session.meta_data.batch ?? "Science Batch"}
                         </div>
                       </div>
                       {renderButton(data)}
@@ -174,7 +193,7 @@ export default function Home() {
             <h1 className="text-primary ml-4 font-semibold text-xl">Tests</h1>
             {quizzes.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 pb-40">
-                {quizzes.map((data, index) => (
+                {quizzes.map((data, index) => (isSessionActive(formatSessionTime(data.end_time)) &&
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
                       <p className={`${commonTextClass}`}>

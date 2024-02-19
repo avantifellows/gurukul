@@ -140,3 +140,12 @@ export interface QuizSession {
   stream: string,
   id: string
 }
+
+export interface SessionSchedule {
+  id: number,
+  session_id: number,
+  start_time: string,
+  end_time: string,
+  batch_id: number,
+  session: Session
+}
