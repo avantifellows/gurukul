@@ -16,6 +16,8 @@ import PlayIcon from "../../../assets/play.png";
 import BackIcon from "../../../assets/icon.png";
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
+import { MixpanelTracking } from '@/services/mixpanel';
+import { MIXPANEL_EVENT } from '@/constants/config';
 
 const ClassLibrary = () => {
     const [activeTab, setActiveTab] = useState('Physics');
@@ -37,6 +39,7 @@ const ClassLibrary = () => {
 
     const handleTabClick = async (tabName: string) => {
         setActiveTab(tabName);
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_TAB + ": " + tabName);
         if (activeTab != tabName) {
             setSelectedChapter(null)
             setSelectedTeacher(undefined)
@@ -86,27 +89,30 @@ const ClassLibrary = () => {
         fetchData();
     }, [selectedGrade, selectedChapter, selectedTeacher]);
 
-    const handleTeacherChange = (selectedTeacherId: number) => {
+    const handleTeacherChange = async (selectedTeacherId: number) => {
         setSelectedTeacher(selectedTeacherId);
+        const teacherName = await getTeachers(selectedTeacherId);
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_TEACHER + ": " + teacherName[0].user.first_name);
     };
 
-    const handleChapterClick = async (chapterId: number) => {
+    const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
             const resourceData = await getResourcesOfChapter(chapterId, selectedTeacher);
             setResources(resourceData);
+            MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER + ": " + chapterName);
         } catch (error) {
             console.error('Error fetching chapter data:', error);
         }
     };
 
-    const toggleChapterExpansion = async (chapterId: number) => {
+    const toggleChapterExpansion = async (chapterId: number, chapterName: string) => {
         setExpandedChapters((prevExpanded) => ({
             ...prevExpanded,
             [chapterId]: !prevExpanded[chapterId],
         }));
 
         if (!expandedChapters[chapterId]) {
-            await handleChapterClick(chapterId);
+            await handleChapterClick(chapterId, chapterName);
         }
     };
 
@@ -117,12 +123,17 @@ const ClassLibrary = () => {
     const handleGradeChange = (grade: number) => {
         setSelectedGrade(grade);
         setSelectedChapter(null)
+        MixpanelTracking.getInstance().trackEvent('Selected grade: ' + grade);
     };
 
     const fetchChapters = async (subjectId: number, gradeId: number) => {
         const chapterData = await getClassChapters(subjectId, gradeId, undefined, selectedTeacher);
         setChapterList(chapterData);
     };
+
+    const handleResourceTracking = (resourceName: any) => {
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_RESOURCE + ": " + resourceName)
+    }
 
     const generateSubjectButton = (subject: string, label: string) => (
         <PrimaryButton
@@ -196,7 +207,7 @@ const ClassLibrary = () => {
                             <div key={chapter.id} className="mx-5">
                                 <div
                                     className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
-                                    onClick={() => toggleChapterExpansion(chapter.id)}
+                                    onClick={() => toggleChapterExpansion(chapter.id, chapter.name)}
                                 >
                                     <div className="w-52">{chapter.name}</div>
                                     <div className="w-8 flex justify-center">
@@ -212,7 +223,7 @@ const ClassLibrary = () => {
                                         {resources
                                             .filter((resource) => resource.chapter_id === chapter.id)
                                             .map((resource) => (
-                                                <li key={resource.id} className="py-2">
+                                                <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
                                                     <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row">
                                                         <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name}
                                                     </Link>

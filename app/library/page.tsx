@@ -8,6 +8,8 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Image from 'next/image';
 import StethoscopeIcon from '../../assets/stethoscope.png';
 import BlueprintIcon from '../../assets/blueprint.png';
+import { MixpanelTracking } from '@/services/mixpanel';
+import { MIXPANEL_EVENT } from '@/constants/config';
 
 const Page: React.FC = () => {
   const [selectedLibrary, setSelectedLibrary] = useState<string | null>('Content');
@@ -15,6 +17,7 @@ const Page: React.FC = () => {
 
   const handleLibraryChange = (library: string) => {
     setSelectedLibrary(library);
+    MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_LIBRARY + ": " + library );
   };
 
   useEffect(() => {

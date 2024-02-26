@@ -12,6 +12,7 @@ import Loading from "./loading";
 import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime, isSessionActive } from "@/utils/dateUtils";
 import { generateQuizLinks } from "@/utils/quizUtils";
 import { api } from "@/services/url";
+import { MixpanelTracking } from "@/services/mixpanel";
 
 export default function Home() {
   const { loggedIn, userId, userDbId } = useAuth();
@@ -74,6 +75,7 @@ export default function Home() {
 
       const liveClassesData = filteredSessions.filter((sessionSchedule: SessionSchedule) => sessionSchedule.session.platform === 'meet');
       setLiveClasses(liveClassesData);
+      MixpanelTracking.getInstance().identify(userId!);
     } catch (error) {
       console.error("Error fetching user sessions:", error);
     }
