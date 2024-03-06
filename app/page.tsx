@@ -5,7 +5,7 @@ import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
 import { getGroupUser, getGroupSessions, getGroupTypes, getQuizBatchData, getSessionSchedule } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
-import { GroupUser, GroupSession, QuizSession, SessionSchedule } from "./types";
+import { GroupUser, GroupSession, QuizSession, SessionSchedule, MessageDisplayProps } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
@@ -130,6 +130,10 @@ export default function Home() {
     return null;
   }
 
+  function MessageDisplay({ message }: MessageDisplayProps) {
+    return <p className={infoMessageClass}>{message}</p>;
+  }
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -185,10 +189,11 @@ export default function Home() {
                     </div>
                   </div>
                 ))}
+                {liveClasses.filter((data) => isSessionActive(formatSessionTime(data.end_time))).length === 0 && (
+                  <MessageDisplay message="No more live classes are scheduled for today!" />
+                )}
               </div>) : (
-              <p className={infoMessageClass}>
-                No more live classes are scheduled for today!
-              </p>
+              <MessageDisplay message="No more live classes are scheduled for today!" />
             )}
           </div>
           <div className="bg-heading">
@@ -219,10 +224,11 @@ export default function Home() {
                     </div>
                   </div>
                 ))}
+                {quizzes.filter((data) => isSessionActive(formatSessionTime(data.end_time))).length === 0 && (
+                  <MessageDisplay message="No more tests are scheduled for today!" />
+                )}
               </div>) : (
-              <p className={`${infoMessageClass}`}>
-                No more tests are scheduled for today!
-              </p>
+              <MessageDisplay message="No more tests are scheduled for today!" />
             )}
           </div>
           <BottomNavigationBar />

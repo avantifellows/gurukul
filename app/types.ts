@@ -149,3 +149,7 @@ export interface SessionSchedule {
   batch_id: number,
   session: Session
 }
+
+export interface MessageDisplayProps {
+  message: string;
+}
