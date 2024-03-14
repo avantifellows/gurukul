@@ -220,7 +220,7 @@ const ContentLibrary = () => {
                                                             .filter((resource) => resource.topic_id === topic.id)
                                                             .map((resource) => (
                                                                 <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
-                                                                    <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row">
+                                                                    <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
                                                                         <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name}
                                                                     </Link>
                                                                 </li>
