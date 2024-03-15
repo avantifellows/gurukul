@@ -118,14 +118,14 @@ export default function Home() {
               className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
           </Link>
         );
+      } else {
+        return (
+          <p className="text-sm italic font-normal mr-6">
+            Starts at <br />
+            {sessionStartTimeStr}
+          </p>
+        );
       }
-    } else {
-      return (
-        <p className="text-sm italic font-normal mr-6">
-          Starts at <br />
-          {sessionStartTimeStr}
-        </p>
-      );
     }
     return null;
   }
@@ -177,12 +177,12 @@ export default function Home() {
                         {formatTime(data.end_time)}
                       </p>
                     </div>
-                    <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
+                    <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
                       <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
                       <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
                         <span className="font-normal pr-4">Subject:</span> {data.session.meta_data.subject ?? "Science"}
                         <div className="text-sm md:text-base font-semibold ">
-                          <span className="font-normal pr-7">Batch:</span> {data.session.meta_data.batch ?? "Science Batch"}
+                          <span className="font-normal pr-7">Name:</span> {data.session.name}
                         </div>
                       </div>
                       {renderButton(data)}
@@ -210,14 +210,14 @@ export default function Home() {
                         {formatQuizSessionTime(data.end_time)}
                       </p>
                     </div>
-                    <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4">
+                    <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
                       <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0  rounded-s-md`}></div>
                       <div className="text-sm md:text-base font-semibold mx-6 md:mx-8">
                         <div className="flex">
                           <span className="font-normal pr-8">Name:</span> <span>{data.name}</span>
                         </div>
                         <div className="text-sm md:text-base font-semibold ">
-                          <span className="font-normal pr-5">Stream:</span> <span>{data.stream}</span>
+                          <span className="font-normal pr-5">Format:</span> <span>{data.testFormat}</span>
                         </div>
                       </div>
                       {renderButton(data)}

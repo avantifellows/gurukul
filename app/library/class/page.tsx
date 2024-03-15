@@ -51,6 +51,9 @@ const ClassLibrary = () => {
             const gradeData = await getGrades(selectedGrade);
             const teacherData = await getTeachers(undefined, actualTabName);
             setTeachers(teacherData);
+            if (teacherData.length > 0 && selectedTeacher === undefined) {
+                setSelectedTeacher(teacherData[0].id);
+            }
             if (subjectData.length > 0) {
                 const subjectId = subjectData[0].id;
                 const gradeId = gradeData[0].id;
@@ -191,7 +194,6 @@ const ClassLibrary = () => {
                         value={selectedTeacher}
                         className="w-32 h-8 rounded-lg text-center"
                     >
-                        <option value="" className="text-sm md:text-lg">Teacher: All</option>
                         {teachers.map((teacher) => (
                             <option key={teacher.id} value={teacher.id} className="text-sm md:text-lg">
                                 {teacher.user.first_name}
@@ -225,7 +227,8 @@ const ClassLibrary = () => {
                                             .map((resource) => (
                                                 <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
                                                     <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                        <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name}
+                                                        <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name} {" - "}
+                                                        {resource.type_params.date}
                                                     </Link>
                                                 </li>
                                             ))}

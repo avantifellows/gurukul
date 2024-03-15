@@ -61,6 +61,9 @@ export interface Resource {
   link: string;
   chapter_id: number;
   type: string;
+  type_params: {
+    date: string
+  }
 }
 
 export interface Topic {
@@ -138,7 +141,8 @@ export interface QuizSession {
   subject: string,
   redirectPlatform: string,
   stream: string,
-  id: string
+  id: string,
+  testFormat: string
 }
 
 export interface SessionSchedule {
