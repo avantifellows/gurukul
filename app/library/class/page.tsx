@@ -227,7 +227,8 @@ const ClassLibrary = () => {
                                             .map((resource) => (
                                                 <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
                                                     <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                        <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name}
+                                                        <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name} {" - "}
+                                                        {resource.type_params.date}
                                                     </Link>
                                                 </li>
                                             ))}
