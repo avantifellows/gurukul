@@ -61,6 +61,9 @@ export interface Resource {
   link: string;
   chapter_id: number;
   type: string;
+  type_params: {
+    date: string
+  }
 }
 
 export interface Topic {
