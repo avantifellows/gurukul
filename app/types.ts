@@ -138,7 +138,8 @@ export interface QuizSession {
   subject: string,
   redirectPlatform: string,
   stream: string,
-  id: string
+  id: string,
+  testFormat: string
 }
 
 export interface SessionSchedule {
