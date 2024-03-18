@@ -217,7 +217,7 @@ const ContentLibrary = () => {
                                                     <h3>{topic.name}</h3>
                                                     <ul className="text-primary m-2 font-normal">
                                                         {resources
-                                                            .filter((resource) => resource.topic_id === topic.id)
+                                                            .filter((resource) => resource.topic_id === topic.id  && resource.link)
                                                             .map((resource) => (
                                                                 <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
                                                                     <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
