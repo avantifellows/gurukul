@@ -139,11 +139,10 @@ export default function Home() {
     try {
       if (userDbId !== null) {
         await fetchUserSessions();
+        setIsLoading(false);
       }
     } catch (error) {
       console.log("Error:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
