@@ -6,6 +6,7 @@ import { getReports } from "@/api/reporting/reports";
 import { ReportsListProps } from "../types";
 import { MixpanelTracking } from "@/services/mixpanel";
 import { MIXPANEL_EVENT } from "@/constants/config";
+import { formatDate } from "@/utils/dateUtils";
 
 export default function ReportsList({ userId }: ReportsListProps) {
     const [responseData, setResponseData] = useState<{ reports: Report[] } | null>(null);
@@ -37,7 +38,7 @@ export default function ReportsList({ userId }: ReportsListProps) {
                             <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
                             <div className="text-left mx-6 md:mx-8">
                                 <p className="text-sm md:text-base font-semibold">{report.test_name}</p>
-                                <p className="text-gray-700 text-sm md:text-base mt-2">Rank: {report.rank}</p>
+                                <p className="text-gray-700 text-sm md:text-base mt-2">Date attempted: {formatDate(report.start_date) ?? "Date not available"}</p>
                             </div>
                         </Link>
                     ))}

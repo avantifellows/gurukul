@@ -54,3 +54,9 @@ export function isSessionActive(endTime: string): boolean {
     const currentTimeObj = new Date(`2000-01-01T${currentTimeStr}`);
     return sessionEndTime.getTime() > currentTimeObj.getTime();
 }
+
+export function formatDate(dateStr: string): string {
+    const [year, month, day] = dateStr.split('-');
+    return `${day}-${month}-${year}`;
+}
+
