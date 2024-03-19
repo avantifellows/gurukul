@@ -25,6 +25,7 @@ export interface Report {
   test_name: string;
   rank: string;
   report_link: string;
+  start_date: string;
 };
 
 export interface PrimaryButton {
