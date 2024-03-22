@@ -49,7 +49,7 @@ const ClassLibrary = () => {
             const actualTabName = tabName.toLowerCase();
             const subjectData = await getSubjects(actualTabName);
             const gradeData = await getGrades(selectedGrade);
-            const teacherData = await getTeachers(undefined, actualTabName);
+            const teacherData = await getTeachers(undefined, subjectData[0].id);
             setTeachers(teacherData);
             if (teacherData.length > 0 && selectedTeacher === undefined) {
                 setSelectedTeacher(teacherData[0].id);
