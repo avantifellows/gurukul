@@ -204,10 +204,10 @@ export default function Home() {
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
                       <p className={`${commonTextClass}`}>
-                        {formatTime(formatQuizSessionTime(data.start_time))}
+                        {formatQuizSessionTime(data.start_time)}
                       </p>
                       <p className={`${commonTextClass}`}>
-                        {formatTime(formatQuizSessionTime(data.end_time))}
+                        {formatQuizSessionTime(data.end_time)}
                       </p>
                     </div>
                     <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
