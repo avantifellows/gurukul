@@ -3,7 +3,7 @@
 import { useAuth } from "@/services/AuthContext";
 import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getGroupUser, getGroupSessions, getGroupTypes, getQuizBatchData, getSessionSchedule } from "@/api/afdb/session";
+import { getGroupUser, getGroupSessions, getGroup, getQuizBatchData, getSessionSchedule } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
 import { GroupUser, GroupSession, QuizSession, SessionSchedule, MessageDisplayProps } from "./types";
 import Link from "next/link";
@@ -30,16 +30,16 @@ export default function Home() {
       const groupUserData = await getGroupUser(userDbId!);
 
       const groupSessions = await Promise.all(groupUserData.map(async (userData: GroupUser) => {
-        const groupType = await getGroupTypes(userData.group_type_id);
+        const group = await getGroup(userData.group_id);
 
-        const groupTypeIds = groupType.map((type: any) => type.id);
+        const groupIds = group.map((type: any) => type.id);
 
-        const quizIds = groupType.map((quiz: any) => quiz.child_id.parent_id)
+        const quizIds = group.map((quiz: any) => quiz.child_id.parent_id)
 
-        const batchId = groupType.map((groupTypeData: any) => groupTypeData.child_id.id)
+        const batchId = group.map((groupTypeData: any) => groupTypeData.child_id.id)
         setBatchId(batchId[0])
 
-        const groupSessionData = await Promise.all(groupTypeIds.map(async (groupId: number) => {
+        const groupSessionData = await Promise.all(groupIds.map(async (groupId: number) => {
           return await getGroupSessions(groupId);
         }));
 
