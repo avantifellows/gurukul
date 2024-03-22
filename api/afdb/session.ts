@@ -27,10 +27,10 @@ export const getGroupUser = async (userDbId: number) => {
 };
 
 
-export const getGroupSessions = async (groupTypeId: number) => {
+export const getGroupSessions = async (groupId: number) => {
   try {
     const queryParams = new URLSearchParams({
-      group_type_id: groupTypeId.toString(),
+      group_id: groupId.toString(),
     });
 
     const urlWithParams = `${url}/group-session?${queryParams.toString()}`;
@@ -85,23 +85,23 @@ export const getSessionSchedule = async (sessionId: number, batchId?: number) =>
   }
 };
 
-export const getGroupTypes = async (groupTypeId: number) => {
+export const getGroup = async (groupId: number) => {
   try {
     const queryParams = new URLSearchParams({
-      id: groupTypeId.toString(),
+      id: groupId.toString(),
       type: "batch"
     });
-    const urlWithParams = `${url}/group-type?${queryParams.toString()}`;
+    const urlWithParams = `${url}/group?${queryParams.toString()}`;
     const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
 
     if (!response.ok) {
-      throw new Error(`Error in fetching Group Type Details: ${response.statusText}`);
+      throw new Error(`Error in fetching Group Details: ${response.statusText}`);
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error in fetching Group Type Details:", error);
+    console.error("Error in fetching Group Details:", error);
     throw error;
   }
 };
