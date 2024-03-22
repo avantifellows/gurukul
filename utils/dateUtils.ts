@@ -43,8 +43,8 @@ export function formatQuizSessionTime(dateTimeStr: string) {
 }
 
 export function formatTime(dateTimeStr: string) {
-    const [hours, minutes] = dateTimeStr.split(':');
-    return `${hours}:${minutes}`;
+    const time = new Date(`2000-01-01T${dateTimeStr}`);
+    return time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
 export function isSessionActive(endTime: string): boolean {

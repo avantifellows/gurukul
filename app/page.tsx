@@ -19,7 +19,7 @@ export default function Home() {
   const [liveClasses, setLiveClasses] = useState<SessionSchedule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
-  const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
+  const commonTextClass = "text-gray-700 text-xs md:text-sm mx-3 md:mx-8 whitespace-nowrap w-12";
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
   const portalBaseUrl = api.portal.frontend.baseUrl;
   const [batchId, setBatchId] = useState();
@@ -105,7 +105,7 @@ export default function Home() {
         return (
           <p className="text-xs italic font-normal mr-4">
             Starts at <br />
-            {sessionStartTimeStr}
+            {formatTime(sessionStartTimeStr)}
           </p>
         );
       }
@@ -122,7 +122,7 @@ export default function Home() {
         return (
           <p className="text-xs italic font-normal mr-4">
             Starts at <br />
-            {sessionStartTimeStr}
+            {formatTime(sessionStartTimeStr)}
           </p>
         );
       }
@@ -204,10 +204,10 @@ export default function Home() {
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
                       <p className={`${commonTextClass}`}>
-                        {formatQuizSessionTime(data.start_time)}
+                        {formatTime(formatQuizSessionTime(data.start_time))}
                       </p>
                       <p className={`${commonTextClass}`}>
-                        {formatQuizSessionTime(data.end_time)}
+                        {formatTime(formatQuizSessionTime(data.end_time))}
                       </p>
                     </div>
                     <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
