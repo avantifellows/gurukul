@@ -36,7 +36,7 @@ export default function Home() {
 
         const quizIds = group.map((quiz: any) => quiz.child_id.parent_id)
 
-        const batchId = group.map((groupTypeData: any) => groupTypeData.child_id.id)
+        const batchId = group.map((groupData: any) => groupData.child_id.id)
         setBatchId(batchId[0])
 
         const groupSessionData = await Promise.all(groupIds.map(async (groupId: number) => {
