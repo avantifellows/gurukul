@@ -30,21 +30,13 @@ export function formatCurrentTime(dateTimeStr: string) {
 }
 
 export function formatQuizSessionTime(dateTimeStr: string) {
-    const [time, period] = dateTimeStr.split(' ');
-    const [hours, minutes, seconds] = time.split(':');
-    let hours24 = parseInt(hours, 10);
-
-    if (period && period.toUpperCase() === 'PM') {
-        hours24 += 12;
-    }
-
-    const formattedTime = `${String(hours24).padStart(2, "0")}:${minutes}`;
-    return formattedTime;
+    const time = new Date(`01/01/2000 ${dateTimeStr}`);
+    return time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 }
 
 export function formatTime(dateTimeStr: string) {
-    const [hours, minutes] = dateTimeStr.split(':');
-    return `${hours}:${minutes}`;
+    const time = new Date(`2000-01-01T${dateTimeStr}`);
+    return time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
 export function isSessionActive(endTime: string): boolean {
