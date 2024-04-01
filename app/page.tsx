@@ -10,7 +10,6 @@ import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
 import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime, isSessionActive, format12HrQuizSessionTime } from "@/utils/dateUtils";
-import { generateQuizLinks } from "@/utils/quizUtils";
 import { api } from "@/services/url";
 import { MixpanelTracking } from "@/services/mixpanel";
 
@@ -34,9 +33,9 @@ export default function Home() {
 
         const groupIds = group.map((type: any) => type.id);
 
-        const quizIds = group.map((quiz: any) => quiz.child_id.parent_id)
+        const quizId = group.map((quiz: any) => quiz.child_id.parent_id)
 
-        const quizGroup = await getGroup(undefined, quizIds[0]);
+        const quizGroup = await getGroup(undefined, quizId[0]);
 
         const quizGroupIds = quizGroup.map((quizGroup: any) => quizGroup.id);
 
