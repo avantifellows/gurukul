@@ -234,7 +234,7 @@ export default function Home() {
                           <span className="font-semibold">{data.name}</span>
                         </div>
                         <div className="text-sm md:text-base">
-                          <span>{data.testFormat}</span>
+                          <span>{data.meta_data.test_format}</span>
                         </div>
                       </div>
                       {renderButton(data)}
