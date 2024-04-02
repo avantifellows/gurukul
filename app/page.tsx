@@ -3,14 +3,13 @@
 import { useAuth } from "@/services/AuthContext";
 import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getGroupUser, getGroupSessions, getGroup, getQuizBatchData, getSessionSchedule } from "@/api/afdb/session";
+import { getGroupUser, getGroupSessions, getGroup, getSessions, getSessionSchedule } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
 import { GroupUser, GroupSession, QuizSession, SessionSchedule, MessageDisplayProps } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
-import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime, isSessionActive } from "@/utils/dateUtils";
-import { generateQuizLinks } from "@/utils/quizUtils";
+import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime, isSessionActive, format12HrQuizSessionTime } from "@/utils/dateUtils";
 import { api } from "@/services/url";
 import { MixpanelTracking } from "@/services/mixpanel";
 
@@ -34,7 +33,11 @@ export default function Home() {
 
         const groupIds = group.map((type: any) => type.id);
 
-        const quizIds = group.map((quiz: any) => quiz.child_id.parent_id)
+        const quizId = group.map((quiz: any) => quiz.child_id.parent_id)
+
+        const quizGroup = await getGroup(undefined, quizId[0]);
+
+        const quizGroupIds = quizGroup.map((quizGroup: any) => quizGroup.id);
 
         const batchId = group.map((groupData: any) => groupData.child_id.id)
         setBatchId(batchId[0])
@@ -43,15 +46,29 @@ export default function Home() {
           return await getGroupSessions(groupId);
         }));
 
-        const quizData = await Promise.all(quizIds.map(async (quizId: number) => {
-          return await getQuizBatchData(quizId);
+        const quizGroupSessionData = await Promise.all(quizGroupIds.map(async (quizGroupId: number) => {
+          return await getGroupSessions(quizGroupId);
         }));
+        const flattenedQuizGroupSessions = quizGroupSessionData.flat();
+
+        const sessionsData = await Promise.all(flattenedQuizGroupSessions.map(async (groupSession: GroupSession) => {
+          const sessionData = await getSessions(groupSession.session_id);
+          if (!sessionData) {
+            return null;
+          }
+          const isActive = sessionData.is_active;
+          const repeatSchedule = sessionData.repeat_schedule;
+
+          if (isActive && repeatSchedule && repeatSchedule.type === 'weekly' && repeatSchedule.params.includes(currentDay)) {
+            return sessionData;
+          }
+          return null;
+        }));
+        const filteredSessions = sessionsData.filter(session => session !== null);
+        const quizzesData = filteredSessions.filter((session: any) => session.platform === 'quiz');
 
         const flattenedGroupSessions = groupSessionData.flat();
-        const flattenedQuizData = quizData.flat();
-        const quizzesData = await generateQuizLinks(flattenedQuizData);
         setQuizzes(quizzesData);
-
         return flattenedGroupSessions;
       }));
 
@@ -110,10 +127,10 @@ export default function Home() {
         );
       }
     }
-    else if (data.redirectPlatform === 'quiz') {
-      if (minutesUntilSessionStart <= 5 && sessionEndTime.getTime() > currentTimeObj.getTime()) {
+    else if (data.platform === 'quiz') {
+      if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
         return (
-          <Link href={`${portalBaseUrl}/?sessionId=${data.id}`} target="_blank">
+          <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
             <PrimaryButton
               className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">START</PrimaryButton>
           </Link>
@@ -122,7 +139,7 @@ export default function Home() {
         return (
           <p className="text-xs italic font-normal mr-4">
             Starts at <br />
-            {formatTime(sessionStartTimeStr)}
+            {format12HrQuizSessionTime(data.start_time)}
           </p>
         );
       }
@@ -200,14 +217,14 @@ export default function Home() {
             <h1 className="text-primary ml-4 font-semibold text-xl">Tests</h1>
             {quizzes.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 pb-40">
-                {quizzes.map((data, index) => (isSessionActive(formatSessionTime(data.end_time)) &&
+                {quizzes.map((data, index) => (isSessionActive(formatQuizSessionTime(data.end_time)) &&
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
                       <p className={`${commonTextClass}`}>
-                        {formatQuizSessionTime(data.start_time)}
+                        {format12HrQuizSessionTime(data.start_time)}
                       </p>
                       <p className={`${commonTextClass}`}>
-                        {formatQuizSessionTime(data.end_time)}
+                        {format12HrQuizSessionTime(data.end_time)}
                       </p>
                     </div>
                     <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
@@ -217,14 +234,14 @@ export default function Home() {
                           <span className="font-semibold">{data.name}</span>
                         </div>
                         <div className="text-sm md:text-base">
-                          <span>{data.testFormat}</span>
+                          <span>{data.meta_data.test_format}</span>
                         </div>
                       </div>
                       {renderButton(data)}
                     </div>
                   </div>
                 ))}
-                {quizzes.filter((data) => isSessionActive(formatSessionTime(data.end_time))).length === 0 && (
+                {quizzes.filter((data) => isSessionActive(formatQuizSessionTime(data.end_time))).length === 0 && (
                   <MessageDisplay message="No more tests are scheduled for today!" />
                 )}
               </div>) : (

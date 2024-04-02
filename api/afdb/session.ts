@@ -85,12 +85,12 @@ export const getSessionSchedule = async (sessionId: number, batchId?: number) =>
   }
 };
 
-export const getGroup = async (groupId: number) => {
+export const getGroup = async (groupId?: number, childId?: number) => {
   try {
-    const queryParams = new URLSearchParams({
-      id: groupId.toString(),
-      type: "batch"
-    });
+    const queryParams = new URLSearchParams();
+    if (groupId !== undefined) queryParams.append('id', groupId.toString());
+    if (childId !== undefined) queryParams.append('child_id', childId.toString());
+    queryParams.append('type', "batch")
     const urlWithParams = `${url}/group?${queryParams.toString()}`;
     const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
 
