@@ -3,7 +3,7 @@
 import { useAuth } from "@/services/AuthContext";
 import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getGroupUser, getGroupSessions, getGroupTypes, getQuizBatchData, getSessionSchedule } from "@/api/afdb/session";
+import { getGroupUser, getGroupSessions, getGroup, getQuizBatchData, getSessionSchedule } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
 import { GroupUser, GroupSession, QuizSession, SessionSchedule, MessageDisplayProps } from "./types";
 import Link from "next/link";
@@ -19,7 +19,7 @@ export default function Home() {
   const [liveClasses, setLiveClasses] = useState<SessionSchedule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
-  const commonTextClass = "text-gray-700 text-sm md:text-base mx-6 md:mx-8";
+  const commonTextClass = "text-gray-700 text-xs md:text-sm mx-3 md:mx-8 whitespace-nowrap w-12";
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
   const portalBaseUrl = api.portal.frontend.baseUrl;
   const [batchId, setBatchId] = useState();
@@ -30,16 +30,16 @@ export default function Home() {
       const groupUserData = await getGroupUser(userDbId!);
 
       const groupSessions = await Promise.all(groupUserData.map(async (userData: GroupUser) => {
-        const groupType = await getGroupTypes(userData.group_type_id);
+        const group = await getGroup(userData.group_id);
 
-        const groupTypeIds = groupType.map((type: any) => type.id);
+        const groupIds = group.map((type: any) => type.id);
 
-        const quizIds = groupType.map((quiz: any) => quiz.child_id.parent_id)
+        const quizIds = group.map((quiz: any) => quiz.child_id.parent_id)
 
-        const batchId = groupType.map((groupTypeData: any) => groupTypeData.child_id.id)
+        const batchId = group.map((groupData: any) => groupData.child_id.id)
         setBatchId(batchId[0])
 
-        const groupSessionData = await Promise.all(groupTypeIds.map(async (groupId: number) => {
+        const groupSessionData = await Promise.all(groupIds.map(async (groupId: number) => {
           return await getGroupSessions(groupId);
         }));
 
@@ -105,7 +105,7 @@ export default function Home() {
         return (
           <p className="text-xs italic font-normal mr-4">
             Starts at <br />
-            {sessionStartTimeStr}
+            {formatTime(sessionStartTimeStr)}
           </p>
         );
       }
@@ -122,7 +122,7 @@ export default function Home() {
         return (
           <p className="text-xs italic font-normal mr-4">
             Starts at <br />
-            {sessionStartTimeStr}
+            {formatTime(sessionStartTimeStr)}
           </p>
         );
       }
