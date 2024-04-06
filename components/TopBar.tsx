@@ -43,6 +43,8 @@ const TopBar = () => {
   const handleLogout = () => {
     deleteCookie("access_token", { path: '/', domain: '.avantifellows.org' });
     deleteCookie("refresh_token", { path: '/', domain: '.avantifellows.org' });
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
     window.location.reload();
     MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.LOGOUT);
   };
