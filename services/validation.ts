@@ -2,17 +2,28 @@ import { getCookie, setCookie } from 'cookies-next';
 import { api } from './url';
 import getFetchConfig from '@/api/fetchConfig';
 
-export async function verifyToken() {
-    const accessToken = getCookie('access_token');
-    const refreshToken = getCookie('refresh_token');
-    const url = `${api.portal.backend.baseUrl}${api.portal.backend.verify}`;
-    const refreshUrl = `${api.portal.backend.baseUrl}${api.portal.backend.refreshToken}`;
-
-    if (!accessToken) {
-        return { isValid: false, message: 'Access token not found' };
+async function getToken(key: string): Promise<string | null> {
+    let token: string | null = localStorage.getItem(key);
+    if (!token) {
+        token = getCookie(key) as string | null;
+        if (token) {
+            localStorage.setItem(key, token);
+        }
     }
+    return token;
+}
 
+export async function verifyToken() {
     try {
+        const accessToken = await getToken('access_token');
+        const refreshToken = await getToken('refresh_token');
+        const url = api.portal.backend.baseUrl + api.portal.backend.verify;
+        const refreshUrl = api.portal.backend.baseUrl + api.portal.backend.refreshToken;
+
+        if (!accessToken) {
+            return { isValid: false, message: 'Access token not found' };
+        }
+
         const response = await fetch(url, getFetchConfig(accessToken));
         const data = await response.json();
 
@@ -29,6 +40,7 @@ export async function verifyToken() {
 
                 const refreshData = await refreshResponse.json();
                 setCookie('access_token', refreshData.access_token, { path: '/', domain: '.avantifellows.org' });
+                localStorage.setItem('access_token', refreshData.access_token);
                 window.location.reload();
                 return { isValid: true };
             }
