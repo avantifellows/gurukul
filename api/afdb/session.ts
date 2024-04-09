@@ -5,66 +5,6 @@ import getFetchConfig from '../fetchConfig';
 const url = process.env.AF_DB_SERVICE_URL;
 const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
 
-export const getGroupUser = async (userDbId: number) => {
-  try {
-    const queryParams = new URLSearchParams({
-      user_id: userDbId.toString(),
-    });
-
-    const urlWithParams = `${url}/group-user?${queryParams.toString()}`;
-    const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
-
-    if (!response.ok) {
-      throw new Error(`Error in fetching Session Details: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error in fetching Session Details:", error);
-    throw error;
-  }
-};
-
-
-export const getGroupSessions = async (groupId: number) => {
-  try {
-    const queryParams = new URLSearchParams({
-      group_id: groupId.toString(),
-    });
-
-    const urlWithParams = `${url}/group-session?${queryParams.toString()}`;
-    const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
-
-    if (!response.ok) {
-      throw new Error(`Error in fetching Session Details: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error in fetching Session Details:", error);
-    throw error;
-  }
-};
-
-export const getSessions = async (sessionId: number) => {
-  try {
-    const urlWithParams = `${url}/session/${sessionId}`;
-    const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
-
-    if (!response.ok) {
-      throw new Error(`Error in fetching Session Details: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error in fetching Session Details:", error);
-    throw error;
-  }
-};
-
 export const getSessionSchedule = async (sessionId: number, batchId?: number) => {
   try {
     const queryParams = new URLSearchParams();
@@ -85,40 +25,22 @@ export const getSessionSchedule = async (sessionId: number, batchId?: number) =>
   }
 };
 
-export const getGroup = async (groupId?: number, childId?: number) => {
+export const fetchUserSession = async (userId: number, isQuiz = false) => {
   try {
-    const queryParams = new URLSearchParams();
-    if (groupId !== undefined) queryParams.append('id', groupId.toString());
-    if (childId !== undefined) queryParams.append('child_id', childId.toString());
-    queryParams.append('type', "batch")
-    const urlWithParams = `${url}/group?${queryParams.toString()}`;
-    const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
+    let urlWithParams = `${url}/user/${userId}/sessions`;
+    if (isQuiz) {
+      urlWithParams += '?quiz=true';
+    }
 
+    const response = await fetch(urlWithParams);
     if (!response.ok) {
-      throw new Error(`Error in fetching Group Details: ${response.statusText}`);
+      throw new Error('Failed to fetch sessions');
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error in fetching Group Details:", error);
-    throw error;
-  }
-};
-
-export const getQuizBatchData = async (id: number) => {
-  try {
-    const urlWithParams = `${url}/batch/${id}`;
-    const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
-
-    if (!response.ok) {
-      throw new Error(`Error in fetching Batch Details: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error in fetching Batch Details:", error);
+    console.error('Error fetching user sessions:', error);
     throw error;
   }
 };

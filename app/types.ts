@@ -103,17 +103,6 @@ export interface User {
   first_name: string;
   last_name: string;
 }
-
-export interface GroupSession {
-  session_id: number;
-  group_id: number
-}
-
-export interface GroupUser {
-  user_id: number;
-  group_id: number
-}
-
 export interface Student {
   id: number;
   student_id: string;
