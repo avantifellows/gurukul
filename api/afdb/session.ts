@@ -40,7 +40,7 @@ export const fetchUserSession = async (userId: number, isQuiz = false) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error fetching user sessions:', error);
+    console.error('Error fetching sessions for a user:', error);
     throw error;
   }
 };
