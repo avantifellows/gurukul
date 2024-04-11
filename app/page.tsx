@@ -3,9 +3,9 @@
 import { useAuth } from "@/services/AuthContext";
 import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getGroupUser, getGroupSessions, getGroup, getSessions, getSessionSchedule } from "@/api/afdb/session";
+import { getSessionSchedule, fetchUserSession } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
-import { GroupUser, GroupSession, QuizSession, SessionSchedule, MessageDisplayProps } from "./types";
+import { QuizSession, SessionSchedule, MessageDisplayProps, Session } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
@@ -21,77 +21,40 @@ export default function Home() {
   const commonTextClass = "text-gray-700 text-xs md:text-sm mx-3 md:mx-8 whitespace-nowrap w-12";
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
   const portalBaseUrl = api.portal.frontend.baseUrl;
-  const [batchId, setBatchId] = useState();
 
   const fetchUserSessions = async () => {
     try {
       const currentDay = (new Date().getDay() + 6) % 7 + 1;
-      const groupUserData = await getGroupUser(userDbId!);
 
-      const groupSessions = await Promise.all(groupUserData.map(async (userData: GroupUser) => {
-        const group = await getGroup(userData.group_id);
+      const [liveSessionData, quizSessionData] = await Promise.all([
+        fetchUserSession(userDbId!),
+        fetchUserSession(userDbId!, true)
+      ]);
 
-        const groupIds = group.map((type: any) => type.id);
+      const filteredQuizSessions = quizSessionData.filter((quiz: Session) => {
+        const { is_active: isActive, repeat_schedule: repeatSchedule } = quiz;
+        return isActive && repeatSchedule &&
+          repeatSchedule.type === 'weekly' &&
+          repeatSchedule.params.includes(currentDay);
+      }).filter(Boolean);
 
-        const quizId = group.map((quiz: any) => quiz.child_id.parent_id)
+      const quizSessions = filteredQuizSessions.filter((session: Session) => session.platform === 'quiz');
+      setQuizzes(quizSessions);
 
-        const quizGroup = await getGroup(undefined, quizId[0]);
+      const sessionsData = await Promise.all(liveSessionData.map(async (liveSession: Session) => {
+        const sessionScheduleData = await getSessionSchedule(liveSession.id);
+        if (!sessionScheduleData) return null;
 
-        const quizGroupIds = quizGroup.map((quizGroup: any) => quizGroup.id);
-
-        const batchId = group.map((groupData: any) => groupData.child_id.id)
-        setBatchId(batchId[0])
-
-        const groupSessionData = await Promise.all(groupIds.map(async (groupId: number) => {
-          return await getGroupSessions(groupId);
-        }));
-
-        const quizGroupSessionData = await Promise.all(quizGroupIds.map(async (quizGroupId: number) => {
-          return await getGroupSessions(quizGroupId);
-        }));
-        const flattenedQuizGroupSessions = quizGroupSessionData.flat();
-
-        const sessionsData = await Promise.all(flattenedQuizGroupSessions.map(async (groupSession: GroupSession) => {
-          const sessionData = await getSessions(groupSession.session_id);
-          if (!sessionData) {
-            return null;
-          }
-          const isActive = sessionData.is_active;
-          const repeatSchedule = sessionData.repeat_schedule;
-
-          if (isActive && repeatSchedule && repeatSchedule.type === 'weekly' && repeatSchedule.params.includes(currentDay)) {
-            return sessionData;
-          }
-          return null;
-        }));
-        const filteredSessions = sessionsData.filter(session => session !== null);
-        const quizzesData = filteredSessions.filter((session: any) => session.platform === 'quiz');
-
-        const flattenedGroupSessions = groupSessionData.flat();
-        setQuizzes(quizzesData);
-        return flattenedGroupSessions;
+        const { is_active: isActive, repeat_schedule: repeatSchedule } = sessionScheduleData.session;
+        return isActive && repeatSchedule &&
+          repeatSchedule.type === 'weekly' &&
+          repeatSchedule.params.includes(currentDay) ? sessionScheduleData : null;
       }));
 
-      const flattenedGroupSessions = groupSessions.flat();
+      const liveSessions = sessionsData.filter(sessionSchedule => sessionSchedule)
+        .filter(sessionSchedule => sessionSchedule.session.platform === 'meet');
 
-      const sessionsData = await Promise.all(flattenedGroupSessions.map(async (groupSession: GroupSession) => {
-        const sessionScheduleData = await getSessionSchedule(groupSession.session_id, batchId);
-        if (!sessionScheduleData) {
-          return null;
-        }
-        const isActive = sessionScheduleData.session.is_active;
-        const repeatSchedule = sessionScheduleData.session.repeat_schedule;
-
-        if (isActive && repeatSchedule && repeatSchedule.type === 'weekly' && repeatSchedule.params.includes(currentDay)) {
-          return sessionScheduleData;
-        }
-        return null;
-      }));
-
-      const filteredSessions = sessionsData.filter(session => session !== null);
-
-      const liveClassesData = filteredSessions.filter((sessionSchedule: SessionSchedule) => sessionSchedule.session.platform === 'meet');
-      setLiveClasses(liveClassesData);
+      setLiveClasses(liveSessions);
       MixpanelTracking.getInstance().identify(userId!);
     } catch (error) {
       console.error("Error fetching user sessions:", error);
