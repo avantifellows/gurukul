@@ -32,7 +32,7 @@ export const fetchUserSession = async (userId: number, isQuiz = false) => {
       urlWithParams += '?quiz=true';
     }
 
-    const response = await fetch(urlWithParams);
+    const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
     if (!response.ok) {
       throw new Error('Failed to fetch sessions');
     }
