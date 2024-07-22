@@ -11,7 +11,7 @@ import { MixpanelTracking } from "@/services/mixpanel";
 import { MIXPANEL_EVENT } from "@/constants/config";
 
 const TopBar = () => {
-  const { userName } = useAuth();
+  const { userName, logout } = useAuth();
   const formatUserName = (userName: string) => {
     const names = userName.split(' ');
 
@@ -45,7 +45,7 @@ const TopBar = () => {
     deleteCookie("refresh_token", { path: '/', domain: '.avantifellows.org' });
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
-    window.location.reload();
+    logout();
     MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.LOGOUT);
   };
 

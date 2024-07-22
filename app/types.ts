@@ -9,6 +9,8 @@ export interface AuthContextProps {
   userId?: string | null;
   userName?: string | null;
   userDbId?: number | null;
+  group?: string | null;
+  logout: () => void;
 }
 
 export interface CurrentTimeProps {
