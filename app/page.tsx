@@ -133,9 +133,9 @@ export default function Home() {
           <Loading />
         </div>
       ) : (
-        <main className="min-h-screen max-w-xl mx-auto md:mx-auto bg-white">
+        <main className="min-h-screen max-w-xl mx-auto md:mx-auto bg-heading">
           <TopBar />
-          <div className="bg-heading">
+          <div>
             <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Live Classes</h1>
             {liveClasses.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 pb-16">
@@ -168,7 +168,7 @@ export default function Home() {
               <MessageDisplay message="No more live classes are scheduled for today!" />
             )}
           </div>
-          <div className="bg-heading">
+          <div>
             <h1 className="text-primary ml-4 font-semibold text-xl">Tests</h1>
             {quizzes.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 pb-40">
