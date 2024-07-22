@@ -3,19 +3,19 @@
 import { useAuth } from "@/services/AuthContext";
 import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getSessionSchedule, fetchUserSession } from "@/api/afdb/session";
+import { getSessionOccurrences, fetchUserSession } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
-import { QuizSession, SessionSchedule, MessageDisplayProps, Session } from "./types";
+import { QuizSession, SessionOccurrence, MessageDisplayProps, Session } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
-import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime, isSessionActive, format12HrQuizSessionTime } from "@/utils/dateUtils";
+import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime, isSessionActive, format12HrSessionTime } from "@/utils/dateUtils";
 import { api } from "@/services/url";
 import { MixpanelTracking } from "@/services/mixpanel";
 
 export default function Home() {
   const { loggedIn, userId, userDbId } = useAuth();
-  const [liveClasses, setLiveClasses] = useState<SessionSchedule[]>([]);
+  const [liveClasses, setLiveClasses] = useState<SessionOccurrence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
   const commonTextClass = "text-gray-700 text-xs md:text-sm mx-3 md:mx-8 whitespace-nowrap w-12";
@@ -24,35 +24,27 @@ export default function Home() {
 
   const fetchUserSessions = async () => {
     try {
-      const currentDay = (new Date().getDay() + 6) % 7 + 1;
-
       const [liveSessionData, quizSessionData] = await Promise.all([
         fetchUserSession(userDbId!),
         fetchUserSession(userDbId!, true)
       ]);
 
-      const filteredQuizSessions = quizSessionData.filter((quiz: Session) => {
-        const { is_active: isActive, repeat_schedule: repeatSchedule } = quiz;
-        return isActive && repeatSchedule &&
-          repeatSchedule.type === 'weekly' &&
-          repeatSchedule.params.includes(currentDay);
-      }).filter(Boolean);
-
-      const quizSessions = filteredQuizSessions.filter((session: Session) => session.platform === 'quiz');
+      const quizData = await Promise.all(quizSessionData.map(async (quiz: Session) => {
+        const sessionOccurrenceData = await getSessionOccurrences(quiz.session_id);
+        if (!sessionOccurrenceData) return null;
+        return sessionOccurrenceData;
+      }));
+      const flattenedQuizData = quizData.flat();
+      const quizSessions = flattenedQuizData.filter(flattenedSessionsData => flattenedSessionsData.session.platform === 'quiz');
       setQuizzes(quizSessions);
 
       const sessionsData = await Promise.all(liveSessionData.map(async (liveSession: Session) => {
-        const sessionScheduleData = await getSessionSchedule(liveSession.id);
-        if (!sessionScheduleData) return null;
-
-        const { is_active: isActive, repeat_schedule: repeatSchedule } = sessionScheduleData.session;
-        return isActive && repeatSchedule &&
-          repeatSchedule.type === 'weekly' &&
-          repeatSchedule.params.includes(currentDay) ? sessionScheduleData : null;
+        const sessionOccurrenceData = await getSessionOccurrences(liveSession.session_id);
+        if (!sessionOccurrenceData) return null;
+        return sessionOccurrenceData;
       }));
-
-      const liveSessions = sessionsData.filter(sessionSchedule => sessionSchedule)
-        .filter(sessionSchedule => sessionSchedule.session.platform === 'meet');
+      const flattenedSessionsData = sessionsData.flat();
+      const liveSessions = flattenedSessionsData.filter(flattenedSessionsData => flattenedSessionsData.session.platform === 'meet');
 
       setLiveClasses(liveSessions);
       MixpanelTracking.getInstance().identify(userId!);
@@ -102,7 +94,7 @@ export default function Home() {
         return (
           <p className="text-xs italic font-normal mr-4">
             Starts at <br />
-            {format12HrQuizSessionTime(data.start_time)}
+            {format12HrSessionTime(data.start_time)}
           </p>
         );
       }
@@ -151,10 +143,10 @@ export default function Home() {
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
                       <p className={`${commonTextClass}`}>
-                        {formatTime(data.start_time)}
+                        {format12HrSessionTime(data.start_time)}
                       </p>
                       <p className={`${commonTextClass}`}>
-                        {formatTime(data.end_time)}
+                        {format12HrSessionTime(data.end_time)}
                       </p>
                     </div>
                     <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
@@ -180,31 +172,31 @@ export default function Home() {
             <h1 className="text-primary ml-4 font-semibold text-xl">Tests</h1>
             {quizzes.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 pb-40">
-                {quizzes.map((data, index) => (isSessionActive(formatQuizSessionTime(data.end_time)) &&
+                {quizzes.map((data, index) => (isSessionActive(formatQuizSessionTime(data.session.end_time)) &&
                   <div key={index} className="flex mt-4 items-center" >
                     <div>
                       <p className={`${commonTextClass}`}>
-                        {format12HrQuizSessionTime(data.start_time)}
+                        {format12HrSessionTime(data.session.start_time)}
                       </p>
                       <p className={`${commonTextClass}`}>
-                        {format12HrQuizSessionTime(data.end_time)}
+                        {format12HrSessionTime(data.session.end_time)}
                       </p>
                     </div>
                     <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
                       <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0  rounded-s-md`}></div>
                       <div className="text-sm md:text-base mx-6 md:mx-8">
                         <div className="flex w-36">
-                          <span className="font-semibold">{data.name}</span>
+                          <span className="font-semibold">{data.session.name}</span>
                         </div>
                         <div className="text-sm md:text-base">
-                          <span>{data.meta_data.test_format}</span>
+                          <span>{data.session.meta_data.test_format}</span>
                         </div>
                       </div>
-                      {renderButton(data)}
+                      {renderButton(data.session)}
                     </div>
                   </div>
                 ))}
-                {quizzes.filter((data) => isSessionActive(formatQuizSessionTime(data.end_time))).length === 0 && (
+                {quizzes.filter((data) => isSessionActive(formatQuizSessionTime(data.session.end_time))).length === 0 && (
                   <MessageDisplay message="No more tests are scheduled for today!" />
                 )}
               </div>) : (

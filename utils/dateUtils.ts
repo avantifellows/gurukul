@@ -45,7 +45,7 @@ export function formatTime(dateTimeStr: string) {
     return time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
-export function format12HrQuizSessionTime(time: string): string {
+export function format12HrSessionTime(time: string): string {
     const isoDate = new Date(time);
     const hours = isoDate.getUTCHours();
     const minutes = isoDate.getUTCMinutes();
