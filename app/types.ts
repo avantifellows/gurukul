@@ -147,21 +147,3 @@ export interface SessionOccurrence {
 export interface MessageDisplayProps {
   message: string;
 }
-
-// Add these to your existing types.ts file
-export interface GroupUser {
-  group_id: string;
-  // Add other properties as needed
-}
-
-export interface Group {
-  id: string;
-  type: string;
-  child_id: string;
-  // Add other properties as needed
-}
-
-export interface AuthGroup {
-  id: string;
-  name: string;
-}
