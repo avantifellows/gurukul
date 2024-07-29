@@ -90,7 +90,8 @@ export interface Session {
   repeat_schedule: {
     type: string;
     params: Object[];
-  }
+  },
+  session_id: string;
 }
 
 export interface ReportsListProps {
@@ -119,20 +120,22 @@ export interface Teacher {
 }
 
 export interface QuizSession {
-  batch: string,
-  end_date: string,
-  end_time: string,
-  meta_data: {
-    test_format: string
-  }
-  start_date: string,
-  start_time: string,
-  name: string,
-  subject: string,
-  id: string,
+  session: {
+    batch: string,
+    end_date: string,
+    end_time: string,
+    meta_data: {
+      test_format: string
+    }
+    start_date: string,
+    start_time: string,
+    name: string,
+    subject: string,
+    id: string,
+  },
 }
 
-export interface SessionSchedule {
+export interface SessionOccurrence {
   id: number,
   session_id: number,
   start_time: string,
