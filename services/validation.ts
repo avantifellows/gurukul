@@ -3,12 +3,12 @@ import { api } from './url';
 import getFetchConfig from '@/api/fetchConfig';
 
 async function getToken(key: string): Promise<string | null> {
-    let token: string | null = localStorage.getItem(key);
+    let token: string | null = getCookie(key) as string | null;
     if (!token) {
-        token = getCookie(key) as string | null;
-        if (token) {
-            localStorage.setItem(key, token);
-        }
+        token = localStorage.getItem(key);
+    }
+    if (token) {
+        localStorage.setItem(key, token);
     }
     return token;
 }
