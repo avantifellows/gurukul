@@ -15,6 +15,9 @@ export default function ReportsList({ userId }: ReportsListProps) {
         async function fetchReportsData() {
             try {
                 const data = await getReports(userId);
+                data.reports.sort((a: Report, b: Report) =>
+                    new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
+                );
                 setResponseData(data);
             } catch (error) {
                 throw error;
