@@ -8,7 +8,7 @@ const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
 export const getSessionOccurrences = async (sessionId: string) => {
   try {
     const queryParams = new URLSearchParams();
-    if (sessionId !== undefined) queryParams.append('session_id', sessionId.toString());
+    if (sessionId) queryParams.append('session_id', sessionId.toString());
     const urlWithParams = `${url}/session-occurrence?${queryParams.toString()}&is_start_time=today`;
     const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
 
