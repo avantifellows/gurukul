@@ -38,6 +38,14 @@ export default function Home() {
       quizCompletionStatus[platformId] === false;
   };
 
+  /**
+ * Filters and sorts quizzes into different categories such as non-chapter tests,
+ * chapter tests, practice tests, and homework. This method is essential for the Gurukul
+ * platform to categorize and display tests efficiently, allowing users to quickly identify
+ * the type of tests they need to attempt based on their purpose (e.g., chapter tests or practice tests).
+ * The separation ensures a clear structure in the UI, enhancing user experience by organizing
+ * tests by relevance.
+ */
   const filterAndSortTests = (quizzes: QuizSession[]) => {
     const activeQuizzes = quizzes
       .filter(quiz => isSessionActive(formatQuizSessionTime(quiz.session.end_time)))
