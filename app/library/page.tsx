@@ -10,10 +10,12 @@ import StethoscopeIcon from '../../assets/stethoscope.png';
 import BlueprintIcon from '../../assets/blueprint.png';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
+import { useAuth } from '@/services/AuthContext';
 
 const Page: React.FC = () => {
   const [selectedLibrary, setSelectedLibrary] = useState<string | null>('Content');
   const { push } = useRouter();
+  const { group } = useAuth();
 
   const handleLibraryChange = (library: string) => {
     setSelectedLibrary(library);
@@ -45,12 +47,14 @@ const Page: React.FC = () => {
           >
             Content Library
           </PrimaryButton>
-          <PrimaryButton
-            onClick={() => handleLibraryChange('Class')}
-            className={`${buttonStyle} ${selectedLibrary === 'Class' ? selectedButtonStyle : unselectedButtonStyle}`}
-          >
-            Class Library
-          </PrimaryButton>
+          {group !== 'EnableStudents' && (
+            <PrimaryButton
+              onClick={() => handleLibraryChange('Class')}
+              className={`${buttonStyle} ${selectedLibrary === 'Class' ? selectedButtonStyle : unselectedButtonStyle}`}
+            >
+              Class Library
+            </PrimaryButton>
+          )}
         </div>
       )}
 
@@ -66,7 +70,6 @@ const Page: React.FC = () => {
                 </div>
               </div>
             </div>
-
           </div>
           <div onClick={() => handleLibraryChange('JEE Content')}>
             <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6 cursor-pointer">
@@ -95,7 +98,6 @@ const Page: React.FC = () => {
                 </div>
               </div>
             </div>
-
           </div>
           <div onClick={() => handleLibraryChange('JEE Classes')}>
             <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6">
