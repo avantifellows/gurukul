@@ -140,7 +140,7 @@ export default function Home() {
   };
 
   const renderTestSection = (title: string, tests: QuizSession[]) => {
-    if (tests.length === 0 && title === "Tests") {
+    if (tests.length === 0) {
       return (
         <div>
           <h2 className="text-primary ml-4 font-semibold text-lg mt-6">{title}</h2>
