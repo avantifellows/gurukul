@@ -47,7 +47,7 @@ const Page: React.FC = () => {
           >
             Content Library
           </PrimaryButton>
-          {group !== 'EnableStudents' && (
+          {group !== 'EnableStudents' && group !== 'AllIndiaStudents' && (
             <PrimaryButton
               onClick={() => handleLibraryChange('Class')}
               className={`${buttonStyle} ${selectedLibrary === 'Class' ? selectedButtonStyle : unselectedButtonStyle}`}
