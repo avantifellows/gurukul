@@ -51,11 +51,16 @@ export default function Home() {
       .filter(quiz => isSessionActive(formatQuizSessionTime(quiz.session.end_time)))
       .filter(quiz => isQuizAttemptable(quiz.session.platform_id));
 
-    const nonChapterTests = activeQuizzes.filter(quiz =>
+    const regularTests = activeQuizzes.filter(quiz =>
+      quiz.session.meta_data.test_type !== 'homework' &&
+      quiz.session.meta_data.test_purpose !== 'practice_test'
+    );
+
+    const nonChapterTests = regularTests.filter(quiz =>
       quiz.session.meta_data.test_format !== 'chapter_test'
     );
 
-    const chapterTests = activeQuizzes.filter(quiz =>
+    const chapterTests = regularTests.filter(quiz =>
       quiz.session.meta_data.test_format === 'chapter_test'
     );
 
@@ -143,7 +148,7 @@ export default function Home() {
     if (tests.length === 0) {
       return (
         <div>
-          <h2 className="text-primary ml-4 font-semibold text-lg mt-6">{title}</h2>
+          <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
           <MessageDisplay message="No more tests are scheduled for today!" />
         </div>
       );
@@ -152,7 +157,7 @@ export default function Home() {
 
     return (
       <div>
-        <h2 className="text-primary ml-4 font-semibold text-lg mt-6">{title}</h2>
+        <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
         <div className="grid grid-cols-1 gap-4 pb-4">
           {tests.map((data, index) => (
             <div key={index} className="flex mt-4 items-center">
@@ -167,7 +172,7 @@ export default function Home() {
               <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
                 <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
                 <div className="text-sm md:text-base mx-6 md:mx-8">
-                  <div className="flex w-36">
+                  <div className="flex w-36 md:w-full">
                     <span className="font-semibold">{data.session.name}</span>
                   </div>
                   <div className="text-sm md:text-base">
