@@ -24,7 +24,7 @@ const BottomNavigationBar = () => {
     <div className="relative">
       <div className="max-w-xl mx-auto fixed bottom-[72px] left-0 right-0 bg-gray-100 border-t-2 shadow-2xl  shadow-black text-center py-2 text-xs text-gray-700 pb-4 md:pb-8 md:text-lg">
         <div className="flex items-center justify-center gap-1 md:gap-2">
-          powered by
+          Powered by
           <Image
             src={CapgeminiLogo}
             alt='Capgemini Logo'
