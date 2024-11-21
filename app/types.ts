@@ -127,13 +127,16 @@ export interface QuizSession {
     end_date: string,
     end_time: string,
     meta_data: {
-      test_format: string
+      test_format: string,
+      test_purpose: string,
+      test_type: string
     }
     start_date: string,
     start_time: string,
     name: string,
     subject: string,
     id: string,
+    platform_id: string,
   },
 }
 
@@ -148,4 +151,8 @@ export interface SessionOccurrence {
 
 export interface MessageDisplayProps {
   message: string;
+}
+
+export interface QuizCompletionStatus {
+  [key: string]: boolean;
 }

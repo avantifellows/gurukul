@@ -43,10 +43,10 @@ export const getChapters = async (
   curriculumId?: number
 ): Promise<Chapter[]> => {
   const queryParams = new URLSearchParams();
-  if (id !== undefined) queryParams.append('id', id.toString());
-  if (subjectId !== undefined) queryParams.append('subject_id', subjectId.toString());
-  if (gradeId !== undefined) queryParams.append('grade_id', gradeId.toString());
-  if (curriculumId !== undefined) queryParams.append('curriculum_id', curriculumId.toString());
+  if (id) queryParams.append('id', id.toString());
+  if (subjectId) queryParams.append('subject_id', subjectId.toString());
+  if (gradeId) queryParams.append('grade_id', gradeId.toString());
+  if (curriculumId) queryParams.append('curriculum_id', curriculumId.toString());
 
   return fetchWithParams('chapter', queryParams);
 };
@@ -91,17 +91,17 @@ export const getResourcesWithSource = async (topicIds: number[]): Promise<Resour
 
 export const getTeachers = async (id?: number, subject_id?: number): Promise<Teacher[]> => {
   const queryParams = new URLSearchParams();
-  if (id !== undefined) queryParams.append('id', id.toString());
-  if (subject_id !== undefined) queryParams.append('subject_id', subject_id.toString());
+  if (id) queryParams.append('id', id.toString());
+  if (subject_id) queryParams.append('subject_id', subject_id.toString());
 
   return fetchWithParams('teacher', queryParams);
 };
 
 export const getResourcesOfChapter = async (chapterId: number, teacherId?: number): Promise<Resource[]> => {
   const queryParams = new URLSearchParams();
-  if (chapterId !== undefined) queryParams.append('chapter_id', chapterId.toString());
+  if (chapterId) queryParams.append('chapter_id', chapterId.toString());
   queryParams.append('type', 'class');
-  if (teacherId !== undefined) queryParams.append('teacher_id', teacherId.toString());
+  if (teacherId) queryParams.append('teacher_id', teacherId.toString());
 
   const chapterResources: Resource[] = await fetchWithParams('resource', queryParams);
 
@@ -127,9 +127,9 @@ export const getClassChapters = async (
   teacherId?: number
 ): Promise<Chapter[]> => {
   const queryParams = new URLSearchParams();
-  if (id !== undefined) queryParams.append('id', id.toString());
-  if (subjectId !== undefined) queryParams.append('subject_id', subjectId.toString());
-  if (gradeId !== undefined) queryParams.append('grade_id', gradeId.toString());
+  if (id) queryParams.append('id', id.toString());
+  if (subjectId) queryParams.append('subject_id', subjectId.toString());
+  if (gradeId) queryParams.append('grade_id', gradeId.toString());
 
   const chapterData: Chapter[] = await fetchWithParams('chapter', queryParams);
 
