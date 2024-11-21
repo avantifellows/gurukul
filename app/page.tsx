@@ -126,7 +126,7 @@ export default function Home() {
               </div>
               <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
                 <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
-                <div className="text-sm md:text-base mx-6 md:mx-8">
+                <div className="text-sm md:text-base mx-6 md:mx-8 w-36">
                   <span className="font-semibold">{data.session.meta_data.subject ?? "Science"} </span>
                   <div className="text-sm md:text-base">
                     {data.session.name}
@@ -172,7 +172,7 @@ export default function Home() {
               <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
                 <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
                 <div className="text-sm md:text-base mx-6 md:mx-8">
-                  <div className="flex">
+                  <div className="flex w-36 md:w-full">
                     <span className="font-semibold">{data.session.name}</span>
                   </div>
                   <div className="text-sm md:text-base">
