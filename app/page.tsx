@@ -25,7 +25,7 @@ export default function Home() {
 
   const fetchQuizCompletionStatus = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_PROD_QUIZ_BACKEND_URL}sessions/user/${userId}/quiz-attempts`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_QUIZ_BACKEND_URL}sessions/user/${userId}/quiz-attempts`);
       const data = await response.json();
       setQuizCompletionStatus(data);
     } catch (error) {
@@ -178,11 +178,6 @@ export default function Home() {
                   <div className="text-sm md:text-base">
                     <span>{data.session.meta_data.test_format}</span>
                   </div>
-                  {quizCompletionStatus.hasOwnProperty(data.session.platform_id) && !quizCompletionStatus[data.session.platform_id] && (
-                    <div className="text-yellow-600 text-xs mt-1">
-                      Resume test
-                    </div>
-                  )}
                 </div>
                 {renderButton(data.session)}
               </div>
@@ -224,13 +219,13 @@ export default function Home() {
       }
     } else if (data.platform === 'quiz') {
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
-        const buttonText = quizCompletionStatus.hasOwnProperty(data.session_id) && !quizCompletionStatus[data.session_id]
-          ? "RESUME"
-          : "START";
-
+        const isResumeable = quizCompletionStatus.hasOwnProperty(data.platform_id) && !quizCompletionStatus[data.platform_id];
+        const buttonText = isResumeable ? "RESUME" : "START";
+        const buttonClass = isResumeable ? "bg-yellow-400 text-white" : "bg-primary text-white";
+  
         return (
           <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
-            <PrimaryButton className="bg-primary text-white text-sm rounded-lg w-16 h-8 mr-4 shadow-md shadow-slate-400">
+            <PrimaryButton className={`${buttonClass} text-sm rounded-lg w-20 h-8 mr-4 shadow-md shadow-slate-400`}>
               {buttonText}
             </PrimaryButton>
           </Link>
