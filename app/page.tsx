@@ -126,9 +126,9 @@ export default function Home() {
               </div>
               <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
                 <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
-                <div className="text-sm md:text-base mx-6 md:mx-8 w-36">
-                  <span className="font-semibold">{data.session.meta_data.subject ?? "Science"} </span>
-                  <div className="text-sm md:text-base">
+                <div className="text-sm md:text-base mx-6 md:mx-8 w-32 md:w-72">
+                  <span className="font-semibold">{data.session.meta_data.subject ?? "Science"}</span>
+                  <div className="text-sm md:text-base break-words">
                     {data.session.name}
                   </div>
                 </div>
@@ -175,7 +175,7 @@ export default function Home() {
                   <div className="flex w-36 md:w-full">
                     <span className="font-semibold">{data.session.name}</span>
                   </div>
-                  <div className="text-sm md:text-base">
+                  <div className="text-sm md:text-base break-words">
                     <span>{data.session.meta_data.test_format}</span>
                   </div>
                 </div>
@@ -222,7 +222,7 @@ export default function Home() {
         const isResumeable = quizCompletionStatus.hasOwnProperty(data.platform_id) && !quizCompletionStatus[data.platform_id];
         const buttonText = isResumeable ? "RESUME" : "START";
         const buttonClass = isResumeable ? "bg-yellow-400 text-white" : "bg-primary text-white";
-  
+
         return (
           <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
             <PrimaryButton className={`${buttonClass} text-sm rounded-lg w-20 h-8 mr-4 shadow-md shadow-slate-400`}>
