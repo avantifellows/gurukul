@@ -14,7 +14,7 @@ import { api } from "@/services/url";
 import { MixpanelTracking } from "@/services/mixpanel";
 
 export default function Home() {
-  const { loggedIn, userId, userDbId } = useAuth();
+  const { loggedIn, userId, userDbId, group } = useAuth();
   const [liveClasses, setLiveClasses] = useState<SessionOccurrence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
@@ -78,7 +78,7 @@ export default function Home() {
   const fetchUserSessions = async () => {
     try {
       const [liveSessionData, quizSessionData] = await Promise.all([
-        fetchUserSession(userDbId!),
+        group !== 'AllIndiaStudents' ? fetchUserSession(userDbId!) : Promise.resolve([]),
         fetchUserSession(userDbId!, true)
       ]);
 
@@ -91,15 +91,17 @@ export default function Home() {
       const quizSessions = flattenedQuizData.filter(flattenedSessionsData => flattenedSessionsData.session.platform === 'quiz');
       setQuizzes(quizSessions);
 
-      const sessionsData = await Promise.all(liveSessionData.map(async (liveSession: Session) => {
-        const sessionOccurrenceData = await getSessionOccurrences(liveSession.session_id);
-        if (!sessionOccurrenceData) return null;
-        return sessionOccurrenceData;
-      }));
-      const flattenedSessionsData = sessionsData.flat();
-      const liveSessions = flattenedSessionsData.filter(flattenedSessionsData => flattenedSessionsData.session.platform === 'meet');
+      if (group !== 'AllIndiaStudents') {
+        const sessionsData = await Promise.all(liveSessionData.map(async (liveSession: Session) => {
+          const sessionOccurrenceData = await getSessionOccurrences(liveSession.session_id);
+          if (!sessionOccurrenceData) return null;
+          return sessionOccurrenceData;
+        }));
+        const flattenedSessionsData = sessionsData.flat();
+        const liveSessions = flattenedSessionsData.filter(flattenedSessionsData => flattenedSessionsData.session.platform === 'meet');
+        setLiveClasses(liveSessions);
+      }
 
-      setLiveClasses(liveSessions);
       MixpanelTracking.getInstance().identify(userId!);
     } catch (error) {
       console.error("Error fetching user sessions:", error);
@@ -278,10 +280,12 @@ export default function Home() {
       ) : (
         <main className="min-h-screen max-w-xl mx-auto md:mx-auto bg-heading">
           <TopBar />
-          <div>
-            <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Live Classes</h1>
-            {renderLiveClasses()}
-          </div>
+          {group !== 'AllIndiaStudents' && (
+            <div>
+              <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Live Classes</h1>
+              {renderLiveClasses()}
+            </div>
+          )}
 
           <div className="pb-40">
             {renderTestSection("Tests", [...nonChapterTests, ...chapterTests])}
