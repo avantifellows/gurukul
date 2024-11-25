@@ -80,27 +80,37 @@ export default function Home() {
   const fetchUserSessions = async () => {
     try {
       const [liveSessionData, quizSessionData] = await Promise.all([
-        group !== 'AllIndiaStudents' ? fetchUserSession(userDbId!) : Promise.resolve([]),
-        fetchUserSession(userDbId!, true)
+        groupConfig.showLiveClasses ? fetchUserSession(userDbId!) : Promise.resolve([]),
+        groupConfig.showTests || groupConfig.showPracticeTests || groupConfig.showHomework
+          ? fetchUserSession(userDbId!, true)
+          : Promise.resolve([])
       ]);
 
-      const quizData = await Promise.all(quizSessionData.map(async (quiz: Session) => {
-        const sessionOccurrenceData = await getSessionOccurrences(quiz.session_id);
-        if (!sessionOccurrenceData) return null;
-        return sessionOccurrenceData;
-      }));
-      const flattenedQuizData = quizData.flat();
-      const quizSessions = flattenedQuizData.filter(flattenedSessionsData => flattenedSessionsData.session.platform === 'quiz');
-      setQuizzes(quizSessions);
+      if (groupConfig.showTests || groupConfig.showPracticeTests || groupConfig.showHomework) {
+        const quizData = await Promise.all(quizSessionData.map(async (quiz: Session) => {
+          const sessionOccurrenceData = await getSessionOccurrences(quiz.session_id);
+          if (!sessionOccurrenceData) return null;
+          return sessionOccurrenceData;
+        }));
 
-      if (group !== 'AllIndiaStudents') {
+        const flattenedQuizData = quizData.flat();
+        const quizSessions = flattenedQuizData.filter(flattenedSessionsData =>
+          flattenedSessionsData.session.platform === 'quiz'
+        );
+        setQuizzes(quizSessions);
+      }
+
+      if (groupConfig.showLiveClasses && liveSessionData.length > 0) {
         const sessionsData = await Promise.all(liveSessionData.map(async (liveSession: Session) => {
           const sessionOccurrenceData = await getSessionOccurrences(liveSession.session_id);
           if (!sessionOccurrenceData) return null;
           return sessionOccurrenceData;
         }));
+
         const flattenedSessionsData = sessionsData.flat();
-        const liveSessions = flattenedSessionsData.filter(flattenedSessionsData => flattenedSessionsData.session.platform === 'meet');
+        const liveSessions = flattenedSessionsData.filter(flattenedSessionsData =>
+          flattenedSessionsData.session.platform === 'meet'
+        );
         setLiveClasses(liveSessions);
       }
 
