@@ -87,39 +87,24 @@ export default function Home() {
         shouldFetchQuizzes ? fetchUserSession(userDbId!, true) : Promise.resolve([])
       ]);
 
-      if (quizSessionData.length > 0) {
-        const quizData = await Promise.all(quizSessionData.map(async (quiz: Session) => {
-          const sessionOccurrenceData = await getSessionOccurrences(quiz.session_id);
-          if (!sessionOccurrenceData) return null;
-          return sessionOccurrenceData;
-        }));
+      const sessionIds = [...liveSessionData, ...quizSessionData].map(session => session.session_id);
 
-        const flattenedQuizData = quizData.flat();
-        const quizSessions = flattenedQuizData.filter(flattenedSessionsData =>
-          flattenedSessionsData.session.platform === 'quiz'
-        );
-        setQuizzes(quizSessions);
-      }
+      const sessionOccurrences = await getSessionOccurrences(sessionIds);
 
-      if (liveSessionData.length > 0) {
-        const sessionsData = await Promise.all(liveSessionData.map(async (liveSession: Session) => {
-          const sessionOccurrenceData = await getSessionOccurrences(liveSession.session_id);
-          if (!sessionOccurrenceData) return null;
-          return sessionOccurrenceData;
-        }));
+      const quizSessions = sessionOccurrences
+        .filter((sessionOccurence: SessionOccurrence) => sessionOccurence.session.platform === 'quiz');
+      setQuizzes(quizSessions);
 
-        const flattenedSessionsData = sessionsData.flat();
-        const liveSessions = flattenedSessionsData.filter(flattenedSessionsData =>
-          flattenedSessionsData.session.platform === 'meet'
-        );
-        setLiveClasses(liveSessions);
-      }
+      const liveSessions = sessionOccurrences
+        .filter((sessionOccurence: SessionOccurrence) => sessionOccurence.session.platform === 'meet');
+      setLiveClasses(liveSessions);
 
       MixpanelTracking.getInstance().identify(userId!);
     } catch (error) {
       console.error("Error fetching user sessions:", error);
     }
   };
+
 
   const renderLiveClasses = () => {
     if (liveClasses.length === 0) {
