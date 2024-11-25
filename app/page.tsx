@@ -12,9 +12,11 @@ import Loading from "./loading";
 import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime, isSessionActive, format12HrSessionTime } from "@/utils/dateUtils";
 import { api } from "@/services/url";
 import { MixpanelTracking } from "@/services/mixpanel";
+import { getGroupConfig } from "@/config/groupConfig";
 
 export default function Home() {
   const { loggedIn, userId, userDbId, group } = useAuth();
+  const groupConfig = getGroupConfig(group || 'defaultGroup');
   const [liveClasses, setLiveClasses] = useState<SessionOccurrence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
@@ -147,6 +149,21 @@ export default function Home() {
   };
 
   const renderTestSection = (title: string, tests: QuizSession[]) => {
+    const shouldShow = (() => {
+      switch (title.toLowerCase()) {
+        case 'tests':
+          return groupConfig.showTests;
+        case 'practice tests':
+          return groupConfig.showPracticeTests;
+        case 'homework':
+          return groupConfig.showHomework;
+        default:
+          return true;
+      }
+    })();
+
+    if (!shouldShow) return null;
+
     if (tests.length === 0) {
       return (
         <div>
@@ -280,7 +297,7 @@ export default function Home() {
       ) : (
         <main className="min-h-screen max-w-xl mx-auto md:mx-auto bg-heading">
           <TopBar />
-          {group !== 'AllIndiaStudents' && (
+          {groupConfig.showLiveClasses && (
             <div>
               <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Live Classes</h1>
               {renderLiveClasses()}
@@ -288,9 +305,9 @@ export default function Home() {
           )}
 
           <div className="pb-40">
-            {renderTestSection("Tests", [...nonChapterTests, ...chapterTests])}
-            {renderTestSection("Practice Tests", practiceTests)}
-            {renderTestSection("Homework", homework)}
+            {groupConfig.showTests && renderTestSection("Tests", [...nonChapterTests, ...chapterTests])}
+            {groupConfig.showPracticeTests && renderTestSection("Practice Tests", practiceTests)}
+            {groupConfig.showHomework && renderTestSection("Homework", homework)}
           </div>
           <BottomNavigationBar />
         </main>
