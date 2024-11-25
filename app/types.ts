@@ -156,3 +156,16 @@ export interface MessageDisplayProps {
 export interface QuizCompletionStatus {
   [key: string]: boolean;
 }
+
+export interface GroupConfig {
+  showLiveClasses: boolean;
+  showTests: boolean;
+  showPracticeTests: boolean;
+  showHomework: boolean;
+  showContentLibrary: boolean;
+  showClassLibrary: boolean;
+}
+
+export type GroupConfigurations = {
+  [key: string]: GroupConfig;
+};
