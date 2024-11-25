@@ -162,13 +162,8 @@ export interface GroupConfig {
   showTests: boolean;
   showPracticeTests: boolean;
   showHomework: boolean;
-  maxTestAttempts?: number;
-  joinClassBeforeMinutes?: number;
-  features?: {
-    enableChat?: boolean;
-    enableDoubt?: boolean;
-    enableNotes?: boolean;
-  };
+  showContentLibrary: boolean;
+  showClassLibrary: boolean;
 }
 
 export type GroupConfigurations = {
