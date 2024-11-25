@@ -79,14 +79,15 @@ export default function Home() {
 
   const fetchUserSessions = async () => {
     try {
+      const groupConfig = getGroupConfig(group || 'defaultGroup');
+      const shouldFetchQuizzes = groupConfig.showTests || groupConfig.showPracticeTests || groupConfig.showHomework;
+
       const [liveSessionData, quizSessionData] = await Promise.all([
         groupConfig.showLiveClasses ? fetchUserSession(userDbId!) : Promise.resolve([]),
-        groupConfig.showTests || groupConfig.showPracticeTests || groupConfig.showHomework
-          ? fetchUserSession(userDbId!, true)
-          : Promise.resolve([])
+        shouldFetchQuizzes ? fetchUserSession(userDbId!, true) : Promise.resolve([])
       ]);
 
-      if (groupConfig.showTests || groupConfig.showPracticeTests || groupConfig.showHomework) {
+      if (quizSessionData.length > 0) {
         const quizData = await Promise.all(quizSessionData.map(async (quiz: Session) => {
           const sessionOccurrenceData = await getSessionOccurrences(quiz.session_id);
           if (!sessionOccurrenceData) return null;
@@ -100,7 +101,7 @@ export default function Home() {
         setQuizzes(quizSessions);
       }
 
-      if (groupConfig.showLiveClasses && liveSessionData.length > 0) {
+      if (liveSessionData.length > 0) {
         const sessionsData = await Promise.all(liveSessionData.map(async (liveSession: Session) => {
           const sessionOccurrenceData = await getSessionOccurrences(liveSession.session_id);
           if (!sessionOccurrenceData) return null;
