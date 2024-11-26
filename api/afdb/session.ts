@@ -5,11 +5,18 @@ import getFetchConfig from '../fetchConfig';
 const url = process.env.AF_DB_SERVICE_URL;
 const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
 
-export const getSessionOccurrences = async (sessionId: string) => {
+export const getSessionOccurrences = async (sessionIds: string[]) => {
   try {
     const queryParams = new URLSearchParams();
-    if (sessionId) queryParams.append('session_id', sessionId.toString());
-    const urlWithParams = `${url}/session-occurrence?${queryParams.toString()}&is_start_time=today`;
+
+    if (sessionIds && sessionIds.length > 0) {
+      queryParams.append('session_ids', sessionIds.join(','));
+    }
+
+    queryParams.append('is_start_time', 'today');
+
+    const urlWithParams = `${url}/session-occurrence?${queryParams.toString()}`;
+
     const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
 
     if (!response.ok) {
