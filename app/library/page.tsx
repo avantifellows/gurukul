@@ -11,11 +11,13 @@ import BlueprintIcon from '../../assets/blueprint.png';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
 import { useAuth } from '@/services/AuthContext';
+import { getGroupConfig } from '@/config/groupConfig';
 
 const Page: React.FC = () => {
   const [selectedLibrary, setSelectedLibrary] = useState<string | null>('Content');
   const { push } = useRouter();
   const { group } = useAuth();
+  const groupConfig = getGroupConfig(group || 'defaultGroup');
 
   const handleLibraryChange = (library: string) => {
     setSelectedLibrary(library);
@@ -47,7 +49,7 @@ const Page: React.FC = () => {
           >
             Content Library
           </PrimaryButton>
-          {group !== 'EnableStudents' && group !== 'AllIndiaStudents' && (
+          {groupConfig.showClassLibrary && (
             <PrimaryButton
               onClick={() => handleLibraryChange('Class')}
               className={`${buttonStyle} ${selectedLibrary === 'Class' ? selectedButtonStyle : unselectedButtonStyle}`}
