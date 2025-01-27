@@ -79,6 +79,33 @@ export default function Home() {
 
   const fetchUserSessions = async () => {
     try {
+      // Use Redis service to fetch aggregated session data
+      const response = await fetch(`/api/session/${userDbId}`);
+      const sessionData = await response.json();
+
+      // Set quizzes and live classes from Redis data
+      const quizSessions = sessionData.sessions
+        .filter((sessionOccurence: SessionOccurrence) => sessionOccurence.session.platform === 'quiz');
+      setQuizzes(quizSessions);
+
+      const liveSessions = sessionData.sessions
+        .filter((sessionOccurence: SessionOccurrence) => sessionOccurence.session.platform === 'meet');
+      setLiveClasses(liveSessions);
+
+      // Set quiz completion status from Redis
+      setQuizCompletionStatus(sessionData.quizCompletionStatus);
+
+      MixpanelTracking.getInstance().identify(userId!);
+    } catch (error) {
+      console.error("Error fetching user sessions from Redis:", error);
+      // Fallback to original API calls if Redis fails
+      await fallbackFetchSessions();
+    }
+  };
+
+  // Fallback method to original API calls
+  const fallbackFetchSessions = async () => {
+    try {
       const groupConfig = getGroupConfig(group || 'defaultGroup');
       const shouldFetchQuizzes = groupConfig.showTests || groupConfig.showPracticeTests || groupConfig.showHomework;
 

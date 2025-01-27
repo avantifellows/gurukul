@@ -169,3 +169,8 @@ export interface GroupConfig {
 export type GroupConfigurations = {
   [key: string]: GroupConfig;
 };
+
+export interface SessionData {
+  sessions: any[];
+  quizCompletionStatus: Record<string, boolean>;
+}
