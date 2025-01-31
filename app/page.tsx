@@ -237,28 +237,31 @@ export default function Home() {
         const formatType = data.meta_data?.gurukul_format_type || 'both';
 
         const renderQuizButton = formatType !== 'omr' ? (
-          <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
-            <PrimaryButton className={`${isResumeable ? "bg-yellow-400" : "bg-primary"} text-white text-sm rounded-lg w-full h-8 mr-4 shadow-slate-400`}>
-              {isResumeable ? "Resume" : "Start Test"}
-            </PrimaryButton>
-          </Link>
+          <div className="flex flex-col items-center w-full">
+            <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank" className="w-full">
+              <PrimaryButton className={`${isResumeable ? "bg-yellow-400" : "bg-primary"} text-white text-sm rounded-lg w-full h-8 mr-4 shadow-slate-400`}>
+                {isResumeable ? "Resume" : "Start Test"}
+              </PrimaryButton>
+            </Link>
+            <div className="text-gray-500 text-xs text-center py-1">Click to attempt online test</div>
+          </div>
         ) : null;
 
         const renderOmrButton = formatType !== 'qa' ? (
-          <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}&omrMode=true`} target="_blank">
-            <PrimaryButton className={`${isResumeable ? "bg-yellow-400" : "bg-primary"} text-white text-sm rounded-lg w-full h-8 mr-4 shadow-slate-400`}>
-              {isResumeable ? "Resume" : "Fill OMR"}
-            </PrimaryButton>
-          </Link>
+          <div className="flex flex-col items-center w-full">
+            <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}&omrMode=true`} target="_blank" className="w-full">
+              <PrimaryButton className={`${isResumeable ? "bg-yellow-400" : "bg-primary"} text-white text-sm rounded-lg w-full h-8 mr-4 shadow-slate-400`}>
+                {isResumeable ? "Resume" : "Fill OMR"}
+              </PrimaryButton>
+            </Link>
+            <div className="text-gray-500 text-xs text-center py-1">To submit offline test responses</div>
+          </div>
         ) : null;
 
         return (
-          <div className="flex flex-col pr-2">
+          <div className="flex flex-col pr-2 w-48">
             {renderQuizButton}
-            {renderQuizButton && <div className="text-gray-500 text-xs text-center pb-2">Click to attempt online test</div>}
-
             {renderOmrButton}
-            {renderOmrButton && <div className="text-gray-500 text-xs text-center">To submit offline test responses</div>}
           </div>
         );
       } else {
