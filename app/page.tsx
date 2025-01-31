@@ -176,25 +176,24 @@ export default function Home() {
         <div className="grid grid-cols-1 gap-4 pb-4">
           {tests.map((data, index) => (
             <div key={index} className="flex mt-4 items-center">
-              <div>
-                <p className={commonTextClass}>
-                  {format12HrSessionTime(data.session.start_time)}
-                </p>
-                <p className={commonTextClass}>
-                  {format12HrSessionTime(data.session.end_time)}
-                </p>
-              </div>
-              <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
-                <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
-                <div className="text-sm md:text-base mx-6 md:mx-8">
-                  <div className="flex w-36 md:w-full">
-                    <span className="font-semibold">{data.session.name}</span>
+              <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mx-3 items-center">
+                <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`} />
+
+                <div className="flex flex-col gap-1 ml-6 sm:w-full w-20 md:w-full">
+                  <div className="text-gray-700 text-xs md:text-sm whitespace-nowrap">
+                    {format12HrSessionTime(data.session.start_time)} - {format12HrSessionTime(data.session.end_time)}
                   </div>
-                  <div className="text-sm md:text-base break-words">
-                    <span>{data.session.meta_data.test_format}</span>
+                  <div className="font-semibold">
+                    {data.session.name}
+                  </div>
+                  <div className="text-gray-600">
+                    {data.session.meta_data.test_format}
                   </div>
                 </div>
-                {renderButton(data.session)}
+
+                <div className="flex items-center">
+                  {renderButton(data.session)}
+                </div>
               </div>
             </div>
           ))}
@@ -235,15 +234,32 @@ export default function Home() {
     } else if (data.platform === 'quiz') {
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
         const isResumeable = quizCompletionStatus.hasOwnProperty(data.platform_id) && !quizCompletionStatus[data.platform_id];
-        const buttonText = isResumeable ? "RESUME" : "START";
-        const buttonClass = isResumeable ? "bg-yellow-400 text-white" : "bg-primary text-white";
+        const formatType = data.meta_data?.gurukul_format_type || 'both';
 
-        return (
+        const renderQuizButton = formatType !== 'omr' ? (
           <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
-            <PrimaryButton className={`${buttonClass} text-sm rounded-lg w-20 h-8 mr-4 shadow-md shadow-slate-400`}>
-              {buttonText}
+            <PrimaryButton className={`${isResumeable ? "bg-yellow-400" : "bg-primary"} text-white text-sm rounded-lg w-full h-8 mr-4 shadow-slate-400`}>
+              {isResumeable ? "Resume" : "Start Test"}
             </PrimaryButton>
           </Link>
+        ) : null;
+
+        const renderOmrButton = formatType !== 'qa' ? (
+          <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}&omrMode=true`} target="_blank">
+            <PrimaryButton className={`${isResumeable ? "bg-yellow-400" : "bg-primary"} text-white text-sm rounded-lg w-full h-8 mr-4 shadow-slate-400`}>
+              {isResumeable ? "Resume" : "Fill OMR"}
+            </PrimaryButton>
+          </Link>
+        ) : null;
+
+        return (
+          <div className="flex flex-col pr-2">
+            {renderQuizButton}
+            {renderQuizButton && <div className="text-gray-500 text-xs text-center pb-2">Click to attempt online test</div>}
+
+            {renderOmrButton}
+            {renderOmrButton && <div className="text-gray-500 text-xs text-center">To submit offline test responses</div>}
+          </div>
         );
       } else {
         return (
