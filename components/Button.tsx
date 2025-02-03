@@ -1,8 +1,8 @@
 import React from 'react';
-import { PrimaryButton } from '@/app/types';
+import type { PrimaryButton as PrimaryButtonProps } from '@/app/types';
 
-const PrimaryButton: React.FC<PrimaryButton> = ({ onClick, children, className }) => {
-  const buttonClasses = `p-2 ${className}`;
+const PrimaryButton: React.FC<PrimaryButtonProps> = ({ onClick, children, className }) => {
+  const buttonClasses = `${className}`;
 
   return (
     <button className={buttonClasses} onClick={onClick}>

@@ -173,14 +173,14 @@ export default function Home() {
     return (
       <div>
         <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
-        <div className="grid grid-cols-1 gap-4 pb-4">
+        <div className="grid grid-cols-1 gap-4 pb-4 mt-4">
           {tests.map((data, index) => (
-            <div key={index} className="flex mt-4 items-center">
-              <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mx-3 items-center">
+            <div key={index} className="flex items-center">
+              <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto min-h-[120px] py-3 relative w-full flex flex-row justify-between mx-3 items-center">
                 <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`} />
 
-                <div className="flex flex-col gap-1 ml-6 sm:w-full w-20 md:w-full">
-                  <div className="text-gray-700 text-xs md:text-sm whitespace-nowrap">
+                <div className="flex flex-col gap-1 ml-6 sm:w-full w-48 md:w-full text-sm md:text-base">
+                  <div className="absolute top-2 left-6 text-gray-700 text-xs md:text-sm whitespace-nowrap">
                     {format12HrSessionTime(data.session.start_time)} - {format12HrSessionTime(data.session.end_time)}
                   </div>
                   <div className="font-semibold">
@@ -218,7 +218,7 @@ export default function Home() {
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
         return (
           <Link href={`${portalBaseUrl}/?sessionId=${data.session.session_id}`} target="_blank">
-            <PrimaryButton className="bg-primary text-white text-sm rounded-lg w-12 h-8 mr-4 shadow-md shadow-slate-400">
+            <PrimaryButton className="bg-primary text-white text-sm rounded-md w-12 h-8 mr-4 shadow-md shadow-slate-400">
               JOIN
             </PrimaryButton>
           </Link>
@@ -237,36 +237,36 @@ export default function Home() {
         const formatType = data.meta_data?.gurukul_format_type || 'both';
 
         const renderQuizButton = formatType !== 'omr' ? (
-          <div className="flex flex-col items-center w-full">
-            <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank" className="w-full">
-              <PrimaryButton className={`${isResumeable ? "bg-yellow-400" : "bg-primary"} text-white text-sm rounded-lg w-full h-8 mr-4 shadow-slate-400`}>
+          <div className="flex flex-col items-center">
+            <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
+              <PrimaryButton className={`${isResumeable ? "bg-yellow-400" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Start Test"}
               </PrimaryButton>
             </Link>
-            <div className="text-gray-500 text-xs text-center py-1">Click to attempt online test</div>
+            <div className="text-gray-500 md:text-xs text-[10px] text-center pb-2">Click to begin online test</div>
           </div>
         ) : null;
 
         const renderOmrButton = formatType !== 'qa' ? (
-          <div className="flex flex-col items-center w-full">
-            <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}&omrMode=true`} target="_blank" className="w-full">
-              <PrimaryButton className={`${isResumeable ? "bg-yellow-400" : "bg-primary"} text-white text-sm rounded-lg w-full h-8 mr-4 shadow-slate-400`}>
+          <div className="flex flex-col items-center">
+            <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}&omrMode=true`} target="_blank">
+              <PrimaryButton className={`${isResumeable ? "bg-yellow-400" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Fill OMR"}
               </PrimaryButton>
             </Link>
-            <div className="text-gray-500 text-xs text-center py-1">To submit offline test responses</div>
+            <div className="text-gray-500 md:text-xs text-[10px] text-center">Click for offline test</div>
           </div>
         ) : null;
 
         return (
-          <div className="flex flex-col pr-2 w-48">
+          <div className="flex flex-col pr-2">
             {renderQuizButton}
             {renderOmrButton}
           </div>
         );
       } else {
         return (
-          <p className="text-xs italic font-normal mr-4">
+          <p className="text-xs italic font-normal mr-4 w-12">
             Starts at <br />
             {format12HrSessionTime(data.start_time)}
           </p>
