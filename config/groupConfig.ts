@@ -32,7 +32,15 @@ const groupConfig: GroupConfigurations = {
         showHomework: true,
         showContentLibrary: true,
         showClassLibrary: true,
-    }
+    },
+    ChhattisgarhStudents: {
+        showLiveClasses: false,
+        showTests: true,
+        showPracticeTests: true,
+        showHomework: true,
+        showContentLibrary: true,
+        showClassLibrary: false,
+    },
 };
 
 export const getGroupConfig = (group: string): GroupConfig => {
