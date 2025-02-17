@@ -239,7 +239,7 @@ export default function Home() {
         const renderQuizButton = formatType !== 'omr' ? (
           <div className="flex flex-col items-center">
             <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
-              <PrimaryButton className={`${isResumeable ? "bg-[#E5AC49]" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
+              <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Start Test"}
               </PrimaryButton>
             </Link>
@@ -250,7 +250,7 @@ export default function Home() {
         const renderOmrButton = formatType !== 'qa' ? (
           <div className="flex flex-col items-center">
             <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}&omrMode=true`} target="_blank">
-              <PrimaryButton className={`${isResumeable ? "bg-[#E5AC49]" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
+              <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Fill OMR"}
               </PrimaryButton>
             </Link>
