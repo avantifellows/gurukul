@@ -235,6 +235,7 @@ export default function Home() {
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
         const isResumeable = quizCompletionStatus.hasOwnProperty(data.platform_id) && !quizCompletionStatus[data.platform_id];
         const formatType = data.meta_data?.gurukul_format_type || 'both';
+        const showBothButtons = formatType === 'both';
 
         const renderQuizButton = formatType !== 'omr' ? (
           <div className="flex flex-col items-center">
@@ -243,7 +244,7 @@ export default function Home() {
                 {isResumeable ? "Resume" : "Start Test"}
               </PrimaryButton>
             </Link>
-            <div className="text-gray-500 md:text-xs text-[10px] text-center">Click to begin online test</div>
+            <div className={`text-gray-500 md:text-xs text-[10px] text-center ${showBothButtons ? 'pb-2' : ''}`}>Click to begin online test</div>
           </div>
         ) : null;
 
