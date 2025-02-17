@@ -173,9 +173,9 @@ export default function Home() {
     return (
       <div>
         <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
-        <div className="grid grid-cols-1 gap-4 pb-4 mt-4">
+        <div className="grid grid-cols-1 gap-4 pb-4">
           {tests.map((data, index) => (
-            <div key={index} className="flex items-center">
+            <div key={index} className="flex items-center mt-4">
               <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto min-h-[120px] py-3 relative w-full flex flex-row justify-between mx-4 items-center">
                 <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`} />
 
