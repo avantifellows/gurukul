@@ -176,10 +176,10 @@ export default function Home() {
         <div className="grid grid-cols-1 gap-4 pb-4 mt-4">
           {tests.map((data, index) => (
             <div key={index} className="flex items-center">
-              <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto min-h-[120px] py-3 relative w-full flex flex-row justify-between mx-3 items-center">
+              <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto min-h-[120px] py-3 relative w-full flex flex-row justify-between mx-4 items-center">
                 <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`} />
 
-                <div className="flex flex-col gap-1 ml-6 sm:w-full w-48 md:w-full text-sm md:text-base">
+                <div className="flex flex-col gap-1 pl-6 sm:w-full w-48 md:w-full text-sm md:text-base">
                   <div className="absolute top-2 left-6 text-gray-700 text-xs md:text-sm whitespace-nowrap">
                     {format12HrSessionTime(data.session.start_time)} - {format12HrSessionTime(data.session.end_time)}
                   </div>
@@ -218,7 +218,7 @@ export default function Home() {
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
         return (
           <Link href={`${portalBaseUrl}/?sessionId=${data.session.session_id}`} target="_blank">
-            <PrimaryButton className="bg-primary text-white text-sm rounded-md w-12 h-8 mr-4 shadow-md shadow-slate-400">
+            <PrimaryButton className="bg-primary text-white text-sm rounded-md w-14 h-8 mr-4 shadow-md shadow-slate-400">
               JOIN
             </PrimaryButton>
           </Link>
@@ -239,18 +239,18 @@ export default function Home() {
         const renderQuizButton = formatType !== 'omr' ? (
           <div className="flex flex-col items-center">
             <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
-              <PrimaryButton className={`${isResumeable ? "bg-yellow-400" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
+              <PrimaryButton className={`${isResumeable ? "bg-[#E5AC49]" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Start Test"}
               </PrimaryButton>
             </Link>
-            <div className="text-gray-500 md:text-xs text-[10px] text-center pb-2">Click to begin online test</div>
+            <div className="text-gray-500 md:text-xs text-[10px] text-center">Click to begin online test</div>
           </div>
         ) : null;
 
         const renderOmrButton = formatType !== 'qa' ? (
           <div className="flex flex-col items-center">
             <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}&omrMode=true`} target="_blank">
-              <PrimaryButton className={`${isResumeable ? "bg-yellow-400" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
+              <PrimaryButton className={`${isResumeable ? "bg-[#E5AC49]" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Fill OMR"}
               </PrimaryButton>
             </Link>
