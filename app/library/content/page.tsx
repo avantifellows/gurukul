@@ -217,10 +217,10 @@ const ContentLibrary = () => {
                                                     <h3>{topic.name}</h3>
                                                     <ul className="text-primary m-2 font-normal">
                                                         {resources
-                                                            .filter((resource) => resource.topic_id === topic.id  && resource.link)
+                                                            .filter((resource) => resource.topic_id === topic.id && resource.type_params.src_link)
                                                             .map((resource) => (
                                                                 <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
-                                                                    <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
+                                                                    <Link href={resource.type_params.src_link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
                                                                         <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name}
                                                                     </Link>
                                                                 </li>
