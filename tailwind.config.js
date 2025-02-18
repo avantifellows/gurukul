@@ -15,7 +15,8 @@ module.exports = {
       colors: {
         "primary": "#008181",
         "card": "#f7f7f7",
-        "heading": "#f5f5f5"
+        "heading": "#f5f5f5",
+        "resumeable": "#E5AC49",
       },
     },
   },
