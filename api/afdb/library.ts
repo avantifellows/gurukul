@@ -61,28 +61,12 @@ export const getTopics = async (chapterIds: number[]): Promise<Topic[]> => {
   return topicResponses.flat();
 };
 
-export const getSource = async (sourceId: number) => {
-  const queryParams = new URLSearchParams({ id: sourceId.toString() });
-  return fetchWithParams('source', queryParams);
-};
 
 export const getResourcesWithSource = async (topicIds: number[]): Promise<Resource[]> => {
   const resourcePromises = topicIds.map(async (topicId) => {
     const queryParams = new URLSearchParams({ topic_id: topicId.toString() });
     const chapterResources: Resource[] = await fetchWithParams('resource', queryParams);
-
-    const sourcePromises = chapterResources.map(async (resource) => {
-      if (resource.source_id) {
-        const sourceData = await getSource(resource.source_id);
-        if (sourceData) {
-          resource.link = sourceData[0].link;
-        }
-      }
-      return resource;
-    });
-
-    const resourcesWithSource = await Promise.all(sourcePromises);
-    return resourcesWithSource;
+    return chapterResources;
   });
 
   const resourceResponses = await Promise.all(resourcePromises);
@@ -100,23 +84,11 @@ export const getTeachers = async (id?: number, subject_id?: number): Promise<Tea
 export const getResourcesOfChapter = async (chapterId: number, teacherId?: number): Promise<Resource[]> => {
   const queryParams = new URLSearchParams();
   if (chapterId) queryParams.append('chapter_id', chapterId.toString());
-  queryParams.append('type', 'class');
   if (teacherId) queryParams.append('teacher_id', teacherId.toString());
 
   const chapterResources: Resource[] = await fetchWithParams('resource', queryParams);
 
-  const sourcePromises = chapterResources.map(async (resource) => {
-    if (resource.source_id) {
-      const sourceData = await getSource(resource.source_id);
-      if (sourceData) {
-        resource.link = sourceData[0].link;
-      }
-    }
-    return resource;
-  });
-
-  const resourcesWithSource = await Promise.all(sourcePromises);
-  return resourcesWithSource;
+  return chapterResources;
 };
 
 
@@ -137,7 +109,7 @@ export const getClassChapters = async (
     chapterData.map(async (chapter) => {
       const chapterResources = await getResourcesOfChapter(chapter.id, teacherId);
 
-      if (chapterResources.some((resource: any) => resource.type === 'class')) {
+      if (chapterResources.some((resource: any) => resource.type_params.resource_type === 'class')) {
         return chapter;
       } else {
         return null;
