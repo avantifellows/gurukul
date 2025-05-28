@@ -174,8 +174,8 @@ const ContentLibrary = () => {
                     <span className="text-sm ml-[52px] font-normal">Content Library</span>
                 </div>
                 <div className="flex flex-row mt-4 mb-4 justify-between mx-6">
-                    {selectedCourse === 'NEET Content' && neetSubjects.map(subject => generateSubjectButton(subject, subject))}
-                    {selectedCourse === 'JEE Content' && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
+                    {selectedCourse === COURSES.NEET && neetSubjects.map(subject => generateSubjectButton(subject, subject))}
+                    {selectedCourse === COURSES.JEE && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
                 </div>
                 <div className="bg-heading h-20 flex justify-between items-center px-4">
                     <select
@@ -227,9 +227,13 @@ const ContentLibrary = () => {
                                             <Loading showChapterContentOnly={true} />
                                         ) : (
                                             <ul>
-                                                {/* Render modules for the chapter */}
+                                                {/* Render resources for the chapter. Currently using hardcoded tag_ids:
+    1 = JEE resources, 2 = NEET resources */}
                                                 {chapterResources
-                                                    .filter((resource) => resource.type_params?.resource_type === "module")
+                                                    .filter((resource) =>
+                                                        resource.type_params?.resource_type === "module" &&
+                                                        resource.tag_ids?.includes(selectedCourse === 'JEE Content' ? 1 : 2)
+                                                    )
                                                     .map((resource) => (
                                                         <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
                                                             <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">

@@ -61,6 +61,7 @@ export interface Resource {
   name: string;
   topic_id: number;
   source_id: number;
+  tag_ids: number[];
   link: string;
   chapter_id: number;
   type: string;
