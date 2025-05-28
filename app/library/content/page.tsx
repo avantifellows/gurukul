@@ -6,7 +6,7 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
-import { getCurriculum, getSubjects, getChapters, getResourcesWithSource, getTopics, getGrades, getResourcesOfChapter, getChapterResourcesComplete } from '../../../api/afdb/library';
+import { getCurriculum, getSubjects, getChapters, getGrades, getChapterResourcesComplete } from '../../../api/afdb/library';
 import { Chapter, Resource, Topic } from '../../types';
 import { useEffect } from 'react';
 import Link from 'next/link';
@@ -235,9 +235,9 @@ const ContentLibrary = () => {
                                                         resource.tag_ids?.includes(selectedCourse === 'JEE Content' ? 1 : 2)
                                                     )
                                                     .map((resource) => (
-                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
+                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary">
                                                             <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                <Image src={ModuleIcon} alt="Module" className="w-10 h-10 mr-2" /> {resource.name}
+                                                                <Image src={ModuleIcon} alt="Module" className="w-8 h-8 mr-2 ml-9" /> {resource.name}
                                                             </Link>
                                                         </li>
                                                     ))}
