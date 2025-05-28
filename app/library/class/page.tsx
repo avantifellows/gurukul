@@ -202,7 +202,7 @@ const ClassLibrary = () => {
                     </select>
                 </div>
                 {isLoading ? (
-                    <Loading />
+                    <Loading showLibraryOnly={true} />
                 ) : (
                     <div className="mt-4 pb-40">
                         {chapters.length > 0 ? (chapters.map((chapter) => (

@@ -1,6 +1,5 @@
 "use client"
 
-import Client from "./client";
 import ReportsList from "./reports_list";
 import Loading from "../loading";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
@@ -15,9 +14,7 @@ export default function ReportsPage() {
             {loggedIn && userId ? (
                 <main className="max-w-xl mx-auto bg-white min-h-screen">
                     <TopBar />
-                    <Client message="">
-                        <ReportsList userId={userId} />
-                    </Client>
+                    <ReportsList userId={userId} />
                     <BottomNavigationBar />
                 </main>
             ) : (
@@ -25,7 +22,6 @@ export default function ReportsPage() {
                     <TopBar />
                     <Loading />
                 </main>
-
             )}
         </>
     );

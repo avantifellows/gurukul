@@ -29,7 +29,7 @@ export default function ReportsList({ userId }: ReportsListProps) {
     }, [userId]);
 
     if (!responseData) {
-        return <Loading />;
+        return <Loading showReportsOnly={true} />;
     }
 
     return (
