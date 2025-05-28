@@ -61,32 +61,23 @@ export const getTopics = async (chapterIds: number[]): Promise<Topic[]> => {
   return topicResponses.flat();
 };
 
-export const getSource = async (sourceId: number) => {
-  const queryParams = new URLSearchParams({ id: sourceId.toString() });
-  return fetchWithParams('source', queryParams);
-};
-
 export const getResourcesWithSource = async (topicIds: number[]): Promise<Resource[]> => {
   const resourcePromises = topicIds.map(async (topicId) => {
     const queryParams = new URLSearchParams({ topic_id: topicId.toString() });
     const chapterResources: Resource[] = await fetchWithParams('resource', queryParams);
 
-    const sourcePromises = chapterResources.map(async (resource) => {
-      if (resource.source_id) {
-        const sourceData = await getSource(resource.source_id);
-        if (sourceData) {
-          resource.link = sourceData[0].link;
-        }
+    const resourcesWithSource = chapterResources.map((resource) => {
+      if (resource.source && resource.source.link) {
+        resource.link = resource.source.link;
       }
       return resource;
     });
 
-    const resourcesWithSource = await Promise.all(sourcePromises);
     return resourcesWithSource;
   });
 
-  const resourceResponses = await Promise.all(resourcePromises);
-  return resourceResponses.flat();
+  const results = await Promise.all(resourcePromises);
+  return results.flat();
 };
 
 export const getTeachers = async (id?: number, subject_id?: number): Promise<Teacher[]> => {
@@ -97,28 +88,27 @@ export const getTeachers = async (id?: number, subject_id?: number): Promise<Tea
   return fetchWithParams('teacher', queryParams);
 };
 
-export const getResourcesOfChapter = async (chapterId: number, teacherId?: number): Promise<Resource[]> => {
+export const getResourcesOfChapter = async (
+  chapterId: number,
+  type: string,
+  teacherId?: number
+): Promise<Resource[]> => {
   const queryParams = new URLSearchParams();
   if (chapterId) queryParams.append('chapter_id', chapterId.toString());
-  queryParams.append('type', 'class');
+  queryParams.append('type', type);
   if (teacherId) queryParams.append('teacher_id', teacherId.toString());
 
   const chapterResources: Resource[] = await fetchWithParams('resource', queryParams);
 
-  const sourcePromises = chapterResources.map(async (resource) => {
-    if (resource.source_id) {
-      const sourceData = await getSource(resource.source_id);
-      if (sourceData) {
-        resource.link = sourceData[0].link;
-      }
+  const resourcesWithSource = chapterResources.map((resource) => {
+    if (resource.source && resource.source.link) {
+      resource.link = resource.source.link;
     }
     return resource;
   });
 
-  const resourcesWithSource = await Promise.all(sourcePromises);
   return resourcesWithSource;
 };
-
 
 export const getClassChapters = async (
   subjectId?: number,
@@ -135,9 +125,9 @@ export const getClassChapters = async (
 
   const filteredChapters = await Promise.all(
     chapterData.map(async (chapter) => {
-      const chapterResources = await getResourcesOfChapter(chapter.id, teacherId);
+      const chapterResources = await getResourcesOfChapter(chapter.id, 'class', teacherId);
 
-      if (chapterResources.some((resource: any) => resource.type === 'class')) {
+      if (chapterResources.length > 0) {
         return chapter;
       } else {
         return null;
@@ -148,4 +138,26 @@ export const getClassChapters = async (
   const validChapters: Chapter[] = filteredChapters.filter((chapter): chapter is Chapter => chapter !== null);
 
   return validChapters;
+};
+
+export const getChapterResourcesComplete = async (chapterId: number): Promise<{
+  topics: Topic[],
+  topicResources: Resource[],
+  chapterResources: Resource[]
+}> => {
+  // Fetch topics and chapter resources in parallel
+  const [topicData, chapterResourceData] = await Promise.all([
+    getTopics([chapterId]),
+    getResourcesOfChapter(chapterId, 'content')
+  ]);
+
+  // Fetch topic resources
+  const topicIds = topicData.map((topic) => topic.id);
+  const topicResourceData = topicIds.length > 0 ? await getResourcesWithSource(topicIds) : [];
+
+  return {
+    topics: topicData,
+    topicResources: topicResourceData,
+    chapterResources: chapterResourceData
+  };
 };

@@ -6,7 +6,7 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
-import { getCurriculum, getSubjects, getChapters, getResourcesWithSource, getTopics, getGrades } from '../../../api/afdb/library';
+import { getCurriculum, getSubjects, getChapters, getResourcesWithSource, getTopics, getGrades, getResourcesOfChapter, getChapterResourcesComplete } from '../../../api/afdb/library';
 import { Chapter, Resource, Topic } from '../../types';
 import { useEffect } from 'react';
 import Link from 'next/link';
@@ -19,12 +19,14 @@ import { useSearchParams } from 'next/navigation';
 import { CURRICULUM_NAMES, COURSES } from '@/constants/config';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
+import ModuleIcon from '../../../assets/notepad.png'
 
 const ContentLibrary = () => {
     const [activeTab, setActiveTab] = useState('Physics');
     const [chapters, setChapters] = useState<Chapter[]>([]);
     const [topics, setTopics] = useState<Topic[]>([]);
     const [resources, setResources] = useState<Resource[]>([]);
+    const [chapterResources, setChapterResources] = useState<Resource[]>([]);
     const [expandedChapters, setExpandedChapters] = useState<Record<number, boolean>>({});
     const [page, setPage] = useState(1);
     const [selectedGrade, setSelectedGrade] = useState(11);
@@ -34,6 +36,7 @@ const ContentLibrary = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isLoading, setIsLoading] = useState(true);
+    const [expandedChapterLoading, setExpandedChapterLoading] = useState<Record<number, boolean>>({});
     const selectedCourse = searchParams.get('course');
     const neetSubjects = ['Physics', 'Chemistry', 'Biology'];
     const jeeSubjects = ['Physics', 'Chemistry', 'Maths'];
@@ -98,11 +101,10 @@ const ContentLibrary = () => {
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
-            const topicData = await getTopics([chapterId]);
-            setTopics(topicData);
-            const topicIds = topicData.map((topic) => topic.id);
-            const resourceData = await getResourcesWithSource(topicIds);
-            setResources(resourceData);
+            const { topics, topicResources, chapterResources } = await getChapterResourcesComplete(chapterId);
+            setTopics(topics);
+            setResources(topicResources);
+            setChapterResources(chapterResources);
             MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER + ": " + chapterName);
         } catch (error) {
             console.error('Error fetching chapter data:', error);
@@ -110,13 +112,24 @@ const ContentLibrary = () => {
     };
 
     const toggleChapterExpansion = async (chapterId: number, chapterName: string) => {
-        setExpandedChapters((prevExpanded) => ({
-            ...prevExpanded,
-            [chapterId]: !prevExpanded[chapterId],
-        }));
+        setExpandedChapters({
+            [chapterId]: !expandedChapters[chapterId],
+        });
 
         if (!expandedChapters[chapterId]) {
+            setExpandedChapterLoading({ [chapterId]: true });
+            setChapterResources([]);
+            setTopics([]);
+            setResources([]);
+
             await handleChapterClick(chapterId, chapterName);
+            setExpandedChapterLoading({ [chapterId]: false });
+        } else {
+            // Clear data when closing the chapter
+            setChapterResources([]);
+            setTopics([]);
+            setResources([]);
+            setExpandedChapterLoading({});
         }
     };
 
@@ -209,29 +222,53 @@ const ContentLibrary = () => {
                                     </div>
                                 </div>
                                 {expandedChapters[chapter.id] && (
-                                    <ul>
-                                        {topics
-                                            .filter((topic) => topic.chapter_id === chapter.id)
-                                            .map((topic) => (
-                                                <div key={topic.id} className="bg-card rounded-lg shadow-lg shadow-slate-400 p-4 mx-2 mt-2 my-8 text-black font-semibold">
-                                                    <h3>{topic.name}</h3>
-                                                    <ul className="text-primary m-2 font-normal">
-                                                        {resources
-                                                            .filter((resource) => resource.topic_id === topic.id && resource.link)
-                                                            .map((resource) => (
-                                                                <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
-                                                                    <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                        <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name}
-                                                                    </Link>
-                                                                </li>
-                                                            ))}
-                                                    </ul>
-                                                </div>
-                                            ))}
-                                    </ul>
+                                    <div>
+                                        {expandedChapterLoading[chapter.id] ? (
+                                            <Loading showChapterContentOnly={true} />
+                                        ) : (
+                                            <ul>
+                                                {/* Render modules for the chapter */}
+                                                {chapterResources
+                                                    .filter((resource) => resource.type_params?.resource_type === "module")
+                                                    .map((resource) => (
+                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
+                                                            <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
+                                                                <Image src={ModuleIcon} alt="Module" className="w-10 h-10 mr-2" /> {resource.name}
+                                                            </Link>
+                                                        </li>
+                                                    ))}
+
+                                                {topics
+                                                    .filter((topic) => topic.chapter_id === chapter.id)
+                                                    .map((topic) => {
+                                                        const videos = resources.filter(
+                                                            (resource) => resource.topic_id === topic.id &&
+                                                                resource.link &&
+                                                                resource.type_params?.resource_type !== "module"
+                                                        );
+
+                                                        return (
+                                                            <div key={topic.id} className="bg-card rounded-lg shadow-lg shadow-slate-400 p-4 mx-2 mt-2 my-8 text-black font-semibold">
+                                                                <h3>{topic.name}</h3>
+                                                                <ul className="text-primary m-2 font-normal">
+                                                                    {videos.map((resource) => (
+                                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
+                                                                            <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
+                                                                                <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name}
+                                                                            </Link>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        );
+                                                    })}
+                                            </ul>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         ))}
+
                         <BottomNavigationBar />
                     </div>
                 )}

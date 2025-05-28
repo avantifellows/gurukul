@@ -65,7 +65,11 @@ export interface Resource {
   chapter_id: number;
   type: string;
   type_params: {
-    date: string
+    date: string,
+    resource_type: string;
+  },
+  source: {
+    link: string;
   }
 }
 
