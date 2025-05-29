@@ -33,9 +33,9 @@ export default function ReportsList({ userId }: ReportsListProps) {
     if (isLoading) {
         return (
             <div className="grid grid-cols-1 gap-4 pb-40">
-                {Array.from({ length: 3 }).map((_, index) => (
+                {Array.from({ length: 5 }).map((_, index) => (
                     <div key={index} className="flex items-center animate-pulse">
-                        <div className="bg-white rounded-lg shadow-lg h-24 mx-4 relative flex items-center my-1 md:my-2 w-full">
+                        <div className="bg-card rounded-lg shadow-lg h-24 mx-4 relative flex items-center my-1 md:my-2 w-full">
                             <div className="bg-gray-200 h-full w-2 absolute left-0 top-0 rounded-s-md"></div>
                             <div className="mx-6 md:mx-8 flex flex-col gap-2 flex-1">
                                 <div className="h-4 bg-gray-200 rounded w-2/3"></div>
