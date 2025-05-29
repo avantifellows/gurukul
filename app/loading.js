@@ -48,7 +48,7 @@ export default function Loading({ showReportsOnly = false, showLibraryOnly = fal
 
     const ReportShimmerCard = () => (
         <div className="flex items-center animate-pulse">
-            <div className="bg-white rounded-lg shadow-lg h-24 mx-4 relative flex items-center my-1 md:my-2 w-full">
+            <div className="bg-card rounded-lg shadow-lg h-24 mx-4 relative flex items-center my-1 md:my-2 w-full">
                 <div className="bg-gray-200 h-full w-2 absolute left-0 top-0 rounded-s-md"></div>
                 <div className="mx-6 md:mx-8 flex flex-col gap-2 flex-1">
                     <div className="h-4 bg-gray-200 rounded w-2/3"></div>
@@ -69,7 +69,7 @@ export default function Loading({ showReportsOnly = false, showLibraryOnly = fal
     );
 
     const SectionShimmer = ({ title, cardCount = 3, showTimeColumn = false, isTestSection = false, isReportSection = false }) => (
-        <div className="pt-6">
+        <div className={`pt-6 ${isReportSection ? 'bg-white' : ''}`}>
             <div className="h-6 w-32 bg-gray-200 rounded ml-4 mb-4 animate-pulse"></div>
             <div className="grid grid-cols-1 gap-4 pb-4">
                 {Array.from({ length: cardCount }).map((_, index) => (
