@@ -14,6 +14,9 @@ export default function ReportsPage() {
             {loggedIn && userId ? (
                 <main className="max-w-xl mx-auto bg-white min-h-screen">
                     <TopBar />
+                    <div className="bg-heading h-20 mb-4">
+                        <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Test Reports</h1>
+                    </div>
                     <ReportsList userId={userId} />
                     <BottomNavigationBar />
                 </main>

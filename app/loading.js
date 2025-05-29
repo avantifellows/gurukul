@@ -4,7 +4,7 @@ import { useAuth } from "@/services/AuthContext";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
 import { getGroupConfig } from "@/config/groupConfig";
 
-export default function Loading({ showReportsOnly = false, showLibraryOnly = false }) {
+export default function Loading({ showReportsOnly = false, showLibraryOnly = false, showChapterContentOnly = false, cardCount = 3 }) {
     const { group } = useAuth();
     const groupConfig = getGroupConfig(group || 'defaultGroup');
 
@@ -95,8 +95,30 @@ export default function Loading({ showReportsOnly = false, showLibraryOnly = fal
         </div>
     );
 
+    const ChapterContentShimmer = ({ cardCount = 2 }) => (
+        <div className="animate-pulse">
+            {/* Topic Cards Shimmer */}
+            {Array.from({ length: cardCount }).map((_, index) => (
+                <div key={index} className="bg-gray-100 rounded-lg shadow-lg p-4 mx-2 mt-2 my-8">
+                    {/* Topic Title */}
+                    <div className="h-5 bg-gray-200 rounded w-48 mb-4"></div>
+
+                    {/* Video Resources */}
+                    <div className="space-y-3">
+                        {Array.from({ length: 2 }).map((_, videoIndex) => (
+                            <div key={videoIndex} className="flex items-center py-2">
+                                <div className="w-10 h-10 bg-gray-200 rounded mr-2"></div>
+                                <div className="h-4 bg-gray-200 rounded w-36"></div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+
     return (
-        <main className="min-h-screen max-w-xl mx-auto md:mx-auto bg-heading">
+        <main className={`${!showChapterContentOnly ? 'min-h-screen' : ''} max-w-xl mx-auto md:mx-auto bg-heading`}>
             {/* Show only library shimmer when showLibraryOnly is true */}
             {showLibraryOnly ? (
                 <>
@@ -105,31 +127,36 @@ export default function Loading({ showReportsOnly = false, showLibraryOnly = fal
             ) : showReportsOnly ? (
                 /* Show only reports shimmer when showReportsOnly is true */
                 <SectionShimmer title="Reports" cardCount={5} isReportSection={true} />
-            ) : (
-                <>
-                    {/* Live Classes Shimmer - only show if enabled in groupConfig */}
-                    {groupConfig.showLiveClasses && (
-                        <SectionShimmer title="Live Classes" cardCount={2} showTimeColumn={true} />
+            ) :
+                showChapterContentOnly ? (
+                    /* Show only chapter content shimmer when showChapterContentOnly is true */
+                    <ChapterContentShimmer cardCount={2} />
+                ) :
+                    (
+                        <>
+                            {/* Live Classes Shimmer - only show if enabled in groupConfig */}
+                            {groupConfig.showLiveClasses && (
+                                <SectionShimmer title="Live Classes" cardCount={2} showTimeColumn={true} />
+                            )}
+
+                            {/* Tests Shimmer - only show if enabled in groupConfig */}
+                            {groupConfig.showTests && (
+                                <SectionShimmer title="Tests" cardCount={3} isTestSection={true} />
+                            )}
+
+                            {/* Practice Tests Shimmer - only show if enabled in groupConfig */}
+                            {groupConfig.showPracticeTests && (
+                                <SectionShimmer title="Practice Tests" cardCount={2} isTestSection={true} />
+                            )}
+
+                            {/* Homework Shimmer - only show if enabled in groupConfig */}
+                            {groupConfig.showHomework && (
+                                <SectionShimmer title="Homework" cardCount={1} isTestSection={true} />
+                            )}
+                        </>
                     )}
 
-                    {/* Tests Shimmer - only show if enabled in groupConfig */}
-                    {groupConfig.showTests && (
-                        <SectionShimmer title="Tests" cardCount={3} isTestSection={true} />
-                    )}
-
-                    {/* Practice Tests Shimmer - only show if enabled in groupConfig */}
-                    {groupConfig.showPracticeTests && (
-                        <SectionShimmer title="Practice Tests" cardCount={2} isTestSection={true} />
-                    )}
-
-                    {/* Homework Shimmer - only show if enabled in groupConfig */}
-                    {groupConfig.showHomework && (
-                        <SectionShimmer title="Homework" cardCount={1} isTestSection={true} />
-                    )}
-                </>
-            )}
-
-            {!showLibraryOnly && <div className="pb-40"></div>}
+            {!showLibraryOnly && !showChapterContentOnly && <div className="pb-40"></div>}
             <BottomNavigationBar />
         </main>
     );

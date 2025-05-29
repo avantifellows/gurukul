@@ -12,29 +12,23 @@ import { MIXPANEL_EVENT } from "@/constants/config";
 
 const TopBar = () => {
   const { userName, logout } = useAuth();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   const formatUserName = (userName: string) => {
     const names = userName.split(' ');
-
     const formattedNames = names.map(name =>
       name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
     );
-
-    const formattedName = formattedNames.join(' ');
-
-    return formattedName;
+    return formattedNames.join(' ');
   };
 
-  const formattedUserName = formatUserName(userName!);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const pathname = usePathname();
   const routeNames: { [key: string]: string } = {
     '/reports': 'Report',
     '/library': 'Library',
     '/library/content': 'Library',
     '/library/class': 'Library',
   };
-
-  const pathname = usePathname();
-  const routeName = routeNames[pathname] || <p>Welcome <br /> {formattedUserName} </p>;
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -49,11 +43,39 @@ const TopBar = () => {
     MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.LOGOUT);
   };
 
+  const UserNameShimmer = () => (
+    <div className="flex flex-col gap-1 animate-pulse">
+      <div>Welcome</div>
+      <div className="h-5 w-32 bg-white/20 rounded"></div>
+    </div>
+  );
+
+  // Determine what to show for the route name/username
+  const getRouteNameContent = () => {
+    const staticRouteName = routeNames[pathname];
+
+    if (staticRouteName) {
+      return staticRouteName;
+    }
+
+    // For home page, show welcome message with username or shimmer
+    if (!userName) {
+      return <UserNameShimmer />;
+    }
+
+    const formattedUserName = formatUserName(userName);
+    return (
+      <p>
+        Welcome <br /> {formattedUserName}
+      </p>
+    );
+  };
+
   return (
     <div className="max-w-xl mx-auto text-white p-4 h-32 justify-between items-center bg-primary">
       <CurrentTime className="text-sm mb-4" />
       <div className="mt-6 text-lg font-semibold justify-between flex mr-4 items-center">
-        {routeName}
+        {getRouteNameContent()}
         <div className="relative">
           <Image
             src={ProfileIcon}

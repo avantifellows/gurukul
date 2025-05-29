@@ -33,6 +33,7 @@ const ClassLibrary = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isLoading, setIsLoading] = useState(true);
+    const [loadingChapters, setLoadingChapters] = useState<Record<number, boolean>>({});
     const selectedCourse = searchParams.get('course');
     const neetSubjects = ['Physics', 'Chemistry', 'Biology'];
     const jeeSubjects = ['Physics', 'Chemistry', 'Maths'];
@@ -100,7 +101,7 @@ const ClassLibrary = () => {
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
-            const resourceData = await getResourcesOfChapter(chapterId, selectedTeacher);
+            const resourceData = await getResourcesOfChapter(chapterId, 'class', selectedTeacher);
             setResources(resourceData);
             MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER + ": " + chapterName);
         } catch (error) {
@@ -114,8 +115,14 @@ const ClassLibrary = () => {
             [chapterId]: !prevExpanded[chapterId],
         }));
 
+        // If expanding the chapter, show loading state
         if (!expandedChapters[chapterId]) {
-            await handleChapterClick(chapterId, chapterName);
+            setLoadingChapters(prev => ({ ...prev, [chapterId]: true }));
+            try {
+                await handleChapterClick(chapterId, chapterName);
+            } finally {
+                setLoadingChapters(prev => ({ ...prev, [chapterId]: false }));
+            }
         }
     };
 
@@ -221,18 +228,24 @@ const ClassLibrary = () => {
                                     </div>
                                 </div>
                                 {expandedChapters[chapter.id] && (
-                                    <ul className="text-primary m-2 font-normal">
-                                        {resources
-                                            .filter((resource) => resource.chapter_id === chapter.id && resource.link)
-                                            .map((resource) => (
-                                                <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
-                                                    <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                        <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name} {" - "}
-                                                        {resource.type_params?.date || 'Date not available'}
-                                                    </Link>
-                                                </li>
-                                            ))}
-                                    </ul>
+                                    <div className="m-2">
+                                        {loadingChapters[chapter.id] ? (
+                                            <Loading showChapterContentOnly={true} cardCount={2} />
+                                        ) : (
+                                            <ul className="text-primary font-normal">
+                                                {resources
+                                                    .filter((resource) => resource.chapter_id === chapter.id && resource.link)
+                                                    .map((resource) => (
+                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
+                                                            <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
+                                                                <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name} {" - "}
+                                                                {resource.type_params?.date || 'Date not available'}
+                                                            </Link>
+                                                        </li>
+                                                    ))}
+                                            </ul>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         ))) : <div className="text-center pt-10">

@@ -61,11 +61,16 @@ export interface Resource {
   name: string;
   topic_id: number;
   source_id: number;
+  tag_ids: number[];
   link: string;
   chapter_id: number;
   type: string;
   type_params: {
-    date: string
+    date: string,
+    resource_type: string;
+  },
+  source: {
+    link: string;
   }
 }
 
