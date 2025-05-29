@@ -116,31 +116,35 @@ export default function Home() {
       return <MessageDisplay message="No more live classes are scheduled for today!" />;
     }
 
+    const activeLiveClasses = liveClasses.filter((data) => isSessionActive(formatSessionTime(data.end_time)));
+
+    if (activeLiveClasses.length === 0) {
+      return <MessageDisplay message="No more live classes are scheduled for today!" />;
+    }
+
     return (
       <div className="grid grid-cols-1 gap-4 pb-16">
-        {liveClasses.map((data, index) => (
-          isSessionActive(formatSessionTime(data.end_time)) && (
-            <div key={index} className="flex mt-4 items-center">
-              <div>
-                <p className={commonTextClass}>
-                  {format12HrSessionTime(data.start_time)}
-                </p>
-                <p className={commonTextClass}>
-                  {format12HrSessionTime(data.end_time)}
-                </p>
-              </div>
-              <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
-                <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
-                <div className="text-sm md:text-base mx-6 md:mx-8 w-32 md:w-72">
-                  <span className="font-semibold">{data.session.meta_data.subject ?? "Science"}</span>
-                  <div className="text-sm md:text-base break-words">
-                    {data.session.name}
-                  </div>
-                </div>
-                {renderButton(data)}
-              </div>
+        {activeLiveClasses.map((data, index) => (
+          <div key={index} className="flex mt-4 items-center">
+            <div>
+              <p className={commonTextClass}>
+                {format12HrSessionTime(data.start_time)}
+              </p>
+              <p className={commonTextClass}>
+                {format12HrSessionTime(data.end_time)}
+              </p>
             </div>
-          )
+            <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
+              <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
+              <div className="text-sm md:text-base mx-6 md:mx-8 w-32 md:w-72">
+                <span className="font-semibold">{data.session.meta_data.subject ?? "Science"}</span>
+                <div className="text-sm md:text-base break-words">
+                  {data.session.name}
+                </div>
+              </div>
+              {renderButton(data)}
+            </div>
+          </div>
         ))}
       </div>
     );
