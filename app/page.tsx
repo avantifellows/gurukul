@@ -21,6 +21,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
   const [quizCompletionStatus, setQuizCompletionStatus] = useState<QuizCompletionStatus>({});
+  const [dataFetched, setDataFetched] = useState(false);
   const commonTextClass = "text-gray-700 text-xs md:text-sm mx-3 md:mx-8 whitespace-nowrap w-12";
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
   const portalBaseUrl = api.portal.frontend.baseUrl;
@@ -78,6 +79,7 @@ export default function Home() {
   };
 
   const fetchUserSessions = async () => {
+    setIsLoading(true);
     try {
       const groupConfig = getGroupConfig(group || 'defaultGroup');
       const shouldFetchQuizzes = groupConfig.showTests || groupConfig.showPracticeTests || groupConfig.showHomework;
@@ -88,25 +90,28 @@ export default function Home() {
       ]);
 
       const sessionIds = [...liveSessionData, ...quizSessionData].map(session => session.session_id);
-
       const sessionOccurrences = await getSessionOccurrences(sessionIds);
 
-      const quizSessions = sessionOccurrences
-        .filter((sessionOccurence: SessionOccurrence) => sessionOccurence.session.platform === 'quiz');
+      const quizSessions = sessionOccurrences.filter((sessionOccurence: SessionOccurrence) => sessionOccurence.session.platform === 'quiz');
       setQuizzes(quizSessions);
 
-      const liveSessions = sessionOccurrences
-        .filter((sessionOccurence: SessionOccurrence) => sessionOccurence.session.platform === 'meet');
+      const liveSessions = sessionOccurrences.filter((sessionOccurence: SessionOccurrence) => sessionOccurence.session.platform === 'meet');
       setLiveClasses(liveSessions);
 
       MixpanelTracking.getInstance().identify(userId!);
     } catch (error) {
       console.error("Error fetching user sessions:", error);
+    } finally {
+      setIsLoading(false);
+      setDataFetched(true);
     }
   };
 
-
   const renderLiveClasses = () => {
+    if (isLoading) return null;
+
+    if (!dataFetched) return null;
+
     if (liveClasses.length === 0) {
       return <MessageDisplay message="No more live classes are scheduled for today!" />;
     }
@@ -137,14 +142,15 @@ export default function Home() {
             </div>
           )
         ))}
-        {liveClasses.filter((data) => isSessionActive(formatSessionTime(data.end_time))).length === 0 && (
-          <MessageDisplay message="No more live classes are scheduled for today!" />
-        )}
       </div>
     );
   };
 
   const renderTestSection = (title: string, tests: QuizSession[]) => {
+    if (isLoading) return null;
+
+    if (!dataFetched) return null;
+
     const shouldShow = (() => {
       switch (title.toLowerCase()) {
         case 'tests':
@@ -168,7 +174,6 @@ export default function Home() {
         </div>
       );
     }
-    if (tests.length === 0) return null;
 
     return (
       <div>

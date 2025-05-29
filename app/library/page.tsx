@@ -21,7 +21,7 @@ const Page: React.FC = () => {
 
   const handleLibraryChange = (library: string) => {
     setSelectedLibrary(library);
-    MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_LIBRARY + ": " + library );
+    MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_LIBRARY + ": " + library);
   };
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const Page: React.FC = () => {
   }, [selectedLibrary, push]);
 
   const buttonStyle = 'mx-4 w-40 md:w-64';
-  const selectedButtonStyle = 'bg-white text-primary font-semibold';
+  const selectedButtonStyle = 'bg-white text-primary font-semibold py-3 px-4 rounded-lg shadow-sm';
   const unselectedButtonStyle = 'bg-heading text-slate-600';
 
   return (
