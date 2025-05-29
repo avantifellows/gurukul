@@ -6,11 +6,12 @@ export interface ReportResponse {
 }
 export interface AuthContextProps {
   loggedIn: boolean;
-  userId?: string | null;
-  userName?: string | null;
-  userDbId?: number | null;
-  group?: string | null;
+  userId: string | null;
+  userName: string;
+  userDbId: number | null;
+  group: string | null;
   logout: () => void;
+  isLoading: boolean;
 }
 
 export interface CurrentTimeProps {
