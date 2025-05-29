@@ -3,7 +3,6 @@
 import { useAuth } from "@/services/AuthContext";
 import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getSessionOccurrences, fetchUserSession } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
 import { QuizSession, SessionOccurrence, MessageDisplayProps, Session, QuizCompletionStatus } from "./types";
 import Link from "next/link";
@@ -84,13 +83,19 @@ export default function Home() {
       const groupConfig = getGroupConfig(group || 'defaultGroup');
       const shouldFetchQuizzes = groupConfig.showTests || groupConfig.showPracticeTests || groupConfig.showHomework;
 
+      const [liveSessionResponse, quizSessionResponse] = await Promise.all([
+        groupConfig.showLiveClasses ? fetch(`/api/afdb/session?action=user-sessions&user_id=${userDbId}`) : Promise.resolve({ json: () => [] }),
+        shouldFetchQuizzes ? fetch(`/api/afdb/session?action=user-sessions&user_id=${userDbId}&quiz=true`) : Promise.resolve({ json: () => [] })
+      ]);
+
       const [liveSessionData, quizSessionData] = await Promise.all([
-        groupConfig.showLiveClasses ? fetchUserSession(userDbId!) : Promise.resolve([]),
-        shouldFetchQuizzes ? fetchUserSession(userDbId!, true) : Promise.resolve([])
+        liveSessionResponse.json(),
+        quizSessionResponse.json()
       ]);
 
       const sessionIds = [...liveSessionData, ...quizSessionData].map(session => session.session_id);
-      const sessionOccurrences = await getSessionOccurrences(sessionIds);
+      const sessionOccurrencesResponse = await fetch(`/api/afdb/session?action=occurrences&session_ids=${sessionIds.join(',')}`);
+      const sessionOccurrences = await sessionOccurrencesResponse.json();
 
       const quizSessions = sessionOccurrences.filter((sessionOccurence: SessionOccurrence) => sessionOccurence.session.platform === 'quiz');
       setQuizzes(quizSessions);
