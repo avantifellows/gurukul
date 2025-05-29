@@ -6,7 +6,6 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
-import { getSubjects, getClassChapters, getGrades, getResourcesOfChapter, getTeachers } from '../../../api/afdb/library';
 import { Chapter, Resource, Topic, Teacher } from '../../types';
 import { useEffect } from 'react';
 import Link from 'next/link';
@@ -48,10 +47,16 @@ const ClassLibrary = () => {
 
         try {
             const actualTabName = tabName.toLowerCase();
-            const subjectData = await getSubjects(actualTabName);
-            const gradeData = await getGrades(selectedGrade);
-            const teacherData = await getTeachers(undefined, subjectData[0].id);
+            const subjectResponse = await fetch(`/api/afdb/library?action=subjects&name=${encodeURIComponent(actualTabName)}`);
+            const subjectData = await subjectResponse.json();
+
+            const gradeResponse = await fetch(`/api/afdb/library?action=grades&number=${selectedGrade}`);
+            const gradeData = await gradeResponse.json();
+
+            const teacherResponse = await fetch(`/api/afdb/library?action=teachers&subject_id=${subjectData[0].id}`);
+            const teacherData = await teacherResponse.json();
             setTeachers(teacherData);
+
             if (teacherData.length > 0 && selectedTeacher === undefined) {
                 setSelectedTeacher(teacherData[0].id);
             }
@@ -60,9 +65,8 @@ const ClassLibrary = () => {
                 const gradeId = gradeData[0].id;
 
                 await fetchChapters(subjectId, gradeId);
-                const chapterData = selectedChapter
-                    ? await getClassChapters(subjectId, gradeId, selectedChapter, selectedTeacher)
-                    : await getClassChapters(subjectId, gradeId, undefined, selectedTeacher);
+                const chapterResponse = await fetch(`/api/afdb/library?action=class-chapters&subject_id=${subjectId}&grade_id=${gradeId}${selectedChapter ? `&id=${selectedChapter}` : ''}${selectedTeacher ? `&teacher_id=${selectedTeacher}` : ''}`);
+                const chapterData = await chapterResponse.json();
 
                 if (chapterData.length > 0) {
                     setChapters(chapterData);
@@ -95,13 +99,15 @@ const ClassLibrary = () => {
 
     const handleTeacherChange = async (selectedTeacherId: number) => {
         setSelectedTeacher(selectedTeacherId);
-        const teacherName = await getTeachers(selectedTeacherId);
+        const response = await fetch(`/api/afdb/library?action=teachers&id=${selectedTeacherId}`);
+        const teacherName = await response.json();
         MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_TEACHER + ": " + teacherName[0].user.first_name);
     };
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
-            const resourceData = await getResourcesOfChapter(chapterId, 'class', selectedTeacher);
+            const response = await fetch(`/api/afdb/library?action=chapter-resources&chapter_id=${chapterId}&type=class${selectedTeacher ? `&teacher_id=${selectedTeacher}` : ''}`);
+            const resourceData = await response.json();
             setResources(resourceData);
             MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER + ": " + chapterName);
         } catch (error) {
@@ -137,7 +143,8 @@ const ClassLibrary = () => {
     };
 
     const fetchChapters = async (subjectId: number, gradeId: number) => {
-        const chapterData = await getClassChapters(subjectId, gradeId, undefined, selectedTeacher);
+        const response = await fetch(`/api/afdb/library?action=class-chapters&subject_id=${subjectId}&grade_id=${gradeId}${selectedTeacher ? `&teacher_id=${selectedTeacher}` : ''}`);
+        const chapterData = await response.json();
         setChapterList(chapterData);
     };
 
