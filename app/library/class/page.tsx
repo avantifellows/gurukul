@@ -149,7 +149,7 @@ const ClassLibrary = () => {
         <PrimaryButton
             key={subject}
             onClick={() => handleTabClick(subject)}
-            className={`py-3 px-4 rounded-lg ${activeTab === subject ? 'bg-heading text-primary font-semibold shadow-sm' : 'bg-white text-slate-600'}`}
+            className={`py-2 px-4 rounded-lg ${activeTab === subject ? 'bg-heading text-primary font-semibold shadow-sm' : 'bg-white text-slate-600'}`}
         >
             {label}
         </PrimaryButton>
