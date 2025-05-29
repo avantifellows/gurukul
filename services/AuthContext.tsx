@@ -22,6 +22,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [userId, setUserId] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [group, setGroup] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         async function checkToken() {
@@ -43,6 +44,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 console.error('Error verifying token:', error);
                 setLoggedIn(false);
                 setUserId(null);
+            } finally {
+                setIsLoading(false);
             }
         }
 
@@ -60,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ loggedIn, userId, userName, userDbId, group, logout }}>
+        <AuthContext.Provider value={{ loggedIn, userId, userName, userDbId, group, logout, isLoading }}>
             {children}
         </AuthContext.Provider>
     );

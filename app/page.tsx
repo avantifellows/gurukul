@@ -14,7 +14,7 @@ import { MixpanelTracking } from "@/services/mixpanel";
 import { getGroupConfig } from "@/config/groupConfig";
 
 export default function Home() {
-  const { loggedIn, userId, userDbId, group } = useAuth();
+  const { loggedIn, userId, userDbId, group, isLoading: authLoading } = useAuth();
   const groupConfig = getGroupConfig(group || 'defaultGroup');
   const [liveClasses, setLiveClasses] = useState<SessionOccurrence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -292,7 +292,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    if (loggedIn) {
+    if (loggedIn && !authLoading) {
       const fetchData = async () => {
         setIsLoading(true);
         try {
@@ -309,13 +309,13 @@ export default function Home() {
       };
       fetchData();
     }
-  }, [loggedIn, userDbId]);
+  }, [loggedIn, userDbId, authLoading]);
 
   const { nonChapterTests, chapterTests, practiceTests, homework } = filterAndSortTests(quizzes);
 
   return (
     <>
-      {isLoading ? (
+      {(isLoading || authLoading) ? (
         <div className="max-w-xl mx-auto">
           <TopBar />
           <Loading />
