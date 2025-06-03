@@ -19,6 +19,7 @@
 @media (max-width: 760px) {
   :root {
     --background-start-rgb: 0, 129, 129;
+    --background-end-rgb: 255, 255, 255;
   }
 }
 
