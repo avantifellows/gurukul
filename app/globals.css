@@ -16,6 +16,12 @@
   }
 }
 
+@media (max-width: 760px) {
+  :root {
+    --background-start-rgb: 0, 129, 129;
+  }
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
