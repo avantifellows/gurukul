@@ -16,7 +16,7 @@ export default function Loading({ showReportsOnly = false, showLibraryOnly = fal
                     <div className="h-3 w-12 bg-gray-200 rounded"></div>
                 </div>
             )}
-            <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 items-center">
+            <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 md:mr-8 items-center">
                 <div className="bg-gray-200 h-full w-2 absolute left-0 top-0 rounded-s-md"></div>
                 <div className="mx-6 md:mx-8 flex flex-col gap-2 flex-1">
                     <div className="h-4 bg-gray-200 rounded w-3/4"></div>
