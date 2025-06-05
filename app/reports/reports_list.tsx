@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Report } from "../types";
 import { useState, useEffect } from "react";
-import { getReports } from "@/api/reporting/reports";
 import { ReportsListProps } from "../types";
 import { MixpanelTracking } from "@/services/mixpanel";
 import { MIXPANEL_EVENT } from "@/constants/config";
@@ -14,7 +13,8 @@ export default function ReportsList({ userId }: ReportsListProps) {
     useEffect(() => {
         async function fetchReportsData() {
             try {
-                const data = await getReports(userId);
+                const response = await fetch(`/api/reporting/reports?user_id=${userId}`);
+                const data = await response.json();
                 data.reports.sort((a: Report, b: Report) =>
                     new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
                 );

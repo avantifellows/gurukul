@@ -6,7 +6,6 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
-import { getCurriculum, getSubjects, getChapters, getGrades, getChapterResourcesComplete } from '../../../api/afdb/library';
 import { Chapter, Resource, Topic } from '../../types';
 import { useEffect } from 'react';
 import Link from 'next/link';
@@ -56,18 +55,24 @@ const ContentLibrary = () => {
                     (selectedCourse === COURSES.NEET && tabName === 'Biology') ? CURRICULUM_NAMES.SANKALP :
                         (selectedCourse === COURSES.NEET && (tabName === 'Physics' || tabName === 'Chemistry')) ? CURRICULUM_NAMES.ALC :
                             CURRICULUM_NAMES.SANKALP;
-            const curriculumData = await getCurriculum(curriculumName);
+
+            const curriculumResponse = await fetch(`/api/afdb/library?action=curriculum&name=${encodeURIComponent(curriculumName)}`);
+            const curriculumData = await curriculumResponse.json();
             const curriculumId = curriculumData[0].id;
-            const subjectData = await getSubjects(actualTabName);
-            const gradeData = await getGrades(selectedGrade);
+
+            const subjectResponse = await fetch(`/api/afdb/library?action=subjects&name=${encodeURIComponent(actualTabName)}`);
+            const subjectData = await subjectResponse.json();
+
+            const gradeResponse = await fetch(`/api/afdb/library?action=grades&number=${selectedGrade}`);
+            const gradeData = await gradeResponse.json();
+
             if (subjectData.length > 0) {
                 const subjectId = subjectData[0].id;
                 const gradeId = gradeData[0].id;
 
                 await fetchChapters(subjectId, gradeId, curriculumId);
-                const chapterData = selectedChapter
-                    ? await getChapters(subjectId, gradeId, selectedChapter, curriculumId)
-                    : await getChapters(subjectId, gradeId, undefined, curriculumId);
+                const chapterResponse = await fetch(`/api/afdb/library?action=chapters&subject_id=${subjectId}&grade_id=${gradeId}${selectedChapter ? `&id=${selectedChapter}` : ''}${curriculumId ? `&curriculum_id=${curriculumId}` : ''}`);
+                const chapterData = await chapterResponse.json();
 
                 if (chapterData.length > 0) {
                     setChapters(chapterData);
@@ -101,7 +106,8 @@ const ContentLibrary = () => {
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
-            const { topics, topicResources, chapterResources } = await getChapterResourcesComplete(chapterId);
+            const response = await fetch(`/api/afdb/library?action=chapter-complete&chapter_id=${chapterId}`);
+            const { topics, topicResources, chapterResources } = await response.json();
             setTopics(topics);
             setResources(topicResources);
             setChapterResources(chapterResources);
@@ -144,7 +150,8 @@ const ContentLibrary = () => {
     };
 
     const fetchChapters = async (subjectId: number, gradeId: number, curriculumId: number) => {
-        const chapterData = await getChapters(subjectId, gradeId, undefined, curriculumId);
+        const response = await fetch(`/api/afdb/library?action=chapters&subject_id=${subjectId}&grade_id=${gradeId}${curriculumId ? `&curriculum_id=${curriculumId}` : ''}`);
+        const chapterData = await response.json();
         setChapterList(chapterData);
     };
 
