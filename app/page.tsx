@@ -26,6 +26,10 @@ export default function Home() {
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
   const portalBaseUrl = api.portal.frontend.baseUrl;
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const fetchQuizCompletionStatus = async () => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_QUIZ_BACKEND_URL}sessions/user/${userId}/quiz-attempts`);

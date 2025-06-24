@@ -3,13 +3,13 @@
 import getFetchConfig from '../fetchConfig';
 import { Student, User } from '@/app/types';
 
-export const getUserName = async (studentId: string): Promise<User | null> => {
+export const getUserName = async (id: string, idType: 'student_id' | 'apaar_id' = 'student_id'): Promise<User | null> => {
     const url = process.env.AF_DB_SERVICE_URL;
     const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN!;
 
     try {
         const queryParams = new URLSearchParams({
-            student_id: studentId,
+            [idType]: id,
         });
 
         const urlWithParams = `${url}/student?${queryParams.toString()}`;
@@ -22,7 +22,7 @@ export const getUserName = async (studentId: string): Promise<User | null> => {
         const data: Student[] = await response.json();
 
         if (data.length === 0) {
-            console.warn(`No user found for student ID: ${studentId}`);
+            console.warn(`No user found for student ID: ${id}`);
             return null;
         }
 
