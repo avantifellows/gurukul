@@ -4,10 +4,15 @@ import { Student } from '@/app/types';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
+    const apaarId = searchParams.get('apaar_id');
     const studentId = searchParams.get('student_id');
+    
+    // Prefer apaar_id if present, otherwise use student_id
+    const id = apaarId || studentId;
+    const idType = apaarId ? 'apaar_id' : 'student_id';
 
-    if (!studentId) {
-        return NextResponse.json({ error: 'Student ID is required' }, { status: 400 });
+    if (!id) {
+        return NextResponse.json({ error: 'Student ID or Apaar ID is required' }, { status: 400 });
     }
 
     try {
@@ -15,7 +20,7 @@ export async function GET(request: Request) {
         const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN!;
 
         const queryParams = new URLSearchParams({
-            student_id: studentId,
+            [idType]: id,
         });
 
         const urlWithParams = `${url}/student?${queryParams.toString()}`;
@@ -28,7 +33,7 @@ export async function GET(request: Request) {
         const data: Student[] = await response.json();
 
         if (data.length === 0) {
-            console.warn(`No user found for student ID: ${studentId}`);
+            console.warn(`No user found for ${idType}: ${id}`);
             return NextResponse.json(null);
         }
 
