@@ -28,7 +28,7 @@ export async function GET(request: Request) {
         switch (action) {
             case 'curriculum': {
                 const name = searchParams.get('name');
-                if (!name) return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+                if (!name) return NextResponse.json({ error: 'Curriculum name is required' }, { status: 400 });
                 const url = `${baseUrl}/curriculum?name=${encodeURIComponent(name)}`;
                 const data = await fetchData(url);
                 return NextResponse.json(data);
@@ -36,7 +36,7 @@ export async function GET(request: Request) {
 
             case 'subjects': {
                 const name = searchParams.get('name');
-                if (!name) return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+                if (!name) return NextResponse.json({ error: 'Subject name is required' }, { status: 400 });
                 const url = `${baseUrl}/subject?name=${encodeURIComponent(name)}`;
                 const data = await fetchData(url);
                 return NextResponse.json(data);
@@ -44,7 +44,7 @@ export async function GET(request: Request) {
 
             case 'grades': {
                 const number = searchParams.get('number');
-                if (!number) return NextResponse.json({ error: 'Number is required' }, { status: 400 });
+                if (!number) return NextResponse.json({ error: 'Grade number is required' }, { status: 400 });
                 const url = `${baseUrl}/grade?number=${number}`;
                 const data = await fetchData(url);
                 return NextResponse.json(data);
