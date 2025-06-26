@@ -30,9 +30,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const result = await verifyToken();
                 if (result.isValid) {
                     setLoggedIn(true);
+                    const userGroup = result.data.data.group;
                     setUserId(result.data.id);
-                    setGroup(result.data.data.group);
-                    const response = await fetch(`/api/afdb/user?student_id=${result.data.id}`);
+                    setGroup(userGroup);
+                    const idType = userGroup === "EnableStudents" ? 'apaar_id' : 'student_id';
+                    const response = await fetch(`/api/afdb/user?${idType}=${result.data.id}`);
                     const userData = await response.json();
                     setUser(userData);
                 } else {

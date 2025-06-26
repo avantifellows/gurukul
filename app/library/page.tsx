@@ -33,9 +33,9 @@ const Page: React.FC = () => {
     }
   }, [selectedLibrary, push]);
 
-  const buttonStyle = 'mx-4 w-40 md:w-64';
-  const selectedButtonStyle = 'bg-white text-primary font-semibold py-3 px-4 rounded-lg shadow-sm';
-  const unselectedButtonStyle = 'bg-heading text-slate-600';
+  const buttonStyle = 'mx-4 w-48 md:w-72 whitespace-nowrap';
+  const selectedButtonStyle = 'bg-white text-primary font-semibold py-2 rounded-lg shadow-sm';
+  const unselectedButtonStyle = 'bg-heading text-slate-600 py-2 rounded-lg';
 
   return (
     <main className="max-w-xl mx-auto bg-heading min-h-screen">
