@@ -12,5 +12,8 @@ export const api = {
     reports: {
       baseUrl: process.env.AF_REPORTS_URL || '',
       student_reports: '/reports/student_reports/',
+    },
+    afdb: {
+      baseUrl: process.env.AF_DB_SERVICE_URL || '',
     }
 }

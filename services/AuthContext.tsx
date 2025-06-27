@@ -5,7 +5,6 @@ import { verifyToken } from '@/services/validation';
 import { useRouter } from 'next/navigation';
 import { AuthContextProps, User } from '../app/types';
 import { api } from '@/services/url';
-import { getUserName } from '@/api/afdb/userName';
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
@@ -35,7 +34,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setUserId(result.data.id);
                     setGroup(userGroup);
                     const idType = userGroup === "EnableStudents" ? 'apaar_id' : 'student_id';
-                    const userData = await getUserName(result.data.id, idType);
+                    const response = await fetch(`/api/afdb/user?${idType}=${result.data.id}`);
+                    const userData = await response.json();
                     setUser(userData);
                 } else {
                     setLoggedIn(false);
