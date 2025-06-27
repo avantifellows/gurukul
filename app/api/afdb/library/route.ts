@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import { Chapter, Resource, Topic } from '@/app/types';
 import getFetchConfig from '@/api/fetchConfig';
+import { api } from '@/services/url';
 
-const baseUrl = process.env.AF_DB_SERVICE_URL;
-const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
+const afdbBaseUrl = api.afdb.baseUrl;
+const afdbBearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
 
 const fetchData = async (url: string) => {
-    const response = await fetch(url, getFetchConfig(bearerToken));
+    const response = await fetch(url, getFetchConfig(afdbBearerToken));
 
     if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
@@ -16,7 +17,7 @@ const fetchData = async (url: string) => {
 };
 
 const fetchWithParams = async (endpoint: string, queryParams: URLSearchParams) => {
-    const urlWithParams = `${baseUrl}/${endpoint}?${queryParams.toString()}`;
+    const urlWithParams = `${afdbBaseUrl}/${endpoint}?${queryParams.toString()}`;
     return fetchData(urlWithParams);
 };
 
@@ -29,7 +30,7 @@ export async function GET(request: Request) {
             case 'curriculum': {
                 const name = searchParams.get('name');
                 if (!name) return NextResponse.json({ error: 'Curriculum name is required' }, { status: 400 });
-                const url = `${baseUrl}/curriculum?name=${encodeURIComponent(name)}`;
+                const url = `${afdbBaseUrl}/curriculum?name=${encodeURIComponent(name)}`;
                 const data = await fetchData(url);
                 return NextResponse.json(data);
             }
@@ -37,7 +38,7 @@ export async function GET(request: Request) {
             case 'subjects': {
                 const name = searchParams.get('name');
                 if (!name) return NextResponse.json({ error: 'Subject name is required' }, { status: 400 });
-                const url = `${baseUrl}/subject?name=${encodeURIComponent(name)}`;
+                const url = `${afdbBaseUrl}/subject?name=${encodeURIComponent(name)}`;
                 const data = await fetchData(url);
                 return NextResponse.json(data);
             }
@@ -45,7 +46,7 @@ export async function GET(request: Request) {
             case 'grades': {
                 const number = searchParams.get('number');
                 if (!number) return NextResponse.json({ error: 'Grade number is required' }, { status: 400 });
-                const url = `${baseUrl}/grade?number=${number}`;
+                const url = `${afdbBaseUrl}/grade?number=${number}`;
                 const data = await fetchData(url);
                 return NextResponse.json(data);
             }

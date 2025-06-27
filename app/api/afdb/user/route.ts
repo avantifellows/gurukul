@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import getFetchConfig from '@/api/fetchConfig';
+import { api } from '@/services/url';
 import { Student } from '@/app/types';
 
 export async function GET(request: Request) {
@@ -16,15 +17,15 @@ export async function GET(request: Request) {
     }
 
     try {
-        const url = process.env.AF_DB_SERVICE_URL;
-        const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN!;
+        const afdbBaseUrl = api.afdb.baseUrl;
+        const afdbBearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
 
         const queryParams = new URLSearchParams({
             [idType]: id,
         });
 
-        const urlWithParams = `${url}/student?${queryParams.toString()}`;
-        const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
+        const urlWithParams = `${afdbBaseUrl}/student?${queryParams.toString()}`;
+        const response = await fetch(urlWithParams, getFetchConfig(afdbBearerToken));
 
         if (!response.ok) {
             throw new Error(`Error fetching student data: ${response.statusText}`);

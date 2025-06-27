@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import getFetchConfig from '@/api/fetchConfig';
+import { api } from '@/services/url';
 
-const url = process.env.AF_DB_SERVICE_URL;
-const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
+const afdbBaseUrl = api.afdb.baseUrl;
+const afdbBearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -18,8 +19,8 @@ export async function GET(request: Request) {
                 queryParams.append('session_ids', sessionIds);
                 queryParams.append('is_start_time', 'today');
 
-                const urlWithParams = `${url}/session-occurrence?${queryParams.toString()}`;
-                const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
+                const urlWithParams = `${afdbBaseUrl}/session-occurrence?${queryParams.toString()}`;
+                const response = await fetch(urlWithParams, getFetchConfig(afdbBearerToken));
 
                 if (!response.ok) {
                     throw new Error(`Error in fetching Session Occurrence Details: ${response.statusText}`);
@@ -35,12 +36,12 @@ export async function GET(request: Request) {
 
                 if (!userId) return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
 
-                let urlWithParams = `${url}/user/${userId}/sessions`;
+                let urlWithParams = `${afdbBaseUrl}/user/${userId}/sessions`;
                 if (isQuiz) {
                     urlWithParams += '?quiz=true';
                 }
 
-                const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
+                const response = await fetch(urlWithParams, getFetchConfig(afdbBearerToken));
                 if (!response.ok) {
                     throw new Error('Failed to fetch sessions');
                 }
