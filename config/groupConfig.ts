@@ -11,11 +11,12 @@ const groupConfig: GroupConfigurations = {
     },
     EnableStudents: {
         showLiveClasses: false,
-        showTests: true,
+        showTests: false,
         showPracticeTests: true,
-        showHomework: true,
+        showHomework: false,
         showContentLibrary: true,
         showClassLibrary: false,
+        usePracticeTestAccordion: true,
     },
     DelhiStudents: {
         showLiveClasses: true,
