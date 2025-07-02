@@ -34,13 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     const userGroup = result.data.data.group;
                     setUserId(result.data.id);
                     setGroup(userGroup);
-                    let userData = null;
-                    if (userGroup === "EnableStudents") {
-                        userData = await getUserName(result.data.id, 'apaar_id');
-                    }
-                    if (!userData) {
-                        userData = await getUserName(result.data.id, 'student_id');
-                    }
+                    const userData = await getUserName(result.data.id, userGroup);
                     setUser(userData);
                 } else {
                     setLoggedIn(false);
