@@ -127,18 +127,15 @@ export default function Home() {
     }
 
     return (
-      <div className="grid grid-cols-1 gap-4 pb-16">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 pb-16">
         {activeLiveClasses.map((data, index) => (
-          <div key={index} className="flex mt-4 items-center">
-            <div>
-              <p className={commonTextClass}>
-                {format12HrSessionTime(data.start_time)}
-              </p>
-              <p className={commonTextClass}>
-                {format12HrSessionTime(data.end_time)}
+          <div key={index} className="flex mt-4 items-center lg:flex-col lg:items-stretch">
+            <div className="lg:order-2 lg:flex lg:justify-between lg:items-center lg:px-4 lg:py-2 lg:bg-gray-50 lg:rounded-t-lg">
+              <p className={`${commonTextClass} lg:text-sm lg:mx-0 lg:whitespace-normal lg:w-auto`}>
+                {format12HrSessionTime(data.start_time)} - {format12HrSessionTime(data.end_time)}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 md:mr-8 items-center">
+            <div className="bg-white rounded-lg lg:rounded-t-none shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 md:mr-8 lg:mr-0 items-center lg:order-1">
               <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
               <div className="text-sm md:text-base mx-6 md:mx-8 w-32 md:w-72">
                 <span className="font-semibold">{data.session.meta_data.subject ?? "Science"}</span>
@@ -186,10 +183,10 @@ export default function Home() {
     return (
       <div>
         <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
-        <div className="grid grid-cols-1 gap-4 pb-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 pb-4">
           {tests.map((data, index) => (
-            <div key={index} className="flex items-center mt-4">
-              <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto min-h-[120px] py-3 relative w-full flex flex-row justify-between mx-4 items-center">
+            <div key={index} className="flex items-center mt-4 lg:block">
+              <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto min-h-[120px] py-3 relative w-full flex flex-row justify-between mx-4 lg:mx-0 items-center lg:min-h-[140px] hover:shadow-xl transition-shadow duration-200">
                 <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`} />
 
                 <div className="flex flex-col gap-1 pl-6 sm:w-full w-48 md:w-full text-sm md:text-base">
@@ -324,7 +321,7 @@ export default function Home() {
           <Loading />
         </div>
       ) : (
-        <main className="min-h-screen max-w-xl mx-auto md:mx-auto bg-heading">
+        <main className="min-h-screen max-w-xl mx-auto lg:max-w-none lg:mx-0 lg:p-6 md:mx-auto bg-heading lg:bg-transparent">
           <TopBar />
           {groupConfig.showLiveClasses && (
             <div>

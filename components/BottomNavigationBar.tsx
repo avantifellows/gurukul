@@ -20,7 +20,7 @@ const BottomNavigationBar = () => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative lg:hidden">
       <div className="max-w-xl mx-auto fixed bottom-[72px] left-0 right-0 bg-gray-100 border-t-2 shadow-2xl  shadow-black text-center py-2 text-xs text-gray-700 md:pb-4 md:text-lg">
         <div className="flex items-center justify-center gap-1 md:gap-2">
           Powered by

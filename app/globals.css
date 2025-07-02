@@ -16,9 +16,16 @@
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 1023px) {
   :root {
     --background-start-rgb: 0, 129, 129;
+    --background-end-rgb: 255, 255, 255;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --background-start-rgb: 249, 250, 251;
     --background-end-rgb: 255, 255, 255;
   }
 }

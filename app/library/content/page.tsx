@@ -164,24 +164,24 @@ const ContentLibrary = () => {
 
     return (
         <>
-            <main className="max-w-xl mx-auto bg-white min-h-screen">
+            <main className="max-w-xl mx-auto lg:max-w-none lg:mx-0 lg:p-6 bg-white lg:bg-transparent min-h-screen">
                 <TopBar />
-                <div className="bg-heading text-primary h-20 flex flex-col">
-                    <div className='flex items-center mx-4 mt-4'>
-                        <IoArrowBack onClick={handleBackClick} className="w-7 h-7 cursor-pointer" />
-                        <h1 className="font-semibold ml-2 text-xl">{selectedCourse === 'NEET Content' ? "NEET Course" : "JEE Course"}<br /></h1>
+                <div className="bg-heading lg:bg-transparent text-primary h-20 lg:h-auto flex flex-col lg:mb-6">
+                    <div className='flex items-center mx-4 lg:mx-0 mt-4 lg:mt-0'>
+                        <IoArrowBack onClick={handleBackClick} className="w-7 h-7 lg:w-8 lg:h-8 cursor-pointer hover:opacity-75 transition-opacity duration-200" />
+                        <h1 className="font-semibold ml-2 text-xl lg:text-2xl">{selectedCourse === 'NEET Content' ? "NEET Course" : "JEE Course"}<br /></h1>
                     </div>
-                    <span className="text-sm ml-[52px] font-normal">Content Library</span>
+                    <span className="text-sm lg:text-base ml-[52px] lg:ml-10 font-normal lg:text-gray-600">Content Library</span>
                 </div>
-                <div className="flex flex-row mt-4 mb-4 justify-between mx-6">
+                <div className="flex flex-row mt-4 mb-4 justify-between lg:justify-center lg:gap-4 mx-6 lg:mx-0">
                     {selectedCourse === COURSES.NEET && neetSubjects.map(subject => generateSubjectButton(subject, subject))}
                     {selectedCourse === COURSES.JEE && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
                 </div>
-                <div className="bg-heading h-20 flex justify-between items-center px-4">
+                <div className="bg-heading lg:bg-gray-50 lg:rounded-lg h-20 lg:h-16 flex justify-between lg:justify-center lg:gap-8 items-center px-4 lg:px-6 lg:mb-6">
                     <select
                         onChange={(e) => handleGradeChange(+e.target.value)}
                         value={selectedGrade}
-                        className="w-32 h-8 rounded-lg text-center"
+                        className="w-32 lg:w-40 h-8 lg:h-10 rounded-lg text-center lg:text-base hover:shadow-md transition-shadow duration-200"
                     >
                         {gradeOptions.map((grade) => (
                             <option key={grade} value={grade} className="text-sm md:text-lg">
@@ -192,7 +192,7 @@ const ContentLibrary = () => {
                     <select
                         onChange={(e) => setSelectedChapter(+e.target.value)}
                         value={selectedChapter || ''}
-                        className="w-32 h-8 rounded-lg text-center"
+                        className="w-32 lg:w-40 h-8 lg:h-10 rounded-lg text-center lg:text-base hover:shadow-md transition-shadow duration-200"
                     >
                         <option value="" className="text-sm md:text-lg">Chapter: All</option>
                         {chapterList.map((chapter) => (
@@ -205,28 +205,29 @@ const ContentLibrary = () => {
                 {isLoading ? (
                     <Loading showLibraryOnly={true} />
                 ) : (
-                    <div className="mt-4 pb-40">
-                        {chapters.map((chapter) => (
-                            <div key={chapter.id} className="mx-5">
-                                <div
-                                    className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
-                                    onClick={() => toggleChapterExpansion(chapter.id, chapter.name)}
-                                >
-                                    <div className="w-52">{chapter.name}</div>
-                                    <div className="w-8 flex justify-center">
-                                        {expandedChapters[chapter.id] ? (
-                                            <Image src={CollapseIcon} alt="Collapse" />
-                                        ) : (
-                                            <Image src={ExpandIcon} alt="Expand" />
-                                        )}
+                    <div className="mt-4 pb-40 lg:pb-20">
+                        <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 lg:gap-6">
+                            {chapters.map((chapter) => (
+                                <div key={chapter.id} className="mx-5 lg:mx-0">
+                                    <div
+                                        className="text-md lg:text-lg font-semibold mt-2 bg-primary text-white cursor-pointer px-4 lg:px-6 py-4 lg:py-5 mb-4 flex flex-row justify-between items-center rounded-lg lg:hover:bg-primary/90 transition-colors duration-200"
+                                        onClick={() => toggleChapterExpansion(chapter.id, chapter.name)}
+                                    >
+                                        <div className="w-52 lg:flex-1">{chapter.name}</div>
+                                        <div className="w-8 lg:w-10 flex justify-center">
+                                            {expandedChapters[chapter.id] ? (
+                                                <Image src={CollapseIcon} alt="Collapse" className="lg:w-6 lg:h-6" />
+                                            ) : (
+                                                <Image src={ExpandIcon} alt="Expand" className="lg:w-6 lg:h-6" />
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                                {expandedChapters[chapter.id] && (
-                                    <div>
-                                        {expandedChapterLoading[chapter.id] ? (
-                                            <Loading showChapterContentOnly={true} />
-                                        ) : (
-                                            <ul>
+                                    {expandedChapters[chapter.id] && (
+                                        <div className="lg:bg-gray-50 lg:p-6 lg:rounded-lg lg:ml-0">
+                                            {expandedChapterLoading[chapter.id] ? (
+                                                <Loading showChapterContentOnly={true} />
+                                            ) : (
+                                                <div className="lg:grid lg:grid-cols-1 xl:grid-cols-2 lg:gap-6">{/* Changed from ul to div */}
                                                 {/* Render resources for the chapter. Currently using hardcoded tag_ids:
     1 = JEE resources, 2 = NEET resources */}
                                                 {chapterResources
@@ -235,11 +236,12 @@ const ContentLibrary = () => {
                                                         resource.tag_ids?.includes(selectedCourse === 'JEE Content' ? 1 : 2)
                                                     )
                                                     .map((resource) => (
-                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary">
-                                                            <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                <Image src={ModuleIcon} alt="Module" className="w-8 h-8 mr-2 ml-9" /> {resource.name}
+                                                        <div key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary">
+                                                            <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center hover:bg-white lg:hover:bg-gray-100 p-2 lg:p-3 rounded-lg transition-colors duration-200">
+                                                                <Image src={ModuleIcon} alt="Module" className="w-8 h-8 lg:w-10 lg:h-10 mr-2 ml-9 lg:ml-0" /> 
+                                                                <span className="lg:text-base">{resource.name}</span>
                                                             </Link>
-                                                        </li>
+                                                        </div>
                                                     ))}
 
                                                 {topics
@@ -252,27 +254,28 @@ const ContentLibrary = () => {
                                                         );
 
                                                         return (
-                                                            <div key={topic.id} className="bg-card rounded-lg shadow-lg shadow-slate-400 p-4 mx-2 mt-2 my-8 text-black font-semibold">
-                                                                <h3>{topic.name}</h3>
-                                                                <ul className="text-primary m-2 font-normal">
+                                                            <div key={topic.id} className="bg-card rounded-lg shadow-lg lg:shadow-md shadow-slate-400 lg:shadow-gray-300 p-4 lg:p-6 mx-2 lg:mx-0 mt-2 my-8 lg:my-4 text-black font-semibold hover:shadow-xl transition-shadow duration-200">
+                                                                <h3 className="lg:text-lg lg:mb-4">{topic.name}</h3>
+                                                                <div className="text-primary m-2 lg:m-0 font-normal space-y-2 lg:space-y-3">
                                                                     {videos.map((resource) => (
-                                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
-                                                                            <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                                <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name}
+                                                                        <div key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 lg:py-0">
+                                                                            <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center hover:bg-gray-50 p-2 lg:p-3 rounded-lg transition-colors duration-200">
+                                                                                <Image src={PlayIcon} alt="Play" className="w-10 h-10 lg:w-12 lg:h-12 mr-2 lg:mr-3" /> 
+                                                                                <span className="lg:text-base">{resource.name}</span>
                                                                             </Link>
-                                                                        </li>
+                                                                        </div>
                                                                     ))}
-                                                                </ul>
+                                                                </div>
                                                             </div>
                                                         );
                                                     })}
-                                            </ul>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                         <BottomNavigationBar />
                     </div>
                 )}

@@ -32,10 +32,10 @@ export default function ReportsList({ userId }: ReportsListProps) {
 
     if (isLoading) {
         return (
-            <div className="grid grid-cols-1 gap-4 pb-40">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 pb-40 lg:pb-20">
                 {Array.from({ length: 5 }).map((_, index) => (
-                    <div key={index} className="flex items-center animate-pulse">
-                        <div className="bg-card rounded-lg shadow-lg h-24 mx-4 relative flex items-center my-1 md:my-2 w-full">
+                    <div key={index} className="flex items-center lg:block animate-pulse">
+                        <div className="bg-card rounded-lg shadow-lg h-24 lg:h-32 mx-4 lg:mx-0 relative flex items-center my-1 md:my-2 lg:my-0 w-full">
                             <div className="bg-gray-200 h-full w-2 absolute left-0 top-0 rounded-s-md"></div>
                             <div className="mx-6 md:mx-8 flex flex-col gap-2 flex-1">
                                 <div className="h-4 bg-gray-200 rounded w-2/3"></div>
@@ -57,21 +57,21 @@ export default function ReportsList({ userId }: ReportsListProps) {
     }
 
     return (
-        <div className="grid grid-cols-1 gap-4 pb-40">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 pb-40 lg:pb-20">
             {responseData.reports.length > 0 ? (
                 <>
                     {responseData.reports.map((report: Report, index: number) => (
-                        <Link href={report.report_link} target="_blank" key={index} className="bg-card rounded-lg shadow-lg h-24 mx-4 relative flex items-center my-1 md:my-2">
+                        <Link href={report.report_link} target="_blank" key={index} className="bg-card rounded-lg shadow-lg h-24 lg:h-32 mx-4 lg:mx-0 relative flex items-center my-1 md:my-2 lg:my-0 hover:shadow-xl transition-shadow duration-200">
                             <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
-                            <div className="text-left mx-6 md:mx-8">
-                                <p className="text-sm md:text-base font-semibold">{report.test_name}</p>
-                                <p className="text-gray-700 text-sm md:text-base mt-2">Date attempted: {report.start_date ? formatDate(report.start_date) : "Date not available"}</p>
+                            <div className="text-left mx-6 md:mx-8 lg:flex lg:flex-col lg:justify-center lg:h-full">
+                                <p className="text-sm md:text-base lg:text-lg font-semibold">{report.test_name}</p>
+                                <p className="text-gray-700 text-sm md:text-base lg:text-sm mt-2">Date attempted: {report.start_date ? formatDate(report.start_date) : "Date not available"}</p>
                             </div>
                         </Link>
                     ))}
                 </>
             ) : (
-                <div className="mt-20 flex items-center justify-center text-center mx-4">
+                <div className="mt-20 lg:col-span-full flex items-center justify-center text-center mx-4">
                     Sorry! There are no reports available.
                 </div>
             )}

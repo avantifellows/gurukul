@@ -157,24 +157,24 @@ const ClassLibrary = () => {
 
     return (
         <>
-            <main className="max-w-xl mx-auto bg-white min-h-screen">
+            <main className="max-w-xl mx-auto lg:max-w-none lg:mx-0 lg:p-6 bg-white lg:bg-transparent min-h-screen">
                 <TopBar />
-                <div className="bg-heading text-primary h-20 flex flex-col">
-                    <div className='flex items-center mx-4 mt-4'>
-                        <IoArrowBack onClick={handleBackClick} className="w-7 h-7 cursor-pointer" />
-                        <h1 className="font-semibold ml-2 text-xl">{selectedCourse === 'NEET Classes' ? "NEET Classes" : "JEE Classes"}<br /></h1>
+                <div className="bg-heading lg:bg-transparent text-primary h-20 lg:h-auto flex flex-col lg:mb-6">
+                    <div className='flex items-center mx-4 lg:mx-0 mt-4 lg:mt-0'>
+                        <IoArrowBack onClick={handleBackClick} className="w-7 h-7 lg:w-8 lg:h-8 cursor-pointer hover:opacity-75 transition-opacity duration-200" />
+                        <h1 className="font-semibold ml-2 text-xl lg:text-2xl">{selectedCourse === 'NEET Classes' ? "NEET Classes" : "JEE Classes"}<br /></h1>
                     </div>
-                    <span className="text-sm ml-[52px] font-normal">Class Library</span>
+                    <span className="text-sm lg:text-base ml-[52px] lg:ml-10 font-normal lg:text-gray-600">Class Library</span>
                 </div>
-                <div className="flex flex-row my-4 justify-between mx-6">
+                <div className="flex flex-row my-4 justify-between lg:justify-center lg:gap-4 mx-6 lg:mx-0">
                     {selectedCourse === 'NEET Classes' && neetSubjects.map(subject => generateSubjectButton(subject, subject))}
                     {selectedCourse === 'JEE Classes' && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
                 </div>
-                <div className="bg-heading h-20 flex justify-between items-center px-4">
+                <div className="bg-heading lg:bg-gray-50 lg:rounded-lg h-20 lg:h-16 flex justify-between lg:justify-center lg:gap-8 items-center px-4 lg:px-6 lg:mb-4">
                     <select
                         onChange={(e) => handleGradeChange(+e.target.value)}
                         value={selectedGrade}
-                        className="w-32 h-8 rounded-lg text-center"
+                        className="w-32 lg:w-40 h-8 lg:h-10 rounded-lg text-center lg:text-base hover:shadow-md transition-shadow duration-200"
                     >
                         {gradeOptions.map((grade) => (
                             <option key={grade} value={grade} className="text-sm md:text-lg">
@@ -185,7 +185,7 @@ const ClassLibrary = () => {
                     <select
                         onChange={(e) => setSelectedChapter(+e.target.value)}
                         value={selectedChapter || ''}
-                        className="w-32 h-8 rounded-lg text-center"
+                        className="w-32 lg:w-40 h-8 lg:h-10 rounded-lg text-center lg:text-base hover:shadow-md transition-shadow duration-200"
                     >
                         <option value="" className="text-sm md:text-lg">Chapter: All</option>
                         {chapterList.map((chapter) => (
@@ -195,11 +195,11 @@ const ClassLibrary = () => {
                         ))}
                     </select>
                 </div>
-                <div className="bg-heading pb-6 flex justify-between items-center px-4">
+                <div className="bg-heading lg:bg-gray-50 lg:rounded-lg pb-6 lg:pb-4 lg:pt-4 flex justify-between lg:justify-center items-center px-4 lg:px-6 lg:mb-6">
                     <select
                         onChange={(e) => handleTeacherChange(+e.target.value)}
                         value={selectedTeacher}
-                        className="w-32 h-8 rounded-lg text-center"
+                        className="w-32 lg:w-40 h-8 lg:h-10 rounded-lg text-center lg:text-base hover:shadow-md transition-shadow duration-200"
                     >
                         {teachers.map((teacher) => (
                             <option key={teacher.id} value={teacher.id} className="text-sm md:text-lg">
@@ -211,47 +211,52 @@ const ClassLibrary = () => {
                 {isLoading ? (
                     <Loading showLibraryOnly={true} />
                 ) : (
-                    <div className="mt-4 pb-40">
-                        {chapters.length > 0 ? (chapters.map((chapter) => (
-                            <div key={chapter.id} className="mx-5">
-                                <div
-                                    className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
-                                    onClick={() => toggleChapterExpansion(chapter.id, chapter.name)}
-                                >
-                                    <div className="w-52">{chapter.name}</div>
-                                    <div className="w-8 flex justify-center">
-                                        {expandedChapters[chapter.id] ? (
-                                            <Image src={CollapseIcon} alt="Collapse" />
-                                        ) : (
-                                            <Image src={ExpandIcon} alt="Expand" />
-                                        )}
+                    <div className="mt-4 pb-40 lg:pb-20">
+                        <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 lg:gap-6">
+                            {chapters.length > 0 ? (chapters.map((chapter) => (
+                                <div key={chapter.id} className="mx-5 lg:mx-0">
+                                    <div
+                                        className="text-md lg:text-lg font-semibold mt-2 bg-primary text-white cursor-pointer px-4 lg:px-6 py-4 lg:py-5 mb-4 flex flex-row justify-between items-center rounded-lg lg:hover:bg-primary/90 transition-colors duration-200"
+                                        onClick={() => toggleChapterExpansion(chapter.id, chapter.name)}
+                                    >
+                                        <div className="w-52 lg:flex-1">{chapter.name}</div>
+                                        <div className="w-8 lg:w-10 flex justify-center">
+                                            {expandedChapters[chapter.id] ? (
+                                                <Image src={CollapseIcon} alt="Collapse" className="lg:w-6 lg:h-6" />
+                                            ) : (
+                                                <Image src={ExpandIcon} alt="Expand" className="lg:w-6 lg:h-6" />
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                                {expandedChapters[chapter.id] && (
-                                    <div className="m-2">
-                                        {loadingChapters[chapter.id] ? (
-                                            <Loading showChapterContentOnly={true} cardCount={2} />
-                                        ) : (
-                                            <ul className="text-primary font-normal">
-                                                {resources
-                                                    .filter((resource) => resource.chapter_id === chapter.id && resource.link)
-                                                    .map((resource) => (
-                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
-                                                            <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name} {" - "}
-                                                                {resource.type_params?.date || 'Date not available'}
-                                                            </Link>
-                                                        </li>
-                                                    ))}
-                                            </ul>
-                                        )}
-                                    </div>
-                                )}
+                                    {expandedChapters[chapter.id] && (
+                                        <div className="m-2 lg:bg-gray-50 lg:p-6 lg:rounded-lg lg:ml-0">
+                                            {loadingChapters[chapter.id] ? (
+                                                <Loading showChapterContentOnly={true} cardCount={2} />
+                                            ) : (
+                                                <div className="text-primary font-normal lg:grid lg:grid-cols-1 xl:grid-cols-2 lg:gap-4 space-y-2 lg:space-y-0">
+                                                    {resources
+                                                        .filter((resource) => resource.chapter_id === chapter.id && resource.link)
+                                                        .map((resource) => (
+                                                            <div key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 lg:py-0">
+                                                                <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center hover:bg-white lg:hover:bg-gray-100 p-2 lg:p-4 rounded-lg transition-colors duration-200 bg-white lg:bg-white shadow-sm lg:shadow-md hover:shadow-md lg:hover:shadow-lg">
+                                                                    <Image src={PlayIcon} alt="Play" className="w-10 h-10 lg:w-12 lg:h-12 mr-2 lg:mr-4" /> 
+                                                                    <div className="flex flex-col">
+                                                                        <span className="lg:text-base font-medium">{resource.name}</span>
+                                                                        <span className="text-sm text-gray-600">{resource.type_params?.date || 'Date not available'}</span>
+                                                                    </div>
+                                                                </Link>
+                                                            </div>
+                                                        ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                             </div>
-                        ))) : <div className="text-center pt-10">
-                            No chapters available
+                            ))) : <div className="text-center pt-10 lg:col-span-full">
+                                No chapters available
+                            </div>
+                            }
                         </div>
-                        }
                         <BottomNavigationBar />
                     </div>
                 )}

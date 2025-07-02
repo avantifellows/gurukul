@@ -71,20 +71,25 @@ const TopBar = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto text-white p-4 h-24 flex items-center justify-between bg-primary">
-      <div className="text-lg font-semibold">
+    <div className="max-w-xl mx-auto lg:max-w-none text-white p-4 lg:px-8 h-24 lg:h-16 flex items-center justify-between bg-primary lg:bg-white lg:text-gray-800 lg:border-b lg:border-gray-200 lg:shadow-sm">
+      <div className="text-lg lg:text-xl font-semibold">
         {getRouteNameContent()}
       </div>
       <div className="relative">
         <Image
           src={ProfileIcon}
           alt="Profile"
-          className="w-6 h-6 cursor-pointer"
+          className="w-6 h-6 lg:w-8 lg:h-8 cursor-pointer hover:opacity-75 transition-opacity duration-200"
           onClick={toggleDropdown}
         />
         {isDropdownOpen && (
-          <div className="absolute top-full right-1 bg-white p-2 shadow-md text-black rounded-lg text-base w-32 grid grid-cols-1 gap-2">
-            <button onClick={handleLogout}>Logout</button>
+          <div className="absolute top-full right-1 bg-white p-2 shadow-lg text-black rounded-lg text-base w-32 grid grid-cols-1 gap-2 border border-gray-200 z-50">
+            <button 
+              onClick={handleLogout}
+              className="hover:bg-gray-50 p-2 rounded transition-colors duration-200 text-left"
+            >
+              Logout
+            </button>
           </div>
         )}
       </div>
