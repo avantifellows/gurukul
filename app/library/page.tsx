@@ -50,7 +50,7 @@ const Page: React.FC = () => {
   const selectedButtonStyle = 'bg-white text-primary font-semibold py-2 rounded-lg shadow-sm';
   const unselectedButtonStyle = 'bg-heading text-slate-600 py-2 rounded-lg';
 
-  function CourseCard({ icon, title, description, onClick }: { icon: ReactNode, title: string, description: string, onClick: () => void }) {
+  function LibraryCard({ icon, title, description, onClick }: { icon: ReactNode, title: string, description: string, onClick: () => void }) {
     return (
       <div onClick={onClick} className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6 cursor-pointer">
         <div className="flex flex-row items-center">
@@ -64,7 +64,7 @@ const Page: React.FC = () => {
     );
   }
 
-  const courses = [
+  const contentCourses = [
     {
       value: 'NEET Content',
       title: 'NEET course',
@@ -97,6 +97,21 @@ const Page: React.FC = () => {
     },
   ];
 
+  const classCourses = [
+    {
+      value: 'NEET Classes',
+      title: 'NEET classes',
+      description: 'Browse all the NEET classes',
+      icon: <Image src={StethoscopeIcon} alt="Stethoscope Icon" className="w-10 h-10" />,
+    },
+    {
+      value: 'JEE Classes',
+      title: 'JEE Mains classes',
+      description: 'Browse all the JEE classes',
+      icon: <Image src={BlueprintIcon} alt="Blueprint Icon" className="w-10 h-10" />,
+    },
+  ];
+
   return (
     <main className="max-w-xl mx-auto bg-heading min-h-screen">
       <TopBar />
@@ -121,9 +136,9 @@ const Page: React.FC = () => {
       )}
 
       {selectedLibrary === 'Content' && (
-        <div className="bg-white pb-40">
-          {courses.map(course => (
-            <CourseCard
+        <div className="bg-white pb-40 pt-4">
+          {contentCourses.map(course => (
+            <LibraryCard
               key={course.value}
               icon={course.icon}
               title={course.title}
@@ -136,29 +151,16 @@ const Page: React.FC = () => {
       )}
 
       {selectedLibrary === 'Class' && (
-        <div className="bg-white h-72">
-          <div onClick={() => handleLibraryChange('NEET Classes')} className="pt-4">
-            <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6">
-              <div className="flex items-center">
-                <Image src={StethoscopeIcon} alt="Stethoscope Icon" className="w-10 h-10" />
-                <div className="flex flex-col ml-4 ">
-                  <h3 className="font-semibold">NEET classes</h3>
-                  <h5 className="text-sm">Browse all the NEET classes</h5>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div onClick={() => handleLibraryChange('JEE Classes')}>
-            <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6">
-              <div className="flex flex-row items-center">
-                <Image src={BlueprintIcon} alt="Blueprint Icon" className="w-10 h-10" />
-                <div className="flex flex-col ml-4 ">
-                  <h3 className="font-semibold">JEE Mains classes</h3>
-                  <h5 className="text-sm">Browse all the JEE classes</h5>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="bg-white pb-40 pt-4">
+          {classCourses.map(course => (
+            <LibraryCard
+              key={course.value}
+              icon={course.icon}
+              title={course.title}
+              description={course.description}
+              onClick={() => handleLibraryChange(course.value)}
+            />
+          ))}
           <BottomNavigationBar />
         </div>
       )}
