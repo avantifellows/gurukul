@@ -15,6 +15,7 @@ import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
 import { useAuth } from '@/services/AuthContext';
 import { getGroupConfig } from '@/config/groupConfig';
+import { ReactNode } from 'react';
 
 const Page: React.FC = () => {
   const [selectedLibrary, setSelectedLibrary] = useState<string | null>('Content');
@@ -49,6 +50,53 @@ const Page: React.FC = () => {
   const selectedButtonStyle = 'bg-white text-primary font-semibold py-2 rounded-lg shadow-sm';
   const unselectedButtonStyle = 'bg-heading text-slate-600 py-2 rounded-lg';
 
+  function CourseCard({ icon, title, description, onClick }: { icon: ReactNode, title: string, description: string, onClick: () => void }) {
+    return (
+      <div onClick={onClick} className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6 cursor-pointer">
+        <div className="flex flex-row items-center">
+          {icon}
+          <div className="flex flex-col ml-4 ">
+            <h3 className="font-semibold">{title}</h3>
+            <h5 className="text-sm">{description}</h5>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const courses = [
+    {
+      value: 'NEET Content',
+      title: 'NEET course',
+      description: 'Browse all the NEET courses',
+      icon: <Image src={StethoscopeIcon} alt="Stethoscope Icon" className="w-10 h-10" />,
+    },
+    {
+      value: 'JEE Content',
+      title: 'JEE Mains course',
+      description: 'Browse all the JEE courses',
+      icon: <Image src={BlueprintIcon} alt="Blueprint Icon" className="w-10 h-10" />,
+    },
+    {
+      value: 'JEE Advance Content',
+      title: 'JEE Advance course',
+      description: 'Browse all the JEE Advance courses',
+      icon: <MdScience className="w-10 h-10 text-blue-700" />,
+    },
+    {
+      value: 'CLAT Content',
+      title: 'CLAT course',
+      description: 'Browse all the CLAT courses',
+      icon: <GiScales className="w-10 h-10 text-green-700" />,
+    },
+    {
+      value: 'CA Content',
+      title: 'CA course',
+      description: 'Browse all the CA courses',
+      icon: <FaRupeeSign className="w-10 h-10 text-yellow-700" />,
+    },
+  ];
+
   return (
     <main className="max-w-xl mx-auto bg-heading min-h-screen">
       <TopBar />
@@ -74,61 +122,15 @@ const Page: React.FC = () => {
 
       {selectedLibrary === 'Content' && (
         <div className="bg-white pb-40">
-          <div onClick={() => handleLibraryChange('NEET Content')} className="pt-4">
-            <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6 cursor-pointer">
-              <div className="flex items-center">
-                <Image src={StethoscopeIcon} alt="Stethoscope Icon" className="w-10 h-10" />
-                <div className="flex flex-col ml-4 ">
-                  <h3 className="font-semibold">NEET course</h3>
-                  <h5 className="text-sm">Browse all the NEET courses</h5>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div onClick={() => handleLibraryChange('JEE Content')}>
-            <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6 cursor-pointer">
-              <div className="flex flex-row items-center">
-                <Image src={BlueprintIcon} alt="Blueprint Icon" className="w-10 h-10" />
-                <div className="flex flex-col ml-4 ">
-                  <h3 className="font-semibold">JEE Mains course</h3>
-                  <h5 className="text-sm">Browse all the JEE courses</h5>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div onClick={() => handleLibraryChange('JEE Advance Content')}>
-            <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6 cursor-pointer">
-              <div className="flex flex-row items-center">
-                <MdScience className="w-10 h-10 text-blue-700" />
-                <div className="flex flex-col ml-4 ">
-                  <h3 className="font-semibold">JEE Advance course</h3>
-                  <h5 className="text-sm">Browse all the JEE Advance courses</h5>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div onClick={() => handleLibraryChange('CLAT Content')}>
-            <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6 cursor-pointer">
-              <div className="flex flex-row items-center">
-                <GiScales className="w-10 h-10 text-green-700" />
-                <div className="flex flex-col ml-4 ">
-                  <h3 className="font-semibold">CLAT course</h3>
-                  <h5 className="text-sm">Browse all the CLAT courses</h5>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div onClick={() => handleLibraryChange('CA Content')}>
-            <div className="bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6 cursor-pointer">
-              <div className="flex flex-row items-center">
-                <FaRupeeSign className="w-10 h-10 text-yellow-700" />
-                <div className="flex flex-col ml-4 ">
-                  <h3 className="font-semibold">CA course</h3>
-                  <h5 className="text-sm">Browse all the CA courses</h5>
-                </div>
-              </div>
-            </div>
-          </div>
+          {courses.map(course => (
+            <CourseCard
+              key={course.value}
+              icon={course.icon}
+              title={course.title}
+              description={course.description}
+              onClick={() => handleLibraryChange(course.value)}
+            />
+          ))}
           <BottomNavigationBar />
         </div>
       )}
