@@ -27,7 +27,6 @@ const ContentLibrary = () => {
     const [resources, setResources] = useState<Resource[]>([]);
     const [chapterResources, setChapterResources] = useState<Resource[]>([]);
     const [expandedChapters, setExpandedChapters] = useState<Record<number, boolean>>({});
-    const [page, setPage] = useState(1);
     const [selectedGrade, setSelectedGrade] = useState(11);
     const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
     const [chapterList, setChapterList] = useState<Chapter[]>([]);
@@ -47,7 +46,6 @@ const ContentLibrary = () => {
         setActiveTab(tabName);
         MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_TAB + ": " + tabName);
         if (activeTab != tabName) {
-            setPage(1);
             setSelectedChapter(null)
         }
 
@@ -86,7 +84,6 @@ const ContentLibrary = () => {
                 }
                 else {
                     setChapters([]);
-                    setPage(page - 1);
                 }
             } else {
                 setChapters([]);
