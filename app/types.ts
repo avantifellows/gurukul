@@ -170,7 +170,6 @@ export interface GroupConfig {
   showHomework: boolean;
   showContentLibrary: boolean;
   showClassLibrary: boolean;
-  usePracticeTestAccordion?: boolean;
 }
 
 export type GroupConfigurations = {

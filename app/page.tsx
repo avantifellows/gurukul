@@ -28,9 +28,6 @@ export default function Home() {
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
   const portalBaseUrl = api.portal.frontend.baseUrl;
 
-  // Use groupConfig flag for EnableStudents-specific UI
-  const usePracticeTestAccordion = groupConfig.usePracticeTestAccordion;
-
   // Accordion state for Practice Test Accordion UI
   const [expandedFormat, setExpandedFormat] = useState<string | null>(null);
 
@@ -186,7 +183,14 @@ export default function Home() {
       return (
         <div>
           <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
-          <MessageDisplay message="No more tests are scheduled for today!" />
+          {group === 'EnableStudents' ? (
+            <p className={infoMessageClass}>
+              No more tests are scheduled for today!{' '}
+              <a href="https://www.nvslakshya.org/nvs-test-details" target="_blank" rel="noopener noreferrer" className="underline text-blue-600">Check your test calendar here</a>
+            </p>
+          ) : (
+            <MessageDisplay message="No more tests are scheduled for today!" />
+          )}
         </div>
       );
     }
@@ -324,108 +328,38 @@ export default function Home() {
 
   const { nonChapterTests, chapterTests, practiceTests, homework } = filterAndSortTests(quizzes);
 
-  // --- Practice Test Accordion UI for flagged groups ---
-  if (usePracticeTestAccordion) {
-    // Filter and group practice tests by format
-    const allowedFormats = [
-      'part_test',
-      'major_test',
-      'full_syllabus_test',
-      'mock_test',
-    ];
-    const formatOrder = [
-      'part_test',
-      'major_test',
-      'full_syllabus_test',
-      'mock_test',
-    ];
-    const formatDisplayNames: { [key: string]: string } = {
-      part_test: 'Part Test',
-      major_test: 'Major Test',
-      full_syllabus_test: 'Full Syllabus Test',
-      mock_test: 'Mock Test',
-    };
-    // Group tests by format
-    const groupedPracticeTests: { [format: string]: QuizSession[] } = {};
-    practiceTests.forEach((test) => {
-      const format = test.session.meta_data.test_format;
-      if (allowedFormats.includes(format)) {
-        if (!groupedPracticeTests[format]) groupedPracticeTests[format] = [];
-        groupedPracticeTests[format].push(test);
-      }
-    });
-    const handleAccordionToggle = (format: string) => {
-      setExpandedFormat(expandedFormat === format ? null : format);
-    };
-    return (
-      <>
-        {(isLoading || authLoading) ? (
-          <div className="max-w-xl mx-auto">
-            <TopBar />
-            <Loading />
-          </div>
-        ) : (
-          <main className="min-h-screen max-w-xl mx-auto md:mx-auto bg-heading">
-            <TopBar />
-            <div className="pb-40">
-              <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Practice Tests</h1>
-              <div className="mt-4">
-                {formatOrder.map((format) => (
-                  groupedPracticeTests[format] && groupedPracticeTests[format].length > 0 && (
-                    <div key={format} className="mx-5 mb-4">
-                      <div
-                        className="text-md font-semibold bg-primary text-white cursor-pointer px-4 py-4 flex flex-row justify-between items-center"
-                        onClick={() => handleAccordionToggle(format)}
-                      >
-                        <div>{formatDisplayNames[format] || format}</div>
-                        <div className="w-8 flex justify-center">
-                          {expandedFormat === format ? (
-                            <img src={CollapseIcon.src} alt="Collapse" />
-                          ) : (
-                            <img src={ExpandIcon.src} alt="Expand" />
-                          )}
-                        </div>
-                      </div>
-                      {expandedFormat === format && (
-                        <div>
-                          {groupedPracticeTests[format].map((test, idx) => (
-                            <div key={test.session.platform_id} className="flex items-center mt-4">
-                              <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto min-h-[120px] py-3 relative w-full flex flex-row justify-between items-center">
-                                <div className={`${idx % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`} />
-                                <div className="flex flex-col gap-1 pl-6 sm:w-full w-48 md:w-full text-sm md:text-base">
-                                  <div className="absolute top-2 left-6 text-gray-700 text-xs md:text-sm whitespace-nowrap">
-                                    {format12HrSessionTime(test.session.start_time)} - {format12HrSessionTime(test.session.end_time)}
-                                  </div>
-                                  <div className="font-semibold">
-                                    {test.session.name}
-                                  </div>
-                                  <div className="text-gray-600">
-                                    {formatDisplayNames[test.session.meta_data.test_format] || test.session.meta_data.test_format}
-                                  </div>
-                                </div>
-                                <div className="flex items-center">
-                                  {renderButton(test.session)}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )
-                ))}
-                {/* If no tests at all, show message */}
-                {formatOrder.every(format => !groupedPracticeTests[format] || groupedPracticeTests[format].length === 0) && (
-                  <MessageDisplay message="No Practice Tests available!" />
-                )}
-              </div>
-            </div>
-            <BottomNavigationBar homeLabel="Practice Tests" />
-          </main>
-        )}
-      </>
-    );
-  }
+  // --- Practice Test Accordion UI for all groups ---
+  // Filter and group practice tests by format
+  const allowedFormats = [
+    'part_test',
+    'major_test',
+    'full_syllabus_test',
+    'mock_test',
+  ];
+  const formatOrder = [
+    'part_test',
+    'major_test',
+    'full_syllabus_test',
+    'mock_test',
+  ];
+  const formatDisplayNames: { [key: string]: string } = {
+    part_test: 'Part Test',
+    major_test: 'Major Test',
+    full_syllabus_test: 'Full Syllabus Test',
+    mock_test: 'Mock Test',
+  };
+  // Group tests by format
+  const groupedPracticeTests: { [format: string]: QuizSession[] } = {};
+  practiceTests.forEach((test) => {
+    const format = test.session.meta_data.test_format;
+    if (allowedFormats.includes(format)) {
+      if (!groupedPracticeTests[format]) groupedPracticeTests[format] = [];
+      groupedPracticeTests[format].push(test);
+    }
+  });
+  const handleAccordionToggle = (format: string) => {
+    setExpandedFormat(expandedFormat === format ? null : format);
+  };
 
   return (
     <>
@@ -445,8 +379,63 @@ export default function Home() {
           )}
 
           <div className="pb-40">
+            {/* Practice Tests Accordion for all groups */}
+            {groupConfig.showPracticeTests && (
+              <div>
+                <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Practice Tests</h1>
+                <div className="mt-4">
+                  {formatOrder.map((format) => (
+                    groupedPracticeTests[format] && groupedPracticeTests[format].length > 0 && (
+                      <div key={format} className="mx-5 mb-4">
+                        <div
+                          className="text-md font-semibold bg-primary text-white cursor-pointer px-4 py-4 flex flex-row justify-between items-center"
+                          onClick={() => handleAccordionToggle(format)}
+                        >
+                          <div>{formatDisplayNames[format] || format}</div>
+                          <div className="w-8 flex justify-center">
+                            {expandedFormat === format ? (
+                              <img src={CollapseIcon.src} alt="Collapse" />
+                            ) : (
+                              <img src={ExpandIcon.src} alt="Expand" />
+                            )}
+                          </div>
+                        </div>
+                        {expandedFormat === format && (
+                          <div>
+                            {groupedPracticeTests[format].map((test, idx) => (
+                              <div key={test.session.platform_id} className="flex items-center mt-4">
+                                <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto min-h-[120px] py-3 relative w-full flex flex-row justify-between items-center">
+                                  <div className={`${idx % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`} />
+                                  <div className="flex flex-col gap-1 pl-6 sm:w-full w-48 md:w-full text-sm md:text-base">
+                                    <div className="absolute top-2 left-6 text-gray-700 text-xs md:text-sm whitespace-nowrap">
+                                      {format12HrSessionTime(test.session.start_time)} - {format12HrSessionTime(test.session.end_time)}
+                                    </div>
+                                    <div className="font-semibold">
+                                      {test.session.name}
+                                    </div>
+                                    <div className="text-gray-600">
+                                      {formatDisplayNames[test.session.meta_data.test_format] || test.session.meta_data.test_format}
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center">
+                                    {renderButton(test.session)}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  ))}
+                  {/* If no tests at all, show message */}
+                  {formatOrder.every(format => !groupedPracticeTests[format] || groupedPracticeTests[format].length === 0) && (
+                    <MessageDisplay message="No Practice Tests available!" />
+                  )}
+                </div>
+              </div>
+            )}
             {groupConfig.showTests && renderTestSection("Tests", [...nonChapterTests, ...chapterTests])}
-            {groupConfig.showPracticeTests && renderTestSection("Practice Tests", practiceTests)}
             {groupConfig.showHomework && renderTestSection("Homework", homework)}
           </div>
           <BottomNavigationBar />
