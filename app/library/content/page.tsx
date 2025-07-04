@@ -247,7 +247,7 @@ const ContentLibrary = () => {
                 ) : (
                     <div className="mt-4 pb-40">
                         {chapters.length === 0 ? (
-                            <div className="text-center pt-10 text-slate-500">No chapters available</div>
+                            <div className="text-center pt-10">No chapters available</div>
                         ) : (
                             chapters.map((chapter) => (
                                 <div key={chapter.id} className="mx-5">
