@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../../loading';
@@ -8,7 +8,6 @@ import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
 import { getCurriculum, getSubjects, getChapters, getGrades, getChapterResourcesComplete } from '../../../api/afdb/library';
 import { Chapter, Resource, Topic } from '../../types';
-import { useEffect } from 'react';
 import Link from 'next/link';
 import ExpandIcon from "../../../assets/expand.png";
 import CollapseIcon from "../../../assets/collapse.png";
@@ -40,6 +39,9 @@ const ContentLibrary = () => {
     const selectedCourse = searchParams.get('course');
     const neetSubjects = ['Physics', 'Chemistry', 'Biology'];
     const jeeSubjects = ['Physics', 'Chemistry', 'Maths'];
+    const caSubjects = ['Accounting', 'Business Economics', 'Quantitative Aptitude'];
+    const clatSubjects = ['English', 'Logical Reasoning', 'Quantitative Aptitude'];
+    const prevCourseRef = useRef<string | null>(null);
 
     const handleTabClick = async (tabName: string) => {
         setActiveTab(tabName);
@@ -51,31 +53,43 @@ const ContentLibrary = () => {
 
         try {
             const actualTabName = tabName.toLowerCase();
-            const curriculumName =
-                selectedCourse === COURSES.JEE ? CURRICULUM_NAMES.ALC :
-                    (selectedCourse === COURSES.NEET && tabName === 'Biology') ? CURRICULUM_NAMES.SANKALP :
-                        (selectedCourse === COURSES.NEET && (tabName === 'Physics' || tabName === 'Chemistry')) ? CURRICULUM_NAMES.ALC :
-                            CURRICULUM_NAMES.SANKALP;
-            const curriculumData = await getCurriculum(curriculumName);
-            const curriculumId = curriculumData[0].id;
+            let curriculumId: number | undefined = undefined;
+            if (selectedCourse === COURSES.JEE || selectedCourse === COURSES.NEET) {
+                const curriculumName =
+                    selectedCourse === COURSES.JEE ? CURRICULUM_NAMES.ALC :
+                        (selectedCourse === COURSES.NEET && tabName === 'Biology') ? CURRICULUM_NAMES.SANKALP :
+                            (selectedCourse === COURSES.NEET && (tabName === 'Physics' || tabName === 'Chemistry')) ? CURRICULUM_NAMES.ALC :
+                                CURRICULUM_NAMES.SANKALP;
+                const curriculumData = await getCurriculum(curriculumName);
+                curriculumId = curriculumData[0].id;
+            }
             const subjectData = await getSubjects(actualTabName);
             const gradeData = await getGrades(selectedGrade);
             if (subjectData.length > 0) {
                 const subjectId = subjectData[0].id;
                 const gradeId = gradeData[0].id;
-
-                await fetchChapters(subjectId, gradeId, curriculumId);
+                if (!curriculumId) {
+                    await fetchChapters(subjectId, gradeId, curriculumId);
+                } else {
+                    await fetchChapters(subjectId, gradeId);
+                }
                 const chapterData = selectedChapter
-                    ? await getChapters(subjectId, gradeId, selectedChapter, curriculumId)
-                    : await getChapters(subjectId, gradeId, undefined, curriculumId);
+                    ? (!curriculumId
+                        ? await getChapters(subjectId, gradeId, selectedChapter)
+                        : await getChapters(subjectId, gradeId, selectedChapter, curriculumId))
+                    : (!curriculumId
+                        ? await getChapters(subjectId, gradeId)
+                        : await getChapters(subjectId, gradeId, undefined, curriculumId));
 
                 if (chapterData.length > 0) {
                     setChapters(chapterData);
                 }
                 else {
+                    setChapters([]);
                     setPage(page - 1);
                 }
             } else {
+                setChapters([]);
                 console.log("Bad request")
             }
         } catch (error) {
@@ -96,8 +110,21 @@ const ContentLibrary = () => {
         };
 
         fetchData();
-    }, [selectedGrade, page, selectedChapter]);
+    }, [selectedCourse, activeTab, selectedGrade, selectedChapter]);
 
+    // Set default subject based on course ONLY when course actually changes
+    useEffect(() => {
+        if (prevCourseRef.current !== selectedCourse) {
+            if (selectedCourse === COURSES.JEE || selectedCourse === COURSES.NEET) {
+                setActiveTab('Physics');
+            } else if (selectedCourse === COURSES.CA) {
+                setActiveTab('Accounting');
+            } else if (selectedCourse === COURSES.CLAT) {
+                setActiveTab('English');
+            }
+            prevCourseRef.current = selectedCourse;
+        }
+    }, [selectedCourse]);
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
@@ -143,8 +170,13 @@ const ContentLibrary = () => {
         MixpanelTracking.getInstance().trackEvent('Selected grade: ' + grade);
     };
 
-    const fetchChapters = async (subjectId: number, gradeId: number, curriculumId: number) => {
-        const chapterData = await getChapters(subjectId, gradeId, undefined, curriculumId);
+    const fetchChapters = async (subjectId: number, gradeId: number, curriculumId?: number) => {
+        let chapterData;
+        if (!curriculumId) {
+            chapterData = await getChapters(subjectId, gradeId);
+        } else {
+            chapterData = await getChapters(subjectId, gradeId, undefined, curriculumId);
+        }
         setChapterList(chapterData);
     };
 
@@ -155,8 +187,8 @@ const ContentLibrary = () => {
     const generateSubjectButton = (subject: string, label: string) => (
         <PrimaryButton
             key={subject}
-            onClick={() => handleTabClick(subject)}
-            className={`py-2 px-4 rounded-lg ${activeTab === subject ? 'bg-heading text-primary font-semibold shadow-sm' : 'bg-white text-slate-600'}`}
+            onClick={() => setActiveTab(subject)}
+            className={`py-2 px-2 w-full h-full rounded-lg text-center break-words ${activeTab === subject ? 'bg-heading text-primary font-semibold shadow-sm' : 'bg-white text-slate-600'}`}
         >
             {label}
         </PrimaryButton>
@@ -169,13 +201,21 @@ const ContentLibrary = () => {
                 <div className="bg-heading text-primary h-20 flex flex-col">
                     <div className='flex items-center mx-4 mt-4'>
                         <IoArrowBack onClick={handleBackClick} className="w-7 h-7 cursor-pointer" />
-                        <h1 className="font-semibold ml-2 text-xl">{selectedCourse === 'NEET Content' ? "NEET Course" : "JEE Course"}<br /></h1>
+                        <h1 className="font-semibold ml-2 text-xl">
+                            {selectedCourse === COURSES.NEET && "NEET Course"}
+                            {selectedCourse === COURSES.JEE && "JEE Course"}
+                            {selectedCourse === COURSES.CA && "CA Course"}
+                            {selectedCourse === COURSES.CLAT && "CLAT Course"}
+                            <br />
+                        </h1>
                     </div>
                     <span className="text-sm ml-[52px] font-normal">Content Library</span>
                 </div>
-                <div className="flex flex-row mt-4 mb-4 justify-between mx-6">
+                <div className="grid grid-cols-3 gap-2 mt-4 mb-4 mx-6">
                     {selectedCourse === COURSES.NEET && neetSubjects.map(subject => generateSubjectButton(subject, subject))}
                     {selectedCourse === COURSES.JEE && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
+                    {selectedCourse === COURSES.CA && caSubjects.map(subject => generateSubjectButton(subject, subject))}
+                    {selectedCourse === COURSES.CLAT && clatSubjects.map(subject => generateSubjectButton(subject, subject))}
                 </div>
                 <div className="bg-heading h-20 flex justify-between items-center px-4">
                     <select
@@ -206,73 +246,81 @@ const ContentLibrary = () => {
                     <Loading showLibraryOnly={true} />
                 ) : (
                     <div className="mt-4 pb-40">
-                        {chapters.map((chapter) => (
-                            <div key={chapter.id} className="mx-5">
-                                <div
-                                    className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
-                                    onClick={() => toggleChapterExpansion(chapter.id, chapter.name)}
-                                >
-                                    <div className="w-52">{chapter.name}</div>
-                                    <div className="w-8 flex justify-center">
-                                        {expandedChapters[chapter.id] ? (
-                                            <Image src={CollapseIcon} alt="Collapse" />
-                                        ) : (
-                                            <Image src={ExpandIcon} alt="Expand" />
-                                        )}
+                        {chapters.length === 0 ? (
+                            <div className="text-center pt-10 text-slate-500">No chapters available</div>
+                        ) : (
+                            chapters.map((chapter) => (
+                                <div key={chapter.id} className="mx-5">
+                                    <div
+                                        className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
+                                        onClick={() => toggleChapterExpansion(chapter.id, chapter.name)}
+                                    >
+                                        <div className="w-52">{chapter.name}</div>
+                                        <div className="w-8 flex justify-center">
+                                            {expandedChapters[chapter.id] ? (
+                                                <Image src={CollapseIcon} alt="Collapse" />
+                                            ) : (
+                                                <Image src={ExpandIcon} alt="Expand" />
+                                            )}
+                                        </div>
                                     </div>
+                                    {expandedChapters[chapter.id] && (
+                                        <div>
+                                            {expandedChapterLoading[chapter.id] ? (
+                                                <Loading showChapterContentOnly={true} />
+                                            ) : (
+                                                <ul>
+                                                    {/* Render modules for the chapter */}
+                                                    {chapterResources
+                                                        .filter((resource) =>
+                                                            resource.type_params?.resource_type === "module"
+                                                        )
+                                                        .map((resource) => (
+                                                            <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary">
+                                                                <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
+                                                                    <Image src={ModuleIcon} alt="Module" className="w-8 h-8 mr-2 ml-9" /> {resource.name}
+                                                                </Link>
+                                                            </li>
+                                                        ))}
+
+                                                    {/* Render topics and their resources */}
+                                                    {topics
+                                                        .filter((topic) => topic.chapter_id === chapter.id)
+                                                        .map((topic) => {
+                                                            const videos = resources.filter(
+                                                                (resource) => resource.topic_id === topic.id &&
+                                                                    resource.link &&
+                                                                    resource.type_params?.resource_type !== "module"
+                                                            );
+
+                                                            return (
+                                                                <div key={topic.id} className="bg-card rounded-lg shadow-lg shadow-slate-400 p-4 mx-2 mt-2 my-8 text-black font-semibold">
+                                                                    <h3>{topic.name}</h3>
+                                                                    <ul className="text-primary m-2 font-normal">
+                                                                        {videos.map((resource) => (
+                                                                            <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
+                                                                                <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
+                                                                                    <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name}
+                                                                                </Link>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
+                                                            );
+                                                        })}
+
+                                                    {/* If no modules and no topics/resources, show a message */}
+                                                    {chapterResources.filter((resource) => resource.type_params?.resource_type === "module").length === 0 &&
+                                                        topics.filter((topic) => topic.chapter_id === chapter.id).length === 0 && (
+                                                            <li className="py-2 text-slate-500 ml-9">No resources available for this chapter.</li>
+                                                        )}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
-                                {expandedChapters[chapter.id] && (
-                                    <div>
-                                        {expandedChapterLoading[chapter.id] ? (
-                                            <Loading showChapterContentOnly={true} />
-                                        ) : (
-                                            <ul>
-                                                {/* Render resources for the chapter. Currently using hardcoded tag_ids:
-    1 = JEE resources, 2 = NEET resources */}
-                                                {chapterResources
-                                                    .filter((resource) =>
-                                                        resource.type_params?.resource_type === "module" &&
-                                                        resource.tag_ids?.includes(selectedCourse === 'JEE Content' ? 1 : 2)
-                                                    )
-                                                    .map((resource) => (
-                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary">
-                                                            <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                <Image src={ModuleIcon} alt="Module" className="w-8 h-8 mr-2 ml-9" /> {resource.name}
-                                                            </Link>
-                                                        </li>
-                                                    ))}
-
-                                                {topics
-                                                    .filter((topic) => topic.chapter_id === chapter.id)
-                                                    .map((topic) => {
-                                                        const videos = resources.filter(
-                                                            (resource) => resource.topic_id === topic.id &&
-                                                                resource.link &&
-                                                                resource.type_params?.resource_type !== "module"
-                                                        );
-
-                                                        return (
-                                                            <div key={topic.id} className="bg-card rounded-lg shadow-lg shadow-slate-400 p-4 mx-2 mt-2 my-8 text-black font-semibold">
-                                                                <h3>{topic.name}</h3>
-                                                                <ul className="text-primary m-2 font-normal">
-                                                                    {videos.map((resource) => (
-                                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
-                                                                            <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                                <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name}
-                                                                            </Link>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
-                                                        );
-                                                    })}
-                                            </ul>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-
+                            ))
+                        )}
                         <BottomNavigationBar />
                     </div>
                 )}

@@ -77,12 +77,13 @@ const Page: React.FC = () => {
       description: 'Browse all the JEE courses',
       icon: <Image src={BlueprintIcon} alt="Blueprint Icon" className="w-10 h-10" />,
     },
-    {
-      value: 'JEE Advance Content',
-      title: 'JEE Advance course',
-      description: 'Browse all the JEE Advance courses',
-      icon: <MdScience className="w-10 h-10 text-blue-700" />,
-    },
+    // Temporarily commenting out JEE Advanced Content until we get the data
+    // {
+    //   value: 'JEE Advanced Content',
+    //   title: 'JEE Advanced course',
+    //   description: 'Browse all the JEE Advance courses',
+    //   icon: <MdScience className="w-10 h-10 text-blue-700" />,
+    // },
     {
       value: 'CLAT Content',
       title: 'CLAT course',

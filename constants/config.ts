@@ -6,6 +6,8 @@ export const CURRICULUM_NAMES = {
 export const COURSES = {
     JEE: 'JEE Content' as const,
     NEET: 'NEET Content' as const,
+    CA: 'CA Content' as const,
+    CLAT: 'CLAT Content' as const,
 } as const;
 
 export const MIXPANEL_EVENT = {
