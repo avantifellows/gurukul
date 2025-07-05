@@ -7,8 +7,9 @@ import { MdOutlineLibraryBooks, MdLibraryBooks } from 'react-icons/md';
 import { RiBarChart2Fill, RiBarChart2Line } from 'react-icons/ri';
 import { IoHome, IoHomeOutline } from 'react-icons/io5';
 import CapgeminiLogo from '../assets/capgemini_logo.png'
+import { BottomNavigationBarProps } from '@/app/types';
 
-const BottomNavigationBar = () => {
+const BottomNavigationBar = ({ homeLabel = 'Home' }: BottomNavigationBarProps) => {
   const pathname = usePathname();
 
   const isActive = (path: string) => {
@@ -47,7 +48,7 @@ const BottomNavigationBar = () => {
           ) : (
             <IoHomeOutline className="h-8 w-8" />
           )}
-          Home
+          {homeLabel}
         </NavLink>
         <NavLink href="/reports" active={isActive('/reports')}>
           {isActive('/reports') ? (
