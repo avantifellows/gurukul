@@ -174,7 +174,7 @@ const ClassLibrary = () => {
                     <select
                         onChange={(e) => handleGradeChange(+e.target.value)}
                         value={selectedGrade}
-                        className="w-32 h-8 rounded-lg text-center"
+                        className="w-32 h-8 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                         {gradeOptions.map((grade) => (
                             <option key={grade} value={grade} className="text-sm md:text-lg">
@@ -185,7 +185,7 @@ const ClassLibrary = () => {
                     <select
                         onChange={(e) => setSelectedChapter(+e.target.value)}
                         value={selectedChapter || ''}
-                        className="w-32 h-8 rounded-lg text-center"
+                        className="w-32 h-8 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                         <option value="" className="text-sm md:text-lg">Chapter: All</option>
                         {chapterList.map((chapter) => (
@@ -199,7 +199,7 @@ const ClassLibrary = () => {
                     <select
                         onChange={(e) => handleTeacherChange(+e.target.value)}
                         value={selectedTeacher}
-                        className="w-32 h-8 rounded-lg text-center"
+                        className="w-32 h-8 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                         {teachers.map((teacher) => (
                             <option key={teacher.id} value={teacher.id} className="text-sm md:text-lg">

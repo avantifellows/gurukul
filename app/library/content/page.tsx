@@ -184,7 +184,7 @@ const ContentLibrary = () => {
     const generateSubjectButton = (subject: string, label: string) => (
         <PrimaryButton
             key={subject}
-            onClick={() => setActiveTab(subject)}
+            onClick={() => handleTabClick(subject)}
             className={`py-2 px-2 w-full h-full rounded-lg text-center break-words ${activeTab === subject ? 'bg-heading text-primary font-semibold shadow-sm' : 'bg-white text-slate-600'}`}
         >
             {label}
@@ -218,7 +218,7 @@ const ContentLibrary = () => {
                     <select
                         onChange={(e) => handleGradeChange(+e.target.value)}
                         value={selectedGrade}
-                        className="w-32 h-8 rounded-lg text-center"
+                        className="w-32 h-8 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                         {gradeOptions.map((grade) => (
                             <option key={grade} value={grade} className="text-sm md:text-lg">
@@ -229,7 +229,7 @@ const ContentLibrary = () => {
                     <select
                         onChange={(e) => setSelectedChapter(+e.target.value)}
                         value={selectedChapter || ''}
-                        className="w-32 h-8 rounded-lg text-center"
+                        className="w-32 h-8 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                         <option value="" className="text-sm md:text-lg">Chapter: All</option>
                         {chapterList.map((chapter) => (
