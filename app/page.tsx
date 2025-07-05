@@ -440,7 +440,7 @@ export default function Home() {
             {groupConfig.showTests && renderTestSection("Tests", [...nonChapterTests, ...chapterTests])}
             {groupConfig.showHomework && renderTestSection("Homework", homework)}
           </div>
-          <BottomNavigationBar homeLabel="Practice test" />
+          <BottomNavigationBar />
         </main>
       )}
     </>

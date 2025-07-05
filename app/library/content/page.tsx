@@ -19,10 +19,8 @@ import { CURRICULUM_NAMES, COURSES } from '@/constants/config';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
 import ModuleIcon from '../../../assets/notepad.png'
-import { useAuth } from '@/services/AuthContext';
 
 const ContentLibrary = () => {
-    const { group } = useAuth();
     const [activeTab, setActiveTab] = useState('Physics');
     const [chapters, setChapters] = useState<Chapter[]>([]);
     const [topics, setTopics] = useState<Topic[]>([]);
@@ -320,7 +318,7 @@ const ContentLibrary = () => {
                                 </div>
                             ))
                         )}
-                        <BottomNavigationBar homeLabel={group === 'EnableStudents' ? 'Practice test' : 'Home'} />
+                        <BottomNavigationBar />
                     </div>
                 )}
             </main>

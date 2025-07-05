@@ -157,7 +157,7 @@ export default function Loading({ showReportsOnly = false, showLibraryOnly = fal
                     )}
 
             {!showLibraryOnly && !showChapterContentOnly && <div className="pb-40"></div>}
-            <BottomNavigationBar homeLabel={group === 'EnableStudents' ? 'Practice test' : 'Home'} />
+            <BottomNavigationBar />
         </main>
     );
 }

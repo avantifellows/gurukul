@@ -24,27 +24,28 @@ const Page: React.FC = () => {
   const groupConfig = getGroupConfig(group || 'defaultGroup');
 
   const handleLibraryChange = (library: string) => {
-    setSelectedLibrary(library);
     MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_LIBRARY + ": " + library);
-  };
 
-  useEffect(() => {
     if (
-      selectedLibrary === 'NEET Content' ||
-      selectedLibrary === 'JEE Content' ||
-      selectedLibrary === 'JEE Advance Content' ||
-      selectedLibrary === 'CLAT Content' ||
-      selectedLibrary === 'CA Content'
+      library === 'NEET Content' ||
+      library === 'JEE Content' ||
+      library === 'JEE Advance Content' ||
+      library === 'CLAT Content' ||
+      library === 'CA Content'
     ) {
-      push(`/library/content?course=${selectedLibrary}`);
+      push(`/library/content?course=${library}`);
+      return;
     }
     if (
-      selectedLibrary === 'NEET Classes' ||
-      selectedLibrary === 'JEE Classes'
+      library === 'NEET Classes' ||
+      library === 'JEE Classes'
     ) {
-      push(`/library/class?course=${selectedLibrary}`);
+      push(`/library/class?course=${library}`);
+      return;
     }
-  }, [selectedLibrary, push]);
+
+    setSelectedLibrary(library);
+  };
 
   const buttonStyle = 'mx-4 w-48 md:w-72 whitespace-nowrap';
   const selectedButtonStyle = 'bg-white text-primary font-semibold py-2 rounded-lg shadow-sm';
@@ -147,7 +148,7 @@ const Page: React.FC = () => {
               onClick={() => handleLibraryChange(course.value)}
             />
           ))}
-          <BottomNavigationBar homeLabel={group === 'EnableStudents' ? 'Practice test' : 'Home'} />
+          <BottomNavigationBar />
         </div>
       )}
 
@@ -162,7 +163,7 @@ const Page: React.FC = () => {
               onClick={() => handleLibraryChange(course.value)}
             />
           ))}
-          <BottomNavigationBar homeLabel={group === 'EnableStudents' ? 'Practice test' : 'Home'} />
+          <BottomNavigationBar />
         </div>
       )}
     </main>
