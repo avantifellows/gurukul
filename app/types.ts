@@ -175,3 +175,7 @@ export interface GroupConfig {
 export type GroupConfigurations = {
   [key: string]: GroupConfig;
 };
+
+export interface BottomNavigationBarProps {
+  homeLabel?: string;
+}

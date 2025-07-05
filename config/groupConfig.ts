@@ -13,9 +13,9 @@ const groupConfig: GroupConfigurations = {
         showLiveClasses: false,
         showTests: true,
         showPracticeTests: true,
-        showHomework: true,
+        showHomework: false,
         showContentLibrary: true,
-        showClassLibrary: false,
+        showClassLibrary: false
     },
     DelhiStudents: {
         showLiveClasses: true,
