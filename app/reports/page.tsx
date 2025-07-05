@@ -7,7 +7,7 @@ import TopBar from "@/components/TopBar";
 import { useAuth } from "../../services/AuthContext";
 
 export default function ReportsPage() {
-    const { loggedIn, userId } = useAuth();
+    const { loggedIn, userId, group } = useAuth();
 
     if (!loggedIn || !userId) {
         return (
@@ -25,7 +25,7 @@ export default function ReportsPage() {
                 <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Test Reports</h1>
             </div>
             <ReportsList userId={userId} />
-            <BottomNavigationBar />
+            <BottomNavigationBar homeLabel={group === 'EnableStudents' ? 'Practice test' : 'Home'} />
         </main>
     );
 }

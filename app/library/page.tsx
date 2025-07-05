@@ -147,7 +147,7 @@ const Page: React.FC = () => {
               onClick={() => handleLibraryChange(course.value)}
             />
           ))}
-          <BottomNavigationBar />
+          <BottomNavigationBar homeLabel={group === 'EnableStudents' ? 'Practice test' : 'Home'} />
         </div>
       )}
 
@@ -162,7 +162,7 @@ const Page: React.FC = () => {
               onClick={() => handleLibraryChange(course.value)}
             />
           ))}
-          <BottomNavigationBar />
+          <BottomNavigationBar homeLabel={group === 'EnableStudents' ? 'Practice test' : 'Home'} />
         </div>
       )}
     </main>
