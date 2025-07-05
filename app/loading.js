@@ -118,7 +118,7 @@ export default function Loading({ showReportsOnly = false, showLibraryOnly = fal
     );
 
     return (
-        <main className={`${!showChapterContentOnly ? 'min-h-screen' : ''} max-w-xl mx-auto md:mx-auto bg-heading`}>
+        <main className={`${!showChapterContentOnly ? 'min-h-screen' : ''} mx-auto md:mx-auto bg-heading`}>
             {/* Show only library shimmer when showLibraryOnly is true */}
             {showLibraryOnly ? (
                 <>
