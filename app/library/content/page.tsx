@@ -259,18 +259,21 @@ const ContentLibrary = () => {
                                             ) : (
                                                 <ul>
                                                     {/* Render modules for the chapter */}
-                                                    {chapterResources
-                                                        .filter((resource) => resource.type === 'document' && resource.subtype === 'Module')
-                                                        .map((resource) => {
-                                                            const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
-                                                            return (
-                                                                <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary pl-4 flex items-center">
-                                                                    <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                        {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {resource.name}
-                                                                    </Link>
-                                                                </li>
-                                                            );
-                                                        })}
+                                                    {[...chapterResources].sort((a, b) => {
+                                                        // Modules first
+                                                        if (a.type === 'document' && a.subtype === 'Module') return -1;
+                                                        if (b.type === 'document' && b.subtype === 'Module') return 1;
+                                                        return 0;
+                                                    }).map((resource) => {
+                                                        const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
+                                                        return (
+                                                            <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary pl-4 flex items-center">
+                                                                <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
+                                                                    {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {resource.name}
+                                                                </Link>
+                                                            </li>
+                                                        );
+                                                    })}
 
                                                     {/* If there are topics for this chapter, render topic cards. Otherwise, render non-module resources directly. */}
                                                     {topics.filter((topic) => topic.chapter_id === chapter.id).length > 0 ? (
@@ -303,26 +306,10 @@ const ContentLibrary = () => {
                                                             })
                                                     ) : (
                                                         // No topics: show all non-module chapter resources directly
-                                                        chapterResources
-                                                            .filter((resource) => !(resource.type === 'document' && resource.subtype === 'Module'))
-                                                            .map((resource) => {
-                                                                const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
-                                                                return (
-                                                                    <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary pl-4 flex items-center">
-                                                                        <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                            {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {resource.name}
-                                                                        </Link>
-                                                                    </li>
-                                                                );
-                                                            })
-                                                    )}
-
-                                                    {/* If no modules and no topics/resources, show a message */}
-                                                    {chapterResources.filter((resource) => resource.type === 'document' && resource.subtype === 'Module').length === 0 &&
-                                                        topics.filter((topic) => topic.chapter_id === chapter.id).length === 0 &&
-                                                        chapterResources.filter((resource) => !(resource.type === 'document' && resource.subtype === 'Module')).length === 0 && (
+                                                        chapterResources.length === 0 && (
                                                             <li className="py-2 text-slate-500 pl-4">No resources available for this chapter.</li>
-                                                        )}
+                                                        )
+                                                    )}
                                                 </ul>
                                             )}
                                         </div>
