@@ -36,6 +36,9 @@ const getResourceIconAndPrefix = (resource: Resource) => {
     return { icon: MdInsertDriveFile, prefix: '', color: '#64748b' };
 };
 
+// Common dropdown class for consistent styling
+const DROPDOWN_CLASS = "w-32 h-8 rounded-lg text-center bg-white border border-gray-300 shadow focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150";
+
 const ContentLibrary = () => {
     const [activeTab, setActiveTab] = useState('');
     const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -209,7 +212,7 @@ const ContentLibrary = () => {
                     <select
                         onChange={(e) => handleGradeChange(+e.target.value)}
                         value={selectedGrade}
-                        className="w-32 h-8 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className={DROPDOWN_CLASS}
                     >
                         {gradeOptions.map((grade) => (
                             <option key={grade} value={grade} className="text-sm md:text-lg">
@@ -220,7 +223,7 @@ const ContentLibrary = () => {
                     <select
                         onChange={(e) => setSelectedChapter(+e.target.value)}
                         value={selectedChapter || ''}
-                        className="w-32 h-8 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className={DROPDOWN_CLASS}
                     >
                         <option value="" className="text-sm md:text-lg">Chapter: All</option>
                         {chapterList.map((chapter) => (

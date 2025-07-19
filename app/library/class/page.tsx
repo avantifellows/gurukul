@@ -162,6 +162,9 @@ const ClassLibrary = () => {
         setActiveTab(defaultTab);
     }, [selectedCourse]);
 
+    // Common dropdown class for consistent styling
+    const DROPDOWN_CLASS = "w-32 h-8 rounded-lg text-center bg-white border border-gray-300 shadow focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150";
+
     return (
         <>
             <main className="max-w-xl mx-auto bg-white min-h-screen">
@@ -181,7 +184,7 @@ const ClassLibrary = () => {
                     <select
                         onChange={(e) => handleGradeChange(+e.target.value)}
                         value={selectedGrade}
-                        className="w-32 h-8 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className={DROPDOWN_CLASS}
                     >
                         {gradeOptions.map((grade) => (
                             <option key={grade} value={grade} className="text-sm md:text-lg">
@@ -192,7 +195,7 @@ const ClassLibrary = () => {
                     <select
                         onChange={(e) => setSelectedChapter(+e.target.value)}
                         value={selectedChapter || ''}
-                        className="w-32 h-8 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className={DROPDOWN_CLASS}
                     >
                         <option value="" className="text-sm md:text-lg">Chapter: All</option>
                         {chapterList.map((chapter) => (
@@ -206,7 +209,7 @@ const ClassLibrary = () => {
                     <select
                         onChange={(e) => handleTeacherChange(+e.target.value)}
                         value={selectedTeacher}
-                        className="w-32 h-8 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className={DROPDOWN_CLASS}
                     >
                         {teachers.map((teacher) => (
                             <option key={teacher.id} value={teacher.id} className="text-sm md:text-lg">
