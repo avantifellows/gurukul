@@ -123,7 +123,6 @@ export const getClassChapters = async (
 
   const filteredChapters = await Promise.all(
     chapterData.map(async (chapter) => {
-      // Fetch all resources and filter by subtype in frontend
       const chapterResources = await getResourcesOfChapter(chapter.id, teacherId);
       if (chapterResources.length > 0) {
         return chapter;
