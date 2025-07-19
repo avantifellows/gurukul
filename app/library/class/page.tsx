@@ -7,20 +7,18 @@ import Loading from '../../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
 import { getSubjects, getClassChapters, getGrades, getResourcesOfChapter, getTeachers } from '../../../api/afdb/library';
-import { Chapter, Resource, Topic, Teacher } from '../../types';
+import { Chapter, Resource, Teacher } from '../../types';
 import { useEffect } from 'react';
 import Link from 'next/link';
-import ExpandIcon from "../../../assets/expand.png";
-import CollapseIcon from "../../../assets/collapse.png";
-import PlayIcon from "../../../assets/play.png";
+import { MdPlayCircleFilled } from 'react-icons/md';
+import { IoIosArrowDown as ExpandIcon, IoIosArrowUp as CollapseIcon } from 'react-icons/io';
 import { IoArrowBack } from 'react-icons/io5';
-import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
 
 const ClassLibrary = () => {
-    const [activeTab, setActiveTab] = useState('Physics');
+    const [activeTab, setActiveTab] = useState('');
     const [chapters, setChapters] = useState<Chapter[]>([]);
     const [resources, setResources] = useState<Resource[]>([]);
     const [expandedChapters, setExpandedChapters] = useState<Record<number, boolean>>({});
@@ -79,6 +77,7 @@ const ClassLibrary = () => {
     };
 
     useEffect(() => {
+        if (!activeTab) return;
         const fetchData = async () => {
             try {
                 setIsLoading(true);
@@ -89,9 +88,8 @@ const ClassLibrary = () => {
                 setIsLoading(false);
             }
         };
-
         fetchData();
-    }, [selectedGrade, selectedChapter, selectedTeacher]);
+    }, [activeTab, selectedGrade, selectedChapter, selectedTeacher]);
 
     const handleTeacherChange = async (selectedTeacherId: number) => {
         setSelectedTeacher(selectedTeacherId);
@@ -101,7 +99,7 @@ const ClassLibrary = () => {
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
-            const resourceData = await getResourcesOfChapter(chapterId, 'class', selectedTeacher);
+            const resourceData = await getResourcesOfChapter(chapterId, selectedTeacher);
             setResources(resourceData);
             MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER + ": " + chapterName);
         } catch (error) {
@@ -154,6 +152,15 @@ const ClassLibrary = () => {
             {label}
         </PrimaryButton>
     );
+
+    // Set default subject based on course on mount and whenever course changes
+    useEffect(() => {
+        let defaultTab = '';
+        if (selectedCourse === 'JEE Classes' || selectedCourse === 'NEET Classes') {
+            defaultTab = 'Physics';
+        }
+        setActiveTab(defaultTab);
+    }, [selectedCourse]);
 
     return (
         <>
@@ -221,9 +228,9 @@ const ClassLibrary = () => {
                                     <div className="w-52">{chapter.name}</div>
                                     <div className="w-8 flex justify-center">
                                         {expandedChapters[chapter.id] ? (
-                                            <Image src={CollapseIcon} alt="Collapse" />
+                                            <CollapseIcon className="w-6 h-6" />
                                         ) : (
-                                            <Image src={ExpandIcon} alt="Expand" />
+                                            <ExpandIcon className="w-6 h-6" />
                                         )}
                                     </div>
                                 </div>
@@ -234,12 +241,11 @@ const ClassLibrary = () => {
                                         ) : (
                                             <ul className="text-primary font-normal">
                                                 {resources
-                                                    .filter((resource) => resource.chapter_id === chapter.id && resource.link)
+                                                    .filter((resource) => resource.chapter_id === chapter.id && resource.link && resource.type === 'video' && resource.subtype === 'classRecording')
                                                     .map((resource) => (
-                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
+                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary pl-4 flex items-center">
                                                             <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name} {" - "}
-                                                                {resource.type_params?.date || 'Date not available'}
+                                                                <MdPlayCircleFilled className="w-10 h-10 mr-2" color="#ef4444" /> {resource.name} {resource.type_params?.date ? `- ${resource.type_params.date}` : ''}
                                                             </Link>
                                                         </li>
                                                     ))}
