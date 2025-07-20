@@ -202,46 +202,50 @@ const ContentLibrary = () => {
                     </div>
                     <span className="text-sm ml-[52px] font-normal">Content Library</span>
                 </div>
-                <div className="grid grid-cols-3 gap-2 mt-4 mb-4 mx-6">
-                    {selectedCourse === COURSES.NEET && neetSubjects.map(subject => generateSubjectButton(subject, subject))}
-                    {selectedCourse === COURSES.JEE && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
-                    {selectedCourse === COURSES.CA && caSubjects.map(subject => generateSubjectButton(subject, subject))}
-                    {selectedCourse === COURSES.CLAT && clatSubjects.map(subject => generateSubjectButton(subject, subject))}
+                <div className="mx-5">
+                    <div className="grid grid-cols-3 gap-2 mt-4 mb-4">
+                        {selectedCourse === COURSES.NEET && neetSubjects.map(subject => generateSubjectButton(subject, subject))}
+                        {selectedCourse === COURSES.JEE && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
+                        {selectedCourse === COURSES.CA && caSubjects.map(subject => generateSubjectButton(subject, subject))}
+                        {selectedCourse === COURSES.CLAT && clatSubjects.map(subject => generateSubjectButton(subject, subject))}
+                    </div>
                 </div>
-                <div className="bg-heading h-20 flex justify-between items-center px-4">
-                    <select
-                        onChange={(e) => handleGradeChange(+e.target.value)}
-                        value={selectedGrade}
-                        className={DROPDOWN_CLASS}
-                    >
-                        {gradeOptions.map((grade) => (
-                            <option key={grade} value={grade} className="text-sm md:text-lg">
-                                Grade {grade}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        onChange={(e) => setSelectedChapter(+e.target.value)}
-                        value={selectedChapter || ''}
-                        className={DROPDOWN_CLASS}
-                    >
-                        <option value="" className="text-sm md:text-lg">Chapter: All</option>
-                        {chapterList.map((chapter) => (
-                            <option key={chapter.id} value={chapter.id} className="text-sm md:text-lg">
-                                {chapter.name}
-                            </option>
-                        ))}
-                    </select>
+                <div className="bg-heading h-20 flex items-center w-full">
+                    <div className="mx-5 w-full flex justify-between">
+                        <select
+                            onChange={(e) => handleGradeChange(+e.target.value)}
+                            value={selectedGrade}
+                            className={DROPDOWN_CLASS}
+                        >
+                            {gradeOptions.map((grade) => (
+                                <option key={grade} value={grade} className="text-sm md:text-lg">
+                                    Grade {grade}
+                                </option>
+                            ))}
+                        </select>
+                        <select
+                            onChange={(e) => setSelectedChapter(+e.target.value)}
+                            value={selectedChapter || ''}
+                            className={DROPDOWN_CLASS}
+                        >
+                            <option value="" className="text-sm md:text-lg">Chapter: All</option>
+                            {chapterList.map((chapter) => (
+                                <option key={chapter.id} value={chapter.id} className="text-sm md:text-lg">
+                                    {chapter.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
                 {isLoading ? (
                     <Loading showLibraryOnly={true} />
                 ) : (
-                    <div className="mt-4 pb-40">
+                    <div className="mt-4 pb-40 mx-5">
                         {chapters.length === 0 ? (
                             <div className="text-center pt-10">No chapters available</div>
                         ) : (
                             chapters.map((chapter) => (
-                                <div key={chapter.id} className="mx-5">
+                                <div key={chapter.id}>
                                     <div
                                         className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
                                         onClick={() => toggleChapterExpansion(chapter.id, chapter.name)}
