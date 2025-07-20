@@ -13,8 +13,7 @@ import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime
 import { api } from "@/services/url";
 import { MixpanelTracking } from "@/services/mixpanel";
 import { getGroupConfig } from "@/config/groupConfig";
-import ExpandIcon from "../assets/expand.png";
-import CollapseIcon from "../assets/collapse.png";
+import { IoIosArrowDown as ExpandIcon, IoIosArrowUp as CollapseIcon } from 'react-icons/io';
 
 export default function Home() {
   const { loggedIn, userId, userDbId, group, isLoading: authLoading } = useAuth();
@@ -294,7 +293,7 @@ export default function Home() {
         );
       } else {
         return (
-          <p className="text-xs italic font-normal mr-4 w-12">
+          <p className="text-xs italic font-normal mr-4 w-14">
             Starts at <br />
             {format12HrSessionTime(data.start_time)}
           </p>
@@ -396,9 +395,9 @@ export default function Home() {
                           <div>{formatDisplayNames[format] || format}</div>
                           <div className="w-8 flex justify-center">
                             {expandedFormat === format ? (
-                              <img src={CollapseIcon.src} alt="Collapse" />
+                              <CollapseIcon className="w-6 h-6" />
                             ) : (
-                              <img src={ExpandIcon.src} alt="Expand" />
+                              <ExpandIcon className="w-6 h-6" />
                             )}
                           </div>
                         </div>

@@ -6,22 +6,41 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
-import { getCurriculum, getSubjects, getChapters, getGrades, getChapterResourcesComplete } from '../../../api/afdb/library';
+import { getSubjects, getChapters, getGrades, getChapterResourcesComplete } from '../../../api/afdb/library';
 import { Chapter, Resource, Topic } from '../../types';
 import Link from 'next/link';
-import ExpandIcon from "../../../assets/expand.png";
-import CollapseIcon from "../../../assets/collapse.png";
-import PlayIcon from "../../../assets/play.png";
+import { MdMenuBook, MdQuiz, MdPlayCircleFilled, MdInsertDriveFile } from 'react-icons/md';
+import { GiArchiveRegister } from 'react-icons/gi';
+import { IoIosArrowDown as ExpandIcon, IoIosArrowUp as CollapseIcon } from 'react-icons/io';
 import { IoArrowBack } from 'react-icons/io5';
-import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { CURRICULUM_NAMES, COURSES } from '@/constants/config';
+import { COURSES } from '@/constants/config';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
-import ModuleIcon from '../../../assets/notepad.png'
+
+// Helper to get icon, prefix, and color for a resource
+const getResourceIconAndPrefix = (resource: Resource) => {
+    if (resource.type === 'document' && resource.subtype === 'Module') {
+        return { icon: MdMenuBook, prefix: 'Module:', color: '#2563eb' };
+    }
+    if (resource.type === 'document' && resource.subtype === 'Previous Year Questions') {
+        return { icon: GiArchiveRegister, prefix: 'PYQ:', color: '#f59e42' };
+    }
+    if (resource.type === 'quiz' && resource.subtype === 'Assessment') {
+        return { icon: MdQuiz, prefix: 'Assessment:', color: '#a21caf' };
+    }
+    if (resource.type === 'video' && resource.subtype === 'Video Lectures') {
+        return { icon: MdPlayCircleFilled, prefix: 'Video:', color: '#ef4444' };
+    }
+    // fallback
+    return { icon: MdInsertDriveFile, prefix: '', color: '#64748b' };
+};
+
+// Common dropdown class for consistent styling
+const DROPDOWN_CLASS = "w-32 h-8 rounded-lg text-center bg-white border border-gray-300 shadow focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150";
 
 const ContentLibrary = () => {
-    const [activeTab, setActiveTab] = useState('Physics');
+    const [activeTab, setActiveTab] = useState('');
     const [chapters, setChapters] = useState<Chapter[]>([]);
     const [topics, setTopics] = useState<Topic[]>([]);
     const [resources, setResources] = useState<Resource[]>([]);
@@ -50,34 +69,15 @@ const ContentLibrary = () => {
         }
 
         try {
-            const actualTabName = tabName.toLowerCase();
-            let curriculumId: number | undefined = undefined;
-            if (selectedCourse === COURSES.JEE || selectedCourse === COURSES.NEET) {
-                const curriculumName =
-                    selectedCourse === COURSES.JEE ? CURRICULUM_NAMES.ALC :
-                        (selectedCourse === COURSES.NEET && tabName === 'Biology') ? CURRICULUM_NAMES.SANKALP :
-                            (selectedCourse === COURSES.NEET && (tabName === 'Physics' || tabName === 'Chemistry')) ? CURRICULUM_NAMES.ALC :
-                                CURRICULUM_NAMES.SANKALP;
-                const curriculumData = await getCurriculum(curriculumName);
-                curriculumId = curriculumData[0].id;
-            }
-            const subjectData = await getSubjects(actualTabName);
+            const subjectData = await getSubjects(tabName);
             const gradeData = await getGrades(selectedGrade);
             if (subjectData.length > 0) {
                 const subjectId = subjectData[0].id;
                 const gradeId = gradeData[0].id;
-                if (!curriculumId) {
-                    await fetchChapters(subjectId, gradeId, curriculumId);
-                } else {
-                    await fetchChapters(subjectId, gradeId);
-                }
+                await fetchChapters(subjectId, gradeId);
                 const chapterData = selectedChapter
-                    ? (!curriculumId
-                        ? await getChapters(subjectId, gradeId, selectedChapter)
-                        : await getChapters(subjectId, gradeId, selectedChapter, curriculumId))
-                    : (!curriculumId
-                        ? await getChapters(subjectId, gradeId)
-                        : await getChapters(subjectId, gradeId, undefined, curriculumId));
+                    ? await getChapters(subjectId, gradeId, selectedChapter)
+                    : await getChapters(subjectId, gradeId);
 
                 if (chapterData.length > 0) {
                     setChapters(chapterData);
@@ -95,6 +95,7 @@ const ContentLibrary = () => {
     };
 
     useEffect(() => {
+        if (!activeTab) return;
         const fetchData = async () => {
             try {
                 setIsLoading(true);
@@ -105,22 +106,20 @@ const ContentLibrary = () => {
                 setIsLoading(false);
             }
         };
-
         fetchData();
     }, [selectedCourse, activeTab, selectedGrade, selectedChapter]);
 
-    // Set default subject based on course ONLY when course actually changes
+    // Set default subject based on course on mount and whenever course changes
     useEffect(() => {
-        if (prevCourseRef.current !== selectedCourse) {
-            if (selectedCourse === COURSES.JEE || selectedCourse === COURSES.NEET) {
-                setActiveTab('Physics');
-            } else if (selectedCourse === COURSES.CA) {
-                setActiveTab('Accounting');
-            } else if (selectedCourse === COURSES.CLAT) {
-                setActiveTab('English');
-            }
-            prevCourseRef.current = selectedCourse;
+        let defaultTab = '';
+        if (selectedCourse === COURSES.JEE || selectedCourse === COURSES.NEET) {
+            defaultTab = 'Physics';
+        } else if (selectedCourse === COURSES.CA) {
+            defaultTab = 'Accounting';
+        } else if (selectedCourse === COURSES.CLAT) {
+            defaultTab = 'English';
         }
+        setActiveTab(defaultTab);
     }, [selectedCourse]);
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
@@ -167,13 +166,8 @@ const ContentLibrary = () => {
         MixpanelTracking.getInstance().trackEvent('Selected grade: ' + grade);
     };
 
-    const fetchChapters = async (subjectId: number, gradeId: number, curriculumId?: number) => {
-        let chapterData;
-        if (!curriculumId) {
-            chapterData = await getChapters(subjectId, gradeId);
-        } else {
-            chapterData = await getChapters(subjectId, gradeId, undefined, curriculumId);
-        }
+    const fetchChapters = async (subjectId: number, gradeId: number) => {
+        const chapterData = await getChapters(subjectId, gradeId);
         setChapterList(chapterData);
     };
 
@@ -218,7 +212,7 @@ const ContentLibrary = () => {
                     <select
                         onChange={(e) => handleGradeChange(+e.target.value)}
                         value={selectedGrade}
-                        className="w-32 h-8 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className={DROPDOWN_CLASS}
                     >
                         {gradeOptions.map((grade) => (
                             <option key={grade} value={grade} className="text-sm md:text-lg">
@@ -229,7 +223,7 @@ const ContentLibrary = () => {
                     <select
                         onChange={(e) => setSelectedChapter(+e.target.value)}
                         value={selectedChapter || ''}
-                        className="w-32 h-8 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className={DROPDOWN_CLASS}
                     >
                         <option value="" className="text-sm md:text-lg">Chapter: All</option>
                         {chapterList.map((chapter) => (
@@ -255,9 +249,9 @@ const ContentLibrary = () => {
                                         <div className="w-52">{chapter.name}</div>
                                         <div className="w-8 flex justify-center">
                                             {expandedChapters[chapter.id] ? (
-                                                <Image src={CollapseIcon} alt="Collapse" />
+                                                <CollapseIcon className="w-6 h-6" />
                                             ) : (
-                                                <Image src={ExpandIcon} alt="Expand" />
+                                                <ExpandIcon className="w-6 h-6" />
                                             )}
                                         </div>
                                     </div>
@@ -268,49 +262,57 @@ const ContentLibrary = () => {
                                             ) : (
                                                 <ul>
                                                     {/* Render modules for the chapter */}
-                                                    {chapterResources
-                                                        .filter((resource) =>
-                                                            resource.type_params?.resource_type === "module"
-                                                        )
-                                                        .map((resource) => (
-                                                            <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary">
+                                                    {[...chapterResources].sort((a, b) => {
+                                                        // Modules first
+                                                        if (a.type === 'document' && a.subtype === 'Module') return -1;
+                                                        if (b.type === 'document' && b.subtype === 'Module') return 1;
+                                                        return 0;
+                                                    }).map((resource) => {
+                                                        const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
+                                                        return (
+                                                            <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary pl-4 flex items-center">
                                                                 <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                    <Image src={ModuleIcon} alt="Module" className="w-8 h-8 mr-2 ml-9" /> {resource.name}
+                                                                    {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {resource.name}
                                                                 </Link>
                                                             </li>
-                                                        ))}
+                                                        );
+                                                    })}
 
-                                                    {/* Render topics and their resources */}
-                                                    {topics
-                                                        .filter((topic) => topic.chapter_id === chapter.id)
-                                                        .map((topic) => {
-                                                            const videos = resources.filter(
-                                                                (resource) => resource.topic_id === topic.id &&
-                                                                    resource.link &&
-                                                                    resource.type_params?.resource_type !== "module"
-                                                            );
+                                                    {/* If there are topics for this chapter, render topic cards. Otherwise, render non-module resources directly. */}
+                                                    {topics.filter((topic) => topic.chapter_id === chapter.id).length > 0 ? (
+                                                        topics
+                                                            .filter((topic) => topic.chapter_id === chapter.id)
+                                                            .map((topic) => {
+                                                                const videos = resources.filter(
+                                                                    (resource) => resource.topic_id === topic.id &&
+                                                                        resource.link &&
+                                                                        !(resource.type === 'document' && resource.subtype === 'Module')
+                                                                );
 
-                                                            return (
-                                                                <div key={topic.id} className="bg-card rounded-lg shadow-lg shadow-slate-400 p-4 mx-2 mt-2 my-8 text-black font-semibold">
-                                                                    <h3>{topic.name}</h3>
-                                                                    <ul className="text-primary m-2 font-normal">
-                                                                        {videos.map((resource) => (
-                                                                            <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2">
-                                                                                <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                                    <Image src={PlayIcon} alt="Play" className="w-10 h-10 mr-2" /> {resource.name}
-                                                                                </Link>
-                                                                            </li>
-                                                                        ))}
-                                                                    </ul>
-                                                                </div>
-                                                            );
-                                                        })}
-
-                                                    {/* If no modules and no topics/resources, show a message */}
-                                                    {chapterResources.filter((resource) => resource.type_params?.resource_type === "module").length === 0 &&
-                                                        topics.filter((topic) => topic.chapter_id === chapter.id).length === 0 && (
-                                                            <li className="py-2 text-slate-500 ml-9">No resources available for this chapter.</li>
-                                                        )}
+                                                                return (
+                                                                    <div key={topic.id} className="bg-card rounded-lg shadow-lg shadow-slate-400 p-4 mx-2 mt-2 my-8 text-black font-semibold">
+                                                                        <h3>{topic.name}</h3>
+                                                                        <ul className="text-primary m-2 font-normal">
+                                                                            {videos.map((resource) => {
+                                                                                const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
+                                                                                return (
+                                                                                    <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary pl-4 flex items-center">
+                                                                                        <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
+                                                                                            {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {resource.name}
+                                                                                        </Link>
+                                                                                    </li>
+                                                                                );
+                                                                            })}
+                                                                        </ul>
+                                                                    </div>
+                                                                );
+                                                            })
+                                                    ) : (
+                                                        // No topics: show all non-module chapter resources directly
+                                                        chapterResources.length === 0 && (
+                                                            <li className="py-2 text-slate-500 pl-4">No resources available for this chapter.</li>
+                                                        )
+                                                    )}
                                                 </ul>
                                             )}
                                         </div>

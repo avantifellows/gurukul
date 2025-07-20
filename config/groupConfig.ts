@@ -23,7 +23,7 @@ const groupConfig: GroupConfigurations = {
         showPracticeTests: true,
         showHomework: true,
         showContentLibrary: true,
-        showClassLibrary: true,
+        showClassLibrary: false,
     },
     defaultGroup: {
         showLiveClasses: true,
@@ -31,7 +31,7 @@ const groupConfig: GroupConfigurations = {
         showPracticeTests: true,
         showHomework: true,
         showContentLibrary: true,
-        showClassLibrary: true,
+        showClassLibrary: false,
     },
     ChhattisgarhStudents: {
         showLiveClasses: false,
