@@ -45,8 +45,7 @@ const ClassLibrary = () => {
         }
 
         try {
-            const actualTabName = tabName.toLowerCase();
-            const subjectData = await getSubjects(actualTabName);
+            const subjectData = await getSubjects(tabName);
             const gradeData = await getGrades(selectedGrade);
             const teacherData = await getTeachers(undefined, subjectData[0].id);
             setTeachers(teacherData);
@@ -76,8 +75,28 @@ const ClassLibrary = () => {
         }
     };
 
+    // Fetch teachers when activeTab or selectedGrade changes
     useEffect(() => {
         if (!activeTab) return;
+        const fetchTeachers = async () => {
+            try {
+                const subjectData = await getSubjects(activeTab);
+                if (subjectData.length > 0) {
+                    const teacherData = await getTeachers(undefined, subjectData[0].id);
+                    setTeachers(teacherData);
+                    if (teacherData.length > 0 && !selectedTeacher) {
+                        setSelectedTeacher(teacherData[0].id);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching teachers:', error);
+            }
+        };
+        fetchTeachers();
+    }, [activeTab, selectedGrade]);
+
+    useEffect(() => {
+        if (!activeTab || !selectedTeacher) return;
         const fetchData = async () => {
             try {
                 setIsLoading(true);
@@ -180,43 +199,47 @@ const ClassLibrary = () => {
                     {selectedCourse === 'NEET Classes' && neetSubjects.map(subject => generateSubjectButton(subject, subject))}
                     {selectedCourse === 'JEE Classes' && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
                 </div>
-                <div className="bg-heading h-20 flex justify-between items-center px-4">
-                    <select
-                        onChange={(e) => handleGradeChange(+e.target.value)}
-                        value={selectedGrade}
-                        className={DROPDOWN_CLASS}
-                    >
-                        {gradeOptions.map((grade) => (
-                            <option key={grade} value={grade} className="text-sm md:text-lg">
-                                Grade {grade}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        onChange={(e) => setSelectedChapter(+e.target.value)}
-                        value={selectedChapter || ''}
-                        className={DROPDOWN_CLASS}
-                    >
-                        <option value="" className="text-sm md:text-lg">Chapter: All</option>
-                        {chapterList.map((chapter) => (
-                            <option key={chapter.id} value={chapter.id} className="text-sm md:text-lg">
-                                {chapter.name}
-                            </option>
-                        ))}
-                    </select>
+                <div className="bg-heading h-20 flex items-center w-full">
+                    <div className="mx-5 w-full flex justify-between">
+                        <select
+                            onChange={(e) => handleGradeChange(+e.target.value)}
+                            value={selectedGrade}
+                            className={DROPDOWN_CLASS}
+                        >
+                            {gradeOptions.map((grade) => (
+                                <option key={grade} value={grade} className="text-sm md:text-lg">
+                                    Grade {grade}
+                                </option>
+                            ))}
+                        </select>
+                        <select
+                            onChange={(e) => setSelectedChapter(+e.target.value)}
+                            value={selectedChapter || ''}
+                            className={DROPDOWN_CLASS}
+                        >
+                            <option value="" className="text-sm md:text-lg">Chapter: All</option>
+                            {chapterList.map((chapter) => (
+                                <option key={chapter.id} value={chapter.id} className="text-sm md:text-lg">
+                                    {chapter.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
-                <div className="bg-heading pb-6 flex justify-between items-center px-4">
-                    <select
-                        onChange={(e) => handleTeacherChange(+e.target.value)}
-                        value={selectedTeacher}
-                        className={DROPDOWN_CLASS}
-                    >
-                        {teachers.map((teacher) => (
-                            <option key={teacher.id} value={teacher.id} className="text-sm md:text-lg">
-                                {teacher.user.first_name}
-                            </option>
-                        ))}
-                    </select>
+                <div className="bg-heading h-20 flex items-center w-full -mt-8">
+                    <div className="mx-5 w-full flex justify-between">
+                        <select
+                            onChange={(e) => handleTeacherChange(+e.target.value)}
+                            value={selectedTeacher}
+                            className={DROPDOWN_CLASS}
+                        >
+                            {teachers.map((teacher) => (
+                                <option key={teacher.id} value={teacher.id} className="text-sm md:text-lg">
+                                    {teacher.user.first_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
                 {isLoading ? (
                     <Loading showLibraryOnly={true} />
