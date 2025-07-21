@@ -288,7 +288,7 @@ const ContentLibrary = () => {
                                         </div>
                                     </div>
                                     {expandedChapters[chapter.id] && (
-                                        <div>
+                                        <div className="mb-8">
                                             {expandedChapterLoading[chapter.id] ? (
                                                 <Loading showChapterContentOnly={true} />
                                             ) : (
