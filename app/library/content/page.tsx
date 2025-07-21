@@ -28,8 +28,8 @@ const getResourceIconAndPrefix = (resource: Resource) => {
     if (resource.type === 'document' && resource.subtype === 'Previous Year Questions') {
         return { icon: GiArchiveRegister, prefix: 'PYQ:', color: '#f59e42' };
     }
-    if (resource.type === 'quiz' && resource.subtype === 'Practice Test') {
-        return { icon: MdQuiz, prefix: 'Assessment:', color: '#a21caf' };
+    if (resource.type === 'quiz' && resource.subtype === 'Assessment') {
+        return { icon: MdQuiz, prefix: 'Practice Test:', color: '#a21caf' };
     }
     if (resource.type === 'video' && resource.subtype === 'Video Lectures') {
         return { icon: MdPlayCircleFilled, prefix: 'Video:', color: '#ef4444' };
