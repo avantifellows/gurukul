@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.4",
     "@types/mixpanel-browser": "^2.48.1",
     "@types/node": "20.2.5",
     "@types/react": "18.2.8",

@@ -17,6 +17,8 @@ import { useSearchParams } from 'next/navigation';
 import { COURSES } from '@/constants/config';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
+import { Listbox } from '@headlessui/react';
+import { IoIosArrowDown as DropdownArrow } from 'react-icons/io';
 
 // Helper to get icon, prefix, and color for a resource
 const getResourceIconAndPrefix = (resource: Resource) => {
@@ -27,7 +29,7 @@ const getResourceIconAndPrefix = (resource: Resource) => {
         return { icon: GiArchiveRegister, prefix: 'PYQ:', color: '#f59e42' };
     }
     if (resource.type === 'quiz' && resource.subtype === 'Assessment') {
-        return { icon: MdQuiz, prefix: 'Assessment:', color: '#a21caf' };
+        return { icon: MdQuiz, prefix: 'Practice Test:', color: '#a21caf' };
     }
     if (resource.type === 'video' && resource.subtype === 'Video Lectures') {
         return { icon: MdPlayCircleFilled, prefix: 'Video:', color: '#ef4444' };
@@ -211,30 +213,56 @@ const ContentLibrary = () => {
                     </div>
                 </div>
                 <div className="bg-heading h-20 flex items-center w-full">
-                    <div className="mx-5 w-full flex justify-between">
-                        <select
-                            onChange={(e) => handleGradeChange(+e.target.value)}
-                            value={selectedGrade}
-                            className={DROPDOWN_CLASS}
-                        >
-                            {gradeOptions.map((grade) => (
-                                <option key={grade} value={grade} className="text-sm md:text-lg">
-                                    Grade {grade}
-                                </option>
-                            ))}
-                        </select>
-                        <select
-                            onChange={(e) => setSelectedChapter(+e.target.value)}
-                            value={selectedChapter || ''}
-                            className={DROPDOWN_CLASS}
-                        >
-                            <option value="" className="text-sm md:text-lg">Chapter: All</option>
-                            {chapterList.map((chapter) => (
-                                <option key={chapter.id} value={chapter.id} className="text-sm md:text-lg">
-                                    {chapter.name}
-                                </option>
-                            ))}
-                        </select>
+                    <div className="mx-5 w-full flex justify-between items-center">
+                        <Listbox value={selectedGrade} onChange={handleGradeChange}>
+                            <div className="relative">
+                                <Listbox.Button className={`${DROPDOWN_CLASS} pr-6`}>
+                                    <span>Grade {selectedGrade}</span>
+                                    <DropdownArrow className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" />
+                                </Listbox.Button>
+                                <Listbox.Options className="absolute mt-1 w-32 bg-white rounded-lg shadow z-10 border border-gray-300">
+                                    {gradeOptions.map((grade) => (
+                                        <Listbox.Option
+                                            key={grade}
+                                            value={grade}
+                                            className={({ active }) =>
+                                                `cursor-pointer select-none px-4 py-2 ${active ? 'bg-primary text-white' : 'text-gray-900'}`
+                                            }
+                                        >
+                                            Grade {grade}
+                                        </Listbox.Option>
+                                    ))}
+                                </Listbox.Options>
+                            </div>
+                        </Listbox>
+
+                        {/* Chapter Dropdown - Right extreme */}
+                        <Listbox value={selectedChapter} onChange={setSelectedChapter}>
+                            <div className="relative">
+                                <Listbox.Button className={`${DROPDOWN_CLASS} truncate pr-6 px-3`}>
+                                    <span>{selectedChapter ? `${chapterList.find(c => c.id === selectedChapter)?.name}` : 'Chapter: All'}</span>
+                                    <DropdownArrow className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" />
+                                </Listbox.Button>
+                                <Listbox.Options className="absolute mt-1 w-60 bg-white rounded-lg shadow z-10 border border-gray-300 max-h-60 overflow-auto right-0">
+                                    <Listbox.Option value={null} className={({ active }) =>
+                                        `cursor-pointer select-none px-4 py-2 ${active ? 'bg-primary text-white' : 'text-gray-900'}`
+                                    }>
+                                        Chapter: All
+                                    </Listbox.Option>
+                                    {chapterList.map((chapter) => (
+                                        <Listbox.Option
+                                            key={chapter.id}
+                                            value={chapter.id}
+                                            className={({ active }) =>
+                                                `cursor-pointer select-none px-4 py-2 ${active ? 'bg-primary text-white' : 'text-gray-900'}`
+                                            }
+                                        >
+                                            {chapter.name}
+                                        </Listbox.Option>
+                                    ))}
+                                </Listbox.Options>
+                            </div>
+                        </Listbox>
                     </div>
                 </div>
                 {isLoading ? (
@@ -250,7 +278,7 @@ const ContentLibrary = () => {
                                         className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
                                         onClick={() => toggleChapterExpansion(chapter.id, chapter.name)}
                                     >
-                                        <div className="w-52">{chapter.name}</div>
+                                        <div className="flex-1 min-w-0 mr-4 break-words">{chapter.name}</div>
                                         <div className="w-8 flex justify-center">
                                             {expandedChapters[chapter.id] ? (
                                                 <CollapseIcon className="w-6 h-6" />
@@ -260,7 +288,7 @@ const ContentLibrary = () => {
                                         </div>
                                     </div>
                                     {expandedChapters[chapter.id] && (
-                                        <div>
+                                        <div className="mb-8">
                                             {expandedChapterLoading[chapter.id] ? (
                                                 <Loading showChapterContentOnly={true} />
                                             ) : (
