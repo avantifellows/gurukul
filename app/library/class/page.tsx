@@ -16,6 +16,8 @@ import { IoArrowBack } from 'react-icons/io5';
 import { useSearchParams } from 'next/navigation';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
+import { Listbox } from '@headlessui/react';
+import { IoIosArrowDown as DropdownArrow } from 'react-icons/io';
 
 const ClassLibrary = () => {
     const [activeTab, setActiveTab] = useState('');
@@ -200,45 +202,79 @@ const ClassLibrary = () => {
                     {selectedCourse === 'JEE Classes' && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
                 </div>
                 <div className="bg-heading h-20 flex items-center w-full">
-                    <div className="mx-5 w-full flex justify-between">
-                        <select
-                            onChange={(e) => handleGradeChange(+e.target.value)}
-                            value={selectedGrade}
-                            className={DROPDOWN_CLASS}
-                        >
-                            {gradeOptions.map((grade) => (
-                                <option key={grade} value={grade} className="text-sm md:text-lg">
-                                    Grade {grade}
-                                </option>
-                            ))}
-                        </select>
-                        <select
-                            onChange={(e) => setSelectedChapter(+e.target.value)}
-                            value={selectedChapter || ''}
-                            className={DROPDOWN_CLASS}
-                        >
-                            <option value="" className="text-sm md:text-lg">Chapter: All</option>
-                            {chapterList.map((chapter) => (
-                                <option key={chapter.id} value={chapter.id} className="text-sm md:text-lg">
-                                    {chapter.name}
-                                </option>
-                            ))}
-                        </select>
+                    <div className="mx-5 w-full flex justify-between items-center">
+                        <Listbox value={selectedGrade} onChange={handleGradeChange}>
+                            <div className="relative">
+                                <Listbox.Button className={`${DROPDOWN_CLASS} pr-6`}>
+                                    <span>Grade {selectedGrade}</span>
+                                    <DropdownArrow className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" />
+                                </Listbox.Button>
+                                <Listbox.Options className="absolute mt-1 w-32 bg-white rounded-lg shadow z-10 border border-gray-300">
+                                    {gradeOptions.map((grade) => (
+                                        <Listbox.Option
+                                            key={grade}
+                                            value={grade}
+                                            className={({ active }) =>
+                                                `cursor-pointer select-none px-4 py-2 ${active ? 'bg-primary text-white' : 'text-gray-900'}`
+                                            }
+                                        >
+                                            Grade {grade}
+                                        </Listbox.Option>
+                                    ))}
+                                </Listbox.Options>
+                            </div>
+                        </Listbox>
+                        <Listbox value={selectedChapter} onChange={setSelectedChapter}>
+                            <div className="relative">
+                                <Listbox.Button className={`${DROPDOWN_CLASS} truncate pr-6 px-3`}>
+                                    <span>{selectedChapter ? `${chapterList.find(c => c.id === selectedChapter)?.name}` : 'Chapter: All'}</span>
+                                    <DropdownArrow className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" />
+                                </Listbox.Button>
+                                <Listbox.Options className="absolute mt-1 w-60 bg-white rounded-lg shadow z-10 border border-gray-300 max-h-60 overflow-auto right-0">
+                                    <Listbox.Option value={null} className={({ active }) =>
+                                        `cursor-pointer select-none px-4 py-2 ${active ? 'bg-primary text-white' : 'text-gray-900'}`
+                                    }>
+                                        Chapter: All
+                                    </Listbox.Option>
+                                    {chapterList.map((chapter) => (
+                                        <Listbox.Option
+                                            key={chapter.id}
+                                            value={chapter.id}
+                                            className={({ active }) =>
+                                                `cursor-pointer select-none px-4 py-2 ${active ? 'bg-primary text-white' : 'text-gray-900'}`
+                                            }
+                                        >
+                                            {chapter.name}
+                                        </Listbox.Option>
+                                    ))}
+                                </Listbox.Options>
+                            </div>
+                        </Listbox>
                     </div>
                 </div>
                 <div className="bg-heading h-20 flex items-center w-full -mt-8">
-                    <div className="mx-5 w-full flex justify-between">
-                        <select
-                            onChange={(e) => handleTeacherChange(+e.target.value)}
-                            value={selectedTeacher}
-                            className={DROPDOWN_CLASS}
-                        >
-                            {teachers.map((teacher) => (
-                                <option key={teacher.id} value={teacher.id} className="text-sm md:text-lg">
-                                    {teacher.user.first_name}
-                                </option>
-                            ))}
-                        </select>
+                    <div className="mx-5 w-full flex justify-between items-center">
+                        <Listbox value={selectedTeacher} onChange={handleTeacherChange}>
+                            <div className="relative">
+                                <Listbox.Button className={`${DROPDOWN_CLASS} pr-6`}>
+                                    <span>{teachers.find(t => t.id === selectedTeacher)?.user.first_name || 'Select Teacher'}</span>
+                                    <DropdownArrow className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" />
+                                </Listbox.Button>
+                                <Listbox.Options className="absolute mt-1 w-40 bg-white rounded-lg shadow z-10 border border-gray-300 max-h-60 overflow-auto right-0">
+                                    {teachers.map((teacher) => (
+                                        <Listbox.Option
+                                            key={teacher.id}
+                                            value={teacher.id}
+                                            className={({ active }) =>
+                                                `cursor-pointer select-none px-4 py-2 ${active ? 'bg-primary text-white' : 'text-gray-900'}`
+                                            }
+                                        >
+                                            {teacher.user.first_name}
+                                        </Listbox.Option>
+                                    ))}
+                                </Listbox.Options>
+                            </div>
+                        </Listbox>
                     </div>
                 </div>
                 {isLoading ? (
