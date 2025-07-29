@@ -115,7 +115,7 @@ const Page: React.FC = () => {
   ];
 
   return (
-    <main className="max-w-xl mx-auto bg-heading min-h-screen">
+    <main className="mx-auto bg-heading min-h-screen">
       <TopBar />
 
       {selectedLibrary !== 'NEET Content' && selectedLibrary !== 'JEE Content' && (

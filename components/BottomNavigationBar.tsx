@@ -27,7 +27,7 @@ const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
 
   return (
     <div className="relative">
-      <div className="max-w-xl mx-auto fixed bottom-[72px] left-0 right-0 bg-gray-100 border-t-2 shadow-2xl  shadow-black text-center py-2 text-xs text-gray-700 md:pb-4 md:text-lg">
+      <div className="mx-auto fixed bottom-[72px] left-0 right-0 bg-gray-100 border-t-2 shadow-2xl  shadow-black text-center py-2 text-xs text-gray-700 md:pb-4 md:text-lg">
         <div className="flex items-center justify-center gap-1 md:gap-2">
           Powered by
           <Image
@@ -38,7 +38,7 @@ const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
         </div>
       </div>
 
-      <div className="max-w-xl mx-auto fixed bottom-0 left-0 right-0 text-xs md:text-lg px-12 md:px-16 bg-white pb-4 pt-2 flex justify-between items-center">
+      <div className="mx-auto fixed bottom-0 left-0 right-0 text-xs md:text-lg px-12 md:px-16 bg-white pb-4 pt-2 flex justify-between items-center">
         <NavLink href="/library" active={isActive('/library')}>
           {isActive('/library') ? (
             <MdLibraryBooks className="h-8 w-8 fill-primary" />

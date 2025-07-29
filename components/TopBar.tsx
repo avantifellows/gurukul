@@ -71,7 +71,7 @@ const TopBar = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto text-white p-4 h-24 flex items-center justify-between bg-primary">
+    <div className="mx-auto text-white p-4 h-24 flex items-center justify-between bg-primary">
       <div className="text-lg font-semibold">
         {getRouteNameContent()}
       </div>

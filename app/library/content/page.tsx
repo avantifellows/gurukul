@@ -189,7 +189,7 @@ const ContentLibrary = () => {
 
     return (
         <>
-            <main className="max-w-xl mx-auto bg-white min-h-screen">
+            <main className="mx-auto bg-white min-h-screen">
                 <TopBar />
                 <div className="bg-heading text-primary h-20 flex flex-col">
                     <div className='flex items-center mx-4 mt-4'>

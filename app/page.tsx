@@ -365,12 +365,12 @@ export default function Home() {
   return (
     <>
       {(isLoading || authLoading) ? (
-        <div className="max-w-xl mx-auto">
+        <div className="mx-auto">
           <TopBar />
           <Loading />
         </div>
       ) : (
-        <main className="min-h-screen max-w-xl mx-auto md:mx-auto bg-heading">
+        <main className="min-h-screen mx-auto md:mx-auto bg-heading">
           <TopBar />
           {groupConfig.showLiveClasses && (
             <div>
