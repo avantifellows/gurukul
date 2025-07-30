@@ -55,6 +55,7 @@ export interface Grade {
 export interface Chapter {
   id: number;
   name: string;
+  grade_id?: number | null;
 }
 
 export interface Resource {
