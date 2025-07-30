@@ -61,7 +61,7 @@ export const getChapters = async (
     if (chapter.grade_id === gradeId) return true;
 
     // Include universal chapters (grade_id is null)
-    if (chapter.grade_id === null || chapter.grade_id === undefined) return true;
+    if (!chapter.grade_id) return true;
 
     return false;
   });
