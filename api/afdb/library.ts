@@ -57,11 +57,8 @@ export const getChapters = async (
   // 1. Chapters for the specific grade (grade_id matches)
   // 2. Universal chapters (grade_id is null)
   const filteredChapters = allChapters.filter(chapter => {
-    // Include chapters for the specific grade
-    if (chapter.grade_id === gradeId) return true;
-
-    // Include universal chapters (grade_id is null)
-    if (!chapter.grade_id) return true;
+    // Include chapters for the specific grade or universal chapters
+    if (chapter.grade_id === gradeId || !chapter.grade_id) return true;
 
     return false;
   });
