@@ -55,6 +55,7 @@ export interface Grade {
 export interface Chapter {
   id: number;
   name: string;
+  grade_id?: number | null;
 }
 
 export interface Resource {
@@ -66,6 +67,7 @@ export interface Resource {
   link: string;
   chapter_id: number;
   type: string;
+  subtype: string;
   type_params: {
     date: string,
     resource_type: string;
