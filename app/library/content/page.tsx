@@ -60,8 +60,7 @@ const ContentLibrary = () => {
     const neetSubjects = ['Physics', 'Chemistry', 'Biology'];
     const jeeSubjects = ['Physics', 'Chemistry', 'Maths'];
     const caSubjects = ['Accounting', 'Business Economics', 'Quantitative Aptitude'];
-    const clatSubjects = ['English', 'Logical Reasoning', 'Quantitative Aptitude'];
-    const prevCourseRef = useRef<string | null>(null);
+    const clatSubjects = ['English', 'Logical Reasoning', 'Legal Reasoning'];
 
     const handleTabClick = async (tabName: string) => {
         setActiveTab(tabName);
