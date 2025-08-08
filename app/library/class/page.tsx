@@ -62,8 +62,8 @@ const ClassLibrary = () => {
 
                 await fetchChapters(subjectId, gradeId);
                 const chapterData = selectedChapter
-                    ? await getClassChapters(subjectId, gradeId, selectedChapter, selectedTeacher, curriculumId || undefined)
-                    : await getClassChapters(subjectId, gradeId, undefined, selectedTeacher, curriculumId || undefined);
+                    ? await getClassChapters(subjectId, gradeId, selectedChapter, selectedTeacher, curriculumId!)
+                    : await getClassChapters(subjectId, gradeId, undefined, selectedTeacher, curriculumId!);
 
                 if (chapterData.length > 0) {
                     setChapters(chapterData);
@@ -123,7 +123,7 @@ const ClassLibrary = () => {
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
             const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
-            const resourceData = await getResourcesOfChapter(chapterId, selectedTeacher, curriculumId || undefined);
+            const resourceData = await getResourcesOfChapter(chapterId, selectedTeacher, curriculumId!);
             setResources(resourceData);
             MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER + ": " + chapterName);
         } catch (error) {
