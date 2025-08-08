@@ -123,7 +123,7 @@ const ClassLibrary = () => {
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
             const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
-            const resourceData = await getResourcesOfChapter(chapterId, selectedTeacher, curriculumId!);
+            const resourceData = await getResourcesOfChapter(chapterId, curriculumId!, selectedTeacher);
             setResources(resourceData);
             MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER + ": " + chapterName);
         } catch (error) {

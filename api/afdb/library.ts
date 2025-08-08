@@ -124,13 +124,13 @@ export const getTeachers = async (id?: number, subject_id?: number): Promise<Tea
 
 export const getResourcesOfChapter = async (
   chapterId: number,
-  teacherId?: number,
-  curriculumId?: number
+  curriculumId?: number,
+  teacherId?: number
 ): Promise<Resource[]> => {
   const queryParams = new URLSearchParams();
   if (chapterId) queryParams.append('chapter_id', chapterId.toString());
-  if (teacherId) queryParams.append('teacher_id', teacherId.toString());
   if (curriculumId) queryParams.append('curriculum_id', curriculumId.toString());
+  if (teacherId) queryParams.append('teacher_id', teacherId.toString());
 
   const chapterResources: Resource[] = await fetchWithParams('resources/curriculum', queryParams);
 
@@ -160,7 +160,7 @@ export const getClassChapters = async (
 
   const filteredChapters = await Promise.all(
     chapterData.map(async (chapter) => {
-      const chapterResources = await getResourcesOfChapter(chapter.id, teacherId, curriculumId);
+      const chapterResources = await getResourcesOfChapter(chapter.id, curriculumId, teacherId);
       if (chapterResources.length > 0) {
         return chapter;
       } else {
@@ -185,7 +185,7 @@ export const getChapterResourcesComplete = async (
   // Fetch topics and chapter resources in parallel
   const [topicData, chapterResourceData] = await Promise.all([
     getTopics([chapterId]),
-    getResourcesOfChapter(chapterId, undefined, curriculumId)
+    getResourcesOfChapter(chapterId, curriculumId)
   ]);
 
   // Fetch topic resources
