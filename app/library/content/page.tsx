@@ -6,7 +6,7 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
-import { getSubjects, getChapters, getGrades, getChapterResourcesComplete } from '../../../api/afdb/library';
+import { getSubjects, getChapters, getGrades, getChapterResourcesComplete, getCurriculumId } from '../../../api/afdb/library';
 import { Chapter, Resource, Topic } from '../../types';
 import Link from 'next/link';
 import { MdMenuBook, MdQuiz, MdPlayCircleFilled, MdInsertDriveFile } from 'react-icons/md';
@@ -126,7 +126,8 @@ const ContentLibrary = () => {
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
-            const { topics, topicResources, chapterResources } = await getChapterResourcesComplete(chapterId);
+            const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
+            const { topics, topicResources, chapterResources } = await getChapterResourcesComplete(chapterId, curriculumId!);
             setTopics(topics);
             setResources(topicResources);
             setChapterResources(chapterResources);

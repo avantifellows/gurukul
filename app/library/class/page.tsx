@@ -6,7 +6,7 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
-import { getSubjects, getClassChapters, getGrades, getResourcesOfChapter, getTeachers } from '../../../api/afdb/library';
+import { getSubjects, getClassChapters, getGrades, getResourcesOfChapter, getTeachers, getCurriculumId } from '../../../api/afdb/library';
 import { Chapter, Resource, Teacher } from '../../types';
 import { useEffect } from 'react';
 import Link from 'next/link';
@@ -50,6 +50,7 @@ const ClassLibrary = () => {
         try {
             const subjectData = await getSubjects(tabName);
             const gradeData = await getGrades(selectedGrade);
+            const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
             const teacherData = await getTeachers(undefined, subjectData[0].id);
             setTeachers(teacherData);
             if (teacherData.length > 0 && selectedTeacher === undefined) {
@@ -61,8 +62,8 @@ const ClassLibrary = () => {
 
                 await fetchChapters(subjectId, gradeId);
                 const chapterData = selectedChapter
-                    ? await getClassChapters(subjectId, gradeId, selectedChapter, selectedTeacher)
-                    : await getClassChapters(subjectId, gradeId, undefined, selectedTeacher);
+                    ? await getClassChapters(subjectId, gradeId, selectedChapter, selectedTeacher, curriculumId || undefined)
+                    : await getClassChapters(subjectId, gradeId, undefined, selectedTeacher, curriculumId || undefined);
 
                 if (chapterData.length > 0) {
                     setChapters(chapterData);
@@ -121,7 +122,8 @@ const ClassLibrary = () => {
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
-            const resourceData = await getResourcesOfChapter(chapterId, selectedTeacher);
+            const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
+            const resourceData = await getResourcesOfChapter(chapterId, selectedTeacher, curriculumId || undefined);
             setResources(resourceData);
             MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER + ": " + chapterName);
         } catch (error) {
