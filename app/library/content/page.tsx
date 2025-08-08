@@ -19,6 +19,7 @@ import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
 import { Listbox } from '@headlessui/react';
 import { IoIosArrowDown as DropdownArrow } from 'react-icons/io';
+import { getResourceName, getChapterName, getTopicName } from '@/utils/resourceUtils';
 
 // Helper to get icon, prefix, and color for a resource
 const getResourceIconAndPrefix = (resource: Resource) => {
@@ -256,7 +257,7 @@ const ContentLibrary = () => {
                                                 `cursor-pointer select-none px-4 py-2 ${active ? 'bg-primary text-white' : 'text-gray-900'}`
                                             }
                                         >
-                                            {chapter.name}
+                                            {getChapterName(chapter)}
                                         </Listbox.Option>
                                     ))}
                                 </Listbox.Options>
@@ -275,9 +276,9 @@ const ContentLibrary = () => {
                                 <div key={chapter.id}>
                                     <div
                                         className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
-                                        onClick={() => toggleChapterExpansion(chapter.id, chapter.name)}
+                                        onClick={() => toggleChapterExpansion(chapter.id, getChapterName(chapter))}
                                     >
-                                        <div className="flex-1 min-w-0 mr-4 break-words">{chapter.name}</div>
+                                        <div className="flex-1 min-w-0 mr-4 break-words">{getChapterName(chapter)}</div>
                                         <div className="w-8 flex justify-center">
                                             {expandedChapters[chapter.id] ? (
                                                 <CollapseIcon className="w-6 h-6" />
@@ -301,9 +302,9 @@ const ContentLibrary = () => {
                                                     }).map((resource) => {
                                                         const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
                                                         return (
-                                                            <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary pl-4 flex items-center">
+                                                            <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center">
                                                                 <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                    {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {resource.name}
+                                                                    {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {getResourceName(resource)}
                                                                 </Link>
                                                             </li>
                                                         );
@@ -322,14 +323,14 @@ const ContentLibrary = () => {
 
                                                                 return (
                                                                     <div key={topic.id} className="bg-card rounded-lg shadow-lg shadow-slate-400 p-4 mx-2 mt-2 my-8 text-black font-semibold">
-                                                                        <h3>{topic.name}</h3>
+                                                                        <h3>{getTopicName(topic)}</h3>
                                                                         <ul className="text-primary m-2 font-normal">
                                                                             {videos.map((resource) => {
                                                                                 const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
                                                                                 return (
-                                                                                    <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary pl-4 flex items-center">
+                                                                                    <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center">
                                                                                         <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                                            {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {resource.name}
+                                                                                            {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {getResourceName(resource)}
                                                                                         </Link>
                                                                                     </li>
                                                                                 );

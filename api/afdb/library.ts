@@ -82,8 +82,8 @@ export const getResourcesWithSource = async (topicIds: number[]): Promise<Resour
     const chapterResources: Resource[] = await fetchWithParams('resource', queryParams);
 
     const resourcesWithSource = chapterResources.map((resource) => {
-      if (resource.source && resource.source.link) {
-        resource.link = resource.source.link;
+      if (resource.type_params && resource.type_params.src_link) {
+        resource.link = resource.type_params.src_link;
       }
       return resource;
     });
@@ -114,8 +114,8 @@ export const getResourcesOfChapter = async (
   const chapterResources: Resource[] = await fetchWithParams('resource', queryParams);
 
   const resourcesWithSource = chapterResources.map((resource) => {
-    if (resource.source && resource.source.link) {
-      resource.link = resource.source.link;
+    if (resource.type_params && resource.type_params.src_link) {
+      resource.link = resource.type_params.src_link;
     }
     return resource;
   });

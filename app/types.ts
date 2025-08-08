@@ -44,7 +44,10 @@ export interface Curriculum {
 
 export interface Subject {
   id: number;
-  name: string;
+  name: Array<{
+    lang_code: string;
+    resource: string;
+  }>;
 }
 
 export interface Grade {
@@ -54,13 +57,19 @@ export interface Grade {
 
 export interface Chapter {
   id: number;
-  name: string;
+  name: Array<{
+    lang_code: string;
+    chapter: string;
+  }>;
   grade_id?: number | null;
 }
 
 export interface Resource {
   id: number;
-  name: string;
+  name: Array<{
+    lang_code: string;
+    resource: string;
+  }>;
   topic_id: number;
   source_id: number;
   tag_ids: number[];
@@ -71,6 +80,7 @@ export interface Resource {
   type_params: {
     date: string,
     resource_type: string;
+    src_link?: string;
   },
   source: {
     link: string;
@@ -79,7 +89,10 @@ export interface Resource {
 
 export interface Topic {
   id: number;
-  name: string;
+  name: Array<{
+    lang_code: string;
+    resource: string;
+  }>;
   chapter_id: number;
 }
 

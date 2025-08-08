@@ -18,6 +18,7 @@ import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
 import { Listbox } from '@headlessui/react';
 import { IoIosArrowDown as DropdownArrow } from 'react-icons/io';
+import { getResourceName, getChapterName } from '@/utils/resourceUtils';
 
 const ClassLibrary = () => {
     const [activeTab, setActiveTab] = useState('');
@@ -244,7 +245,7 @@ const ClassLibrary = () => {
                                                 `cursor-pointer select-none px-4 py-2 ${active ? 'bg-primary text-white' : 'text-gray-900'}`
                                             }
                                         >
-                                            {chapter.name}
+                                            {getChapterName(chapter)}
                                         </Listbox.Option>
                                     ))}
                                 </Listbox.Options>
@@ -285,9 +286,9 @@ const ClassLibrary = () => {
                             <div key={chapter.id} className="mx-5">
                                 <div
                                     className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
-                                    onClick={() => toggleChapterExpansion(chapter.id, chapter.name)}
+                                    onClick={() => toggleChapterExpansion(chapter.id, getChapterName(chapter))}
                                 >
-                                    <div className="w-52">{chapter.name}</div>
+                                    <div className="w-52">{getChapterName(chapter)}</div>
                                     <div className="w-8 flex justify-center">
                                         {expandedChapters[chapter.id] ? (
                                             <CollapseIcon className="w-6 h-6" />
@@ -305,9 +306,9 @@ const ClassLibrary = () => {
                                                 {resources
                                                     .filter((resource) => resource.chapter_id === chapter.id && resource.link && resource.type === 'video' && resource.subtype === 'classRecording')
                                                     .map((resource) => (
-                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary pl-4 flex items-center">
+                                                        <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center">
                                                             <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                <MdPlayCircleFilled className="w-10 h-10 mr-2" color="#ef4444" /> {resource.name} {resource.type_params?.date ? `- ${resource.type_params.date}` : ''}
+                                                                <MdPlayCircleFilled className="w-10 h-10 mr-2" color="#ef4444" /> {getResourceName(resource)} {resource.type_params?.date ? `- ${resource.type_params.date}` : ''}
                                                             </Link>
                                                         </li>
                                                     ))}
