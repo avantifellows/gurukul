@@ -380,6 +380,7 @@ export default function Home() {
           )}
 
           <div className="pb-40">
+            {groupConfig.showTests && renderTestSection(groupConfig.testsSectionTitle || "Tests", [...nonChapterTests, ...chapterTests])}
             {/* Practice Tests Accordion for all groups */}
             {groupConfig.showPracticeTests && (
               <div>
@@ -436,7 +437,6 @@ export default function Home() {
                 </div>
               </div>
             )}
-            {groupConfig.showTests && renderTestSection("Tests", [...nonChapterTests, ...chapterTests])}
             {groupConfig.showHomework && renderTestSection("Homework", homework)}
           </div>
           <BottomNavigationBar />

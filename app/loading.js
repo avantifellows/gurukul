@@ -141,7 +141,7 @@ export default function Loading({ showReportsOnly = false, showLibraryOnly = fal
 
                             {/* Tests Shimmer - only show if enabled in groupConfig */}
                             {groupConfig.showTests && (
-                                <SectionShimmer title="Tests" cardCount={3} isTestSection={true} />
+                                <SectionShimmer title={groupConfig.testsSectionTitle || 'Tests'} cardCount={3} isTestSection={true} />
                             )}
 
                             {/* Practice Tests Shimmer - only show if enabled in groupConfig */}
