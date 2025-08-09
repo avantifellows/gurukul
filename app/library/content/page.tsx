@@ -241,7 +241,7 @@ const ContentLibrary = () => {
                         <Listbox value={selectedChapter} onChange={setSelectedChapter}>
                             <div className="relative">
                                 <Listbox.Button className={`${DROPDOWN_CLASS} truncate pr-6 px-3`}>
-                                    <span>{selectedChapter ? `${chapterList.find(c => c.id === selectedChapter)?.name}` : 'Chapter: All'}</span>
+                                    <span>{selectedChapter ? getChapterName(chapterList.find(c => c.id === selectedChapter)!) : 'Chapter: All'}</span>
                                     <DropdownArrow className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" />
                                 </Listbox.Button>
                                 <Listbox.Options className="absolute mt-1 w-60 bg-white rounded-lg shadow z-10 border border-gray-300 max-h-60 overflow-auto right-0">

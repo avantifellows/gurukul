@@ -8,14 +8,16 @@ import { RiBarChart2Fill, RiBarChart2Line } from 'react-icons/ri';
 import { IoHome, IoHomeOutline } from 'react-icons/io5';
 import CapgeminiLogo from '../assets/capgemini_logo.png'
 import { BottomNavigationBarProps } from '@/app/types';
+import { getGroupConfig } from '@/config/groupConfig';
 import { useAuth } from '@/services/AuthContext';
 
 const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
   const pathname = usePathname();
   const { group } = useAuth();
+  const groupConfig = getGroupConfig(group || 'defaultGroup');
 
-  // Determine the home label based on group or provided prop
-  const displayHomeLabel = homeLabel || (group === 'EnableStudents' ? 'Practice test' : 'Home');
+  // Determine the home label from config or provided prop
+  const displayHomeLabel = homeLabel || groupConfig.homeTabLabel || 'Home';
 
   const isActive = (path: string) => {
     if (path === '/') {

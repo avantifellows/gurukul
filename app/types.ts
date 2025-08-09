@@ -185,6 +185,8 @@ export interface GroupConfig {
   showHomework: boolean;
   showContentLibrary: boolean;
   showClassLibrary: boolean;
+  testsSectionTitle?: string;
+  homeTabLabel?: string;
 }
 
 export type GroupConfigurations = {
