@@ -173,7 +173,7 @@ export const getChapterResourcesComplete = async (
   // Fetch topic resources
   const topicIds = topicData.map((topic) => topic.id);
   const topicResourceData = topicIds.length > 0
-    ? (await Promise.all(topicIds.map((id) => getResourcesOfChapter(undefined, curriculumId, undefined, id)))).flat()
+    ? (await Promise.all(topicIds.map((id) => getResourcesOfChapter(chapterId, curriculumId, undefined, id)))).flat()
     : [];
 
   return {
