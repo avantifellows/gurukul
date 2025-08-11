@@ -27,7 +27,6 @@ export const getCurriculum = async (curriculumName: string): Promise<Curriculum[
   return fetchData(url);
 };
 
-// Use CURRICULUM_NAMES for mapping
 const courseToCurriculum = {
   'JEE Content': CURRICULUM_NAMES.JEE,
   'NEET Content': CURRICULUM_NAMES.NEET,
