@@ -27,6 +27,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [group, setGroup] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    const redirectToPortal = (targetGroup?: string) => {
+        const redirectGroup = targetGroup || group || 'DelhiStudents';
+        router.push(`${api.portal.frontend.baseUrl}/?group=${redirectGroup}&platform=gurukul`);
+    };
+
     useEffect(() => {
         async function checkToken() {
             try {
@@ -46,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 } else {
                     setLoggedIn(false);
                     setUserId(null);
-                    router.push(`${api.portal.frontend.baseUrl}/?group=DelhiStudents&platform=gurukul`);
+                    redirectToPortal();
                 }
             } catch (error) {
                 console.error('Error verifying token:', error);
@@ -67,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoggedIn(false);
         setUserId(null);
         setUser(null);
-        router.push(`${api.portal.frontend.baseUrl}/?group=${group}&platform=gurukul`);
+        redirectToPortal();
     };
 
     return (
