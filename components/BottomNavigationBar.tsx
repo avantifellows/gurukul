@@ -49,14 +49,16 @@ const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
           )}
           Library
         </NavLink>
-        <NavLink href="/" active={isActive('/')}>
-          {isActive('/') ? (
-            <IoHome className="h-8 w-8 fill-primary" />
-          ) : (
-            <IoHomeOutline className="h-8 w-8" />
-          )}
-          {displayHomeLabel}
-        </NavLink>
+        {groupConfig.showHomeTab !== false && (
+          <NavLink href="/" active={isActive('/')}>
+            {isActive('/') ? (
+              <IoHome className="h-8 w-8 fill-primary" />
+            ) : (
+              <IoHomeOutline className="h-8 w-8" />
+            )}
+            {displayHomeLabel}
+          </NavLink>
+        )}
         <NavLink href="/reports" active={isActive('/reports')}>
           {isActive('/reports') ? (
             <RiBarChart2Fill className="h-8 w-8 fill-primary" />

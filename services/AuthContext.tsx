@@ -2,10 +2,11 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { verifyToken } from '@/services/validation';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { AuthContextProps, User } from '../app/types';
 import { api } from '@/services/url';
 import { getUserName } from '@/api/afdb/userName';
+import { getGroupConfig } from '@/config/groupConfig';
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
@@ -19,6 +20,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
+    const pathname = usePathname();
     const [loggedIn, setLoggedIn] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
@@ -36,6 +38,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setGroup(userGroup);
                     const userData = await getUserName(result.data.id, userGroup);
                     setUser(userData);
+                    // Redirect users to library based on group configuration
+                    const config = getGroupConfig(userGroup);
+                    if (pathname === '/' && config.showHomeTab === false) {
+                        router.replace('/library');
+                    }
                 } else {
                     setLoggedIn(false);
                     setUserId(null);

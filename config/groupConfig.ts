@@ -21,6 +21,17 @@ const groupConfig: GroupConfigurations = {
         testsSectionTitle: 'Scheduled Tests',
         homeTabLabel: 'Tests',
     },
+    EnableSchools: {
+        showLiveClasses: false,
+        showTests: false,
+        showPracticeTests: false,
+        showHomework: false,
+        showContentLibrary: true,
+        showClassLibrary: false,
+        testsSectionTitle: 'Tests',
+        homeTabLabel: 'Home',
+        showHomeTab: false,
+    },
     DelhiStudents: {
         showLiveClasses: true,
         showTests: true,
