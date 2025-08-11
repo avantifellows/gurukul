@@ -53,5 +53,5 @@ export const getSubjectName = (subject: Subject): string => {
  * Prioritizes English names, falls back to first available name
  */
 export const getTopicName = (topic: Topic): string => {
-    return getNameFromArray(topic, 'resource', 'Untitled Topic');
+    return getNameFromArray(topic, 'topic', 'Untitled Topic');
 };
