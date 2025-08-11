@@ -94,8 +94,6 @@ export const getTopics = async (chapterIds: number[]): Promise<Topic[]> => {
   return topicResponses.flat();
 };
 
-// Unified resource fetcher: supports chapter resources, and topic resources (by passing topicId)
-
 export const getTeachers = async (id?: number, subject_id?: number): Promise<Teacher[]> => {
   const queryParams = new URLSearchParams();
   if (id) queryParams.append('id', id.toString());
