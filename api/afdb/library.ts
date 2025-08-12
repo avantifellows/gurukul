@@ -2,6 +2,7 @@
 
 import { Curriculum, Subject, Grade, Chapter, Resource, Topic, Teacher } from '../../app/types';
 import getFetchConfig from '../fetchConfig';
+import { CURRICULUM_NAMES } from '@/constants/config';
 
 const baseUrl = process.env.AF_DB_SERVICE_URL;
 const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
@@ -24,6 +25,22 @@ const fetchWithParams = async (endpoint: string, queryParams: URLSearchParams) =
 export const getCurriculum = async (curriculumName: string): Promise<Curriculum[]> => {
   const url = `${baseUrl}/curriculum?name=${encodeURIComponent(curriculumName)}`;
   return fetchData(url);
+};
+
+const courseToCurriculum = {
+  'JEE Content': CURRICULUM_NAMES.JEE,
+  'NEET Content': CURRICULUM_NAMES.NEET,
+  'CA Content': CURRICULUM_NAMES.CA,
+  'CLAT Content': CURRICULUM_NAMES.CLAT,
+};
+
+type CourseName = keyof typeof courseToCurriculum;
+
+export const getCurriculumId = async (courseName: string): Promise<number | null> => {
+  const curriculumName = courseToCurriculum[courseName as CourseName];
+  if (!curriculumName) return null;
+  const curriculum = await getCurriculum(curriculumName);
+  return curriculum.length > 0 ? curriculum[0].id : null;
 };
 
 export const getSubjects = async (subjectName: string): Promise<Subject[]> => {
@@ -76,25 +93,6 @@ export const getTopics = async (chapterIds: number[]): Promise<Topic[]> => {
   return topicResponses.flat();
 };
 
-export const getResourcesWithSource = async (topicIds: number[]): Promise<Resource[]> => {
-  const resourcePromises = topicIds.map(async (topicId) => {
-    const queryParams = new URLSearchParams({ topic_id: topicId.toString() });
-    const chapterResources: Resource[] = await fetchWithParams('resource', queryParams);
-
-    const resourcesWithSource = chapterResources.map((resource) => {
-      if (resource.source && resource.source.link) {
-        resource.link = resource.source.link;
-      }
-      return resource;
-    });
-
-    return resourcesWithSource;
-  });
-
-  const results = await Promise.all(resourcePromises);
-  return results.flat();
-};
-
 export const getTeachers = async (id?: number, subject_id?: number): Promise<Teacher[]> => {
   const queryParams = new URLSearchParams();
   if (id) queryParams.append('id', id.toString());
@@ -104,18 +102,22 @@ export const getTeachers = async (id?: number, subject_id?: number): Promise<Tea
 };
 
 export const getResourcesOfChapter = async (
-  chapterId: number,
-  teacherId?: number
+  chapterId?: number,
+  curriculumId?: number,
+  teacherId?: number,
+  topicId?: number
 ): Promise<Resource[]> => {
   const queryParams = new URLSearchParams();
   if (chapterId) queryParams.append('chapter_id', chapterId.toString());
+  if (curriculumId) queryParams.append('curriculum_id', curriculumId.toString());
   if (teacherId) queryParams.append('teacher_id', teacherId.toString());
+  if (topicId) queryParams.append('topic_id', topicId.toString());
 
-  const chapterResources: Resource[] = await fetchWithParams('resource', queryParams);
+  const chapterResources: Resource[] = await fetchWithParams('resources/curriculum', queryParams);
 
   const resourcesWithSource = chapterResources.map((resource) => {
-    if (resource.source && resource.source.link) {
-      resource.link = resource.source.link;
+    if (resource.type_params && resource.type_params.src_link) {
+      resource.link = resource.type_params.src_link;
     }
     return resource;
   });
@@ -127,7 +129,8 @@ export const getClassChapters = async (
   subjectId?: number,
   gradeId?: number,
   id?: number,
-  teacherId?: number
+  teacherId?: number,
+  curriculumId?: number
 ): Promise<Chapter[]> => {
   const queryParams = new URLSearchParams();
   if (id) queryParams.append('id', id.toString());
@@ -138,7 +141,7 @@ export const getClassChapters = async (
 
   const filteredChapters = await Promise.all(
     chapterData.map(async (chapter) => {
-      const chapterResources = await getResourcesOfChapter(chapter.id, teacherId);
+      const chapterResources = await getResourcesOfChapter(chapter.id, curriculumId, teacherId);
       if (chapterResources.length > 0) {
         return chapter;
       } else {
@@ -152,7 +155,10 @@ export const getClassChapters = async (
   return validChapters;
 };
 
-export const getChapterResourcesComplete = async (chapterId: number): Promise<{
+export const getChapterResourcesComplete = async (
+  chapterId: number,
+  curriculumId?: number
+): Promise<{
   topics: Topic[],
   topicResources: Resource[],
   chapterResources: Resource[]
@@ -160,12 +166,14 @@ export const getChapterResourcesComplete = async (chapterId: number): Promise<{
   // Fetch topics and chapter resources in parallel
   const [topicData, chapterResourceData] = await Promise.all([
     getTopics([chapterId]),
-    getResourcesOfChapter(chapterId)
+    getResourcesOfChapter(chapterId, curriculumId)
   ]);
 
   // Fetch topic resources
   const topicIds = topicData.map((topic) => topic.id);
-  const topicResourceData = topicIds.length > 0 ? await getResourcesWithSource(topicIds) : [];
+  const topicResourceData = topicIds.length > 0
+    ? (await Promise.all(topicIds.map((id) => getResourcesOfChapter(chapterId, curriculumId, undefined, id)))).flat()
+    : [];
 
   return {
     topics: topicData,

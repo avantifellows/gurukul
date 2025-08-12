@@ -2,10 +2,11 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { verifyToken } from '@/services/validation';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { AuthContextProps, User } from '../app/types';
 import { api } from '@/services/url';
 import { getUserName } from '@/api/afdb/userName';
+import { getGroupConfig } from '@/config/groupConfig';
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
@@ -19,11 +20,17 @@ export function useAuth() {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
+    const pathname = usePathname();
     const [loggedIn, setLoggedIn] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [group, setGroup] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    const redirectToPortal = (targetGroup?: string) => {
+        const redirectGroup = targetGroup || group || 'DelhiStudents';
+        router.push(`${api.portal.frontend.baseUrl}/?group=${redirectGroup}&platform=gurukul`);
+    };
 
     useEffect(() => {
         async function checkToken() {
@@ -36,10 +43,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setGroup(userGroup);
                     const userData = await getUserName(result.data.id, userGroup);
                     setUser(userData);
+                    // Redirect users to library based on group configuration
+                    const config = getGroupConfig(userGroup);
+                    if (pathname === '/' && config.showHomeTab === false) {
+                        router.replace('/library');
+                    }
                 } else {
                     setLoggedIn(false);
                     setUserId(null);
-                    router.push(`${api.portal.frontend.baseUrl}/?group=DelhiStudents&platform=gurukul`);
+                    redirectToPortal();
                 }
             } catch (error) {
                 console.error('Error verifying token:', error);
@@ -60,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoggedIn(false);
         setUserId(null);
         setUser(null);
-        router.push(`${api.portal.frontend.baseUrl}/?group=${group}&platform=gurukul`);
+        redirectToPortal();
     };
 
     return (

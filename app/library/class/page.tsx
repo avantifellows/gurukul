@@ -6,7 +6,7 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
-import { getSubjects, getClassChapters, getGrades, getResourcesOfChapter, getTeachers } from '../../../api/afdb/library';
+import { getSubjects, getClassChapters, getGrades, getResourcesOfChapter, getTeachers, getCurriculumId } from '../../../api/afdb/library';
 import { Chapter, Resource, Teacher } from '../../types';
 import { useEffect } from 'react';
 import Link from 'next/link';
@@ -18,6 +18,7 @@ import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
 import { Listbox } from '@headlessui/react';
 import { IoIosArrowDown as DropdownArrow } from 'react-icons/io';
+import { getResourceName, getChapterName } from '@/utils/resourceUtils';
 
 const ClassLibrary = () => {
     const [activeTab, setActiveTab] = useState('');
@@ -49,6 +50,7 @@ const ClassLibrary = () => {
         try {
             const subjectData = await getSubjects(tabName);
             const gradeData = await getGrades(selectedGrade);
+            const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
             const teacherData = await getTeachers(undefined, subjectData[0].id);
             setTeachers(teacherData);
             if (teacherData.length > 0 && selectedTeacher === undefined) {
@@ -60,8 +62,8 @@ const ClassLibrary = () => {
 
                 await fetchChapters(subjectId, gradeId);
                 const chapterData = selectedChapter
-                    ? await getClassChapters(subjectId, gradeId, selectedChapter, selectedTeacher)
-                    : await getClassChapters(subjectId, gradeId, undefined, selectedTeacher);
+                    ? await getClassChapters(subjectId, gradeId, selectedChapter, selectedTeacher, curriculumId!)
+                    : await getClassChapters(subjectId, gradeId, undefined, selectedTeacher, curriculumId!);
 
                 if (chapterData.length > 0) {
                     setChapters(chapterData);
@@ -120,7 +122,8 @@ const ClassLibrary = () => {
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
-            const resourceData = await getResourcesOfChapter(chapterId, selectedTeacher);
+            const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
+            const resourceData = await getResourcesOfChapter(chapterId, curriculumId!, selectedTeacher);
             setResources(resourceData);
             MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER + ": " + chapterName);
         } catch (error) {
@@ -227,7 +230,7 @@ const ClassLibrary = () => {
                         <Listbox value={selectedChapter} onChange={setSelectedChapter}>
                             <div className="relative">
                                 <Listbox.Button className={`${DROPDOWN_CLASS} truncate pr-6 px-3`}>
-                                    <span>{selectedChapter ? `${chapterList.find(c => c.id === selectedChapter)?.name}` : 'Chapter: All'}</span>
+                                    <span>{selectedChapter ? getChapterName(chapterList.find(c => c.id === selectedChapter)!) : 'Chapter: All'}</span>
                                     <DropdownArrow className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" />
                                 </Listbox.Button>
                                 <Listbox.Options className="absolute mt-1 w-60 bg-white rounded-lg shadow z-10 border border-gray-300 max-h-60 overflow-auto right-0">
@@ -244,7 +247,7 @@ const ClassLibrary = () => {
                                                 `cursor-pointer select-none px-4 py-2 ${active ? 'bg-primary text-white' : 'text-gray-900'}`
                                             }
                                         >
-                                            {chapter.name}
+                                            {getChapterName(chapter)}
                                         </Listbox.Option>
                                     ))}
                                 </Listbox.Options>
@@ -285,9 +288,9 @@ const ClassLibrary = () => {
                             <div key={chapter.id} className="mx-5">
                                 <div
                                     className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
-                                    onClick={() => toggleChapterExpansion(chapter.id, chapter.name)}
+                                    onClick={() => toggleChapterExpansion(chapter.id, getChapterName(chapter))}
                                 >
-                                    <div className="w-52">{chapter.name}</div>
+                                    <div className="w-52">{getChapterName(chapter)}</div>
                                     <div className="w-8 flex justify-center">
                                         {expandedChapters[chapter.id] ? (
                                             <CollapseIcon className="w-6 h-6" />
@@ -305,9 +308,9 @@ const ClassLibrary = () => {
                                                 {resources
                                                     .filter((resource) => resource.chapter_id === chapter.id && resource.link && resource.type === 'video' && resource.subtype === 'classRecording')
                                                     .map((resource) => (
-                                                        <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary pl-4 flex items-center">
+                                                        <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center">
                                                             <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                <MdPlayCircleFilled className="w-10 h-10 mr-2" color="#ef4444" /> {resource.name} {resource.type_params?.date ? `- ${resource.type_params.date}` : ''}
+                                                                <MdPlayCircleFilled className="w-10 h-10 mr-2" color="#ef4444" /> {getResourceName(resource)} {resource.type_params?.date ? `- ${resource.type_params.date}` : ''}
                                                             </Link>
                                                         </li>
                                                     ))}
