@@ -1,6 +1,8 @@
 export const CURRICULUM_NAMES = {
-    ALC: 'ALC' as const,
-    SANKALP: 'Sankalp' as const,
+    JEE: 'JEE Mains',
+    NEET: 'NEET',
+    CA: 'CA',
+    CLAT: 'CLAT',
 } as const;
 
 export const COURSES = {

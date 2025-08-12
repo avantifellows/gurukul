@@ -67,16 +67,16 @@ const Page: React.FC = () => {
 
   const contentCourses = [
     {
-      value: 'NEET Content',
-      title: 'NEET course',
-      description: 'Browse all the NEET courses',
-      icon: <Image src={StethoscopeIcon} alt="Stethoscope Icon" className="w-10 h-10" />,
-    },
-    {
       value: 'JEE Content',
       title: 'JEE Mains course',
       description: 'Browse all the JEE courses',
       icon: <Image src={BlueprintIcon} alt="Blueprint Icon" className="w-10 h-10" />,
+    },
+    {
+      value: 'NEET Content',
+      title: 'NEET course',
+      description: 'Browse all the NEET courses',
+      icon: <Image src={StethoscopeIcon} alt="Stethoscope Icon" className="w-10 h-10" />,
     },
     // Temporarily commenting out JEE Advanced Content until we get the data
     // {
@@ -101,16 +101,16 @@ const Page: React.FC = () => {
 
   const classCourses = [
     {
-      value: 'NEET Classes',
-      title: 'NEET classes',
-      description: 'Browse all the NEET classes',
-      icon: <Image src={StethoscopeIcon} alt="Stethoscope Icon" className="w-10 h-10" />,
-    },
-    {
       value: 'JEE Classes',
       title: 'JEE Mains classes',
       description: 'Browse all the JEE classes',
       icon: <Image src={BlueprintIcon} alt="Blueprint Icon" className="w-10 h-10" />,
+    },
+    {
+      value: 'NEET Classes',
+      title: 'NEET classes',
+      description: 'Browse all the NEET classes',
+      icon: <Image src={StethoscopeIcon} alt="Stethoscope Icon" className="w-10 h-10" />,
     },
   ];
 

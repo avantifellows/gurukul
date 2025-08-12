@@ -6,7 +6,7 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Loading from '../../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
-import { getSubjects, getChapters, getGrades, getChapterResourcesComplete } from '../../../api/afdb/library';
+import { getSubjects, getChapters, getGrades, getChapterResourcesComplete, getCurriculumId } from '../../../api/afdb/library';
 import { Chapter, Resource, Topic } from '../../types';
 import Link from 'next/link';
 import { MdMenuBook, MdQuiz, MdPlayCircleFilled, MdInsertDriveFile } from 'react-icons/md';
@@ -19,6 +19,7 @@ import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
 import { Listbox } from '@headlessui/react';
 import { IoIosArrowDown as DropdownArrow } from 'react-icons/io';
+import { getResourceName, getChapterName, getTopicName } from '@/utils/resourceUtils';
 
 // Helper to get icon, prefix, and color for a resource
 const getResourceIconAndPrefix = (resource: Resource) => {
@@ -125,7 +126,8 @@ const ContentLibrary = () => {
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
-            const { topics, topicResources, chapterResources } = await getChapterResourcesComplete(chapterId);
+            const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
+            const { topics, topicResources, chapterResources } = await getChapterResourcesComplete(chapterId, curriculumId!);
             setTopics(topics);
             setResources(topicResources);
             setChapterResources(chapterResources);
@@ -239,7 +241,7 @@ const ContentLibrary = () => {
                         <Listbox value={selectedChapter} onChange={setSelectedChapter}>
                             <div className="relative">
                                 <Listbox.Button className={`${DROPDOWN_CLASS} truncate pr-6 px-3`}>
-                                    <span>{selectedChapter ? `${chapterList.find(c => c.id === selectedChapter)?.name}` : 'Chapter: All'}</span>
+                                    <span>{selectedChapter ? getChapterName(chapterList.find(c => c.id === selectedChapter)!) : 'Chapter: All'}</span>
                                     <DropdownArrow className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" />
                                 </Listbox.Button>
                                 <Listbox.Options className="absolute mt-1 w-60 bg-white rounded-lg shadow z-10 border border-gray-300 max-h-60 overflow-auto right-0">
@@ -256,7 +258,7 @@ const ContentLibrary = () => {
                                                 `cursor-pointer select-none px-4 py-2 ${active ? 'bg-primary text-white' : 'text-gray-900'}`
                                             }
                                         >
-                                            {chapter.name}
+                                            {getChapterName(chapter)}
                                         </Listbox.Option>
                                     ))}
                                 </Listbox.Options>
@@ -275,9 +277,9 @@ const ContentLibrary = () => {
                                 <div key={chapter.id}>
                                     <div
                                         className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
-                                        onClick={() => toggleChapterExpansion(chapter.id, chapter.name)}
+                                        onClick={() => toggleChapterExpansion(chapter.id, getChapterName(chapter))}
                                     >
-                                        <div className="flex-1 min-w-0 mr-4 break-words">{chapter.name}</div>
+                                        <div className="flex-1 min-w-0 mr-4 break-words">{getChapterName(chapter)}</div>
                                         <div className="w-8 flex justify-center">
                                             {expandedChapters[chapter.id] ? (
                                                 <CollapseIcon className="w-6 h-6" />
@@ -301,9 +303,9 @@ const ContentLibrary = () => {
                                                     }).map((resource) => {
                                                         const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
                                                         return (
-                                                            <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary pl-4 flex items-center">
+                                                            <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center">
                                                                 <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                    {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {resource.name}
+                                                                    {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {getResourceName(resource)}
                                                                 </Link>
                                                             </li>
                                                         );
@@ -316,20 +318,19 @@ const ContentLibrary = () => {
                                                             .map((topic) => {
                                                                 const videos = resources.filter(
                                                                     (resource) => resource.topic_id === topic.id &&
-                                                                        resource.link &&
-                                                                        !(resource.type === 'document' && resource.subtype === 'Module')
+                                                                        resource.link
                                                                 );
 
                                                                 return (
                                                                     <div key={topic.id} className="bg-card rounded-lg shadow-lg shadow-slate-400 p-4 mx-2 mt-2 my-8 text-black font-semibold">
-                                                                        <h3>{topic.name}</h3>
+                                                                        <h3>{getTopicName(topic)}</h3>
                                                                         <ul className="text-primary m-2 font-normal">
                                                                             {videos.map((resource) => {
                                                                                 const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
                                                                                 return (
-                                                                                    <li key={resource.id} onClick={() => handleResourceTracking(resource.name)} className="py-2 text-primary pl-4 flex items-center">
+                                                                                    <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary flex items-center">
                                                                                         <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                                            {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {resource.name}
+                                                                                            {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {getResourceName(resource)}
                                                                                         </Link>
                                                                                     </li>
                                                                                 );

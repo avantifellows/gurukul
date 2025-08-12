@@ -8,6 +8,8 @@ const groupConfig: GroupConfigurations = {
         showHomework: false,
         showContentLibrary: true,
         showClassLibrary: false,
+        testsSectionTitle: 'Tests',
+        homeTabLabel: 'Home',
     },
     EnableStudents: {
         showLiveClasses: false,
@@ -15,7 +17,20 @@ const groupConfig: GroupConfigurations = {
         showPracticeTests: true,
         showHomework: false,
         showContentLibrary: true,
-        showClassLibrary: false
+        showClassLibrary: false,
+        testsSectionTitle: 'NVS Live Test',
+        homeTabLabel: 'Tests',
+    },
+    EnableSchools: {
+        showLiveClasses: false,
+        showTests: false,
+        showPracticeTests: false,
+        showHomework: false,
+        showContentLibrary: true,
+        showClassLibrary: false,
+        testsSectionTitle: 'Tests',
+        homeTabLabel: 'Home',
+        showHomeTab: false,
     },
     DelhiStudents: {
         showLiveClasses: true,
@@ -24,6 +39,8 @@ const groupConfig: GroupConfigurations = {
         showHomework: true,
         showContentLibrary: true,
         showClassLibrary: false,
+        testsSectionTitle: 'Tests',
+        homeTabLabel: 'Home',
     },
     defaultGroup: {
         showLiveClasses: true,
@@ -32,6 +49,8 @@ const groupConfig: GroupConfigurations = {
         showHomework: true,
         showContentLibrary: true,
         showClassLibrary: false,
+        testsSectionTitle: 'Tests',
+        homeTabLabel: 'Home',
     },
     ChhattisgarhStudents: {
         showLiveClasses: false,
@@ -40,6 +59,8 @@ const groupConfig: GroupConfigurations = {
         showHomework: false,
         showContentLibrary: true,
         showClassLibrary: false,
+        testsSectionTitle: 'Tests',
+        homeTabLabel: 'Home',
     },
 };
 
