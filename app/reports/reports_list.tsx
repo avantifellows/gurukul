@@ -6,10 +6,14 @@ import { ReportsListProps } from "../types";
 import { MixpanelTracking } from "@/services/mixpanel";
 import { MIXPANEL_EVENT } from "@/constants/config";
 import { formatDate } from "@/utils/dateUtils";
+import { useAuth } from "@/services/AuthContext";
+import { getGroupConfig } from "@/config/groupConfig";
 
 export default function ReportsList({ userId }: ReportsListProps) {
     const [responseData, setResponseData] = useState<{ reports: Report[] } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const { group } = useAuth();
+    const groupConfig = getGroupConfig(group || 'defaultGroup');
 
     useEffect(() => {
         async function fetchReportsData() {
@@ -72,7 +76,7 @@ export default function ReportsList({ userId }: ReportsListProps) {
                 </>
             ) : (
                 <div className="mt-20 flex items-center justify-center text-center mx-4">
-                    Sorry! There are no reports available.
+                    {groupConfig.showTests === false ? 'Coming Soon' : 'Sorry! There are no reports available.'}
                 </div>
             )}
         </div>
