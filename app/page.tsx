@@ -184,7 +184,7 @@ export default function Home() {
           <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
           {group === 'EnableStudents' ? (
             <div className="flex flex-col items-center justify-center text-center h-72 pb-40">
-              <p className="text-center">No more tests are scheduled for today!</p>
+              <p className="text-center">There is no NVS live test for today!</p>
               <p>
                 <a href="https://www.nvslakshya.org/nvs-test-details" target="_blank" rel="noopener noreferrer" className="underline text-blue-600">Check your test calendar here</a>
               </p>

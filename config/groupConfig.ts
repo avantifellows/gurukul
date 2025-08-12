@@ -18,7 +18,7 @@ const groupConfig: GroupConfigurations = {
         showHomework: false,
         showContentLibrary: true,
         showClassLibrary: false,
-        testsSectionTitle: 'Scheduled Tests',
+        testsSectionTitle: 'NVS Live Test',
         homeTabLabel: 'Tests',
     },
     EnableSchools: {
