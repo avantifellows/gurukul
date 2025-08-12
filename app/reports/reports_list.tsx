@@ -76,7 +76,7 @@ export default function ReportsList({ userId }: ReportsListProps) {
                 </>
             ) : (
                 <div className="mt-20 flex items-center justify-center text-center mx-4">
-                    {groupConfig.showTests === false ? 'Coming Soon' : 'The reports will be available once the first test has been completed'}
+                    The reports will be available once the first test has been completed
                 </div>
             )}
         </div>
