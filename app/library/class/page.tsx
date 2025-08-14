@@ -41,7 +41,7 @@ const ClassLibrary = () => {
 
     const handleTabClick = async (tabName: string) => {
         setActiveTab(tabName);
-        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_TAB + ": " + tabName);
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_TAB, { tab_name: tabName });
         if (activeTab != tabName) {
             setSelectedChapter(null)
             setSelectedTeacher(undefined)
@@ -117,7 +117,7 @@ const ClassLibrary = () => {
     const handleTeacherChange = async (selectedTeacherId: number) => {
         setSelectedTeacher(selectedTeacherId);
         const teacherName = await getTeachers(selectedTeacherId);
-        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_TEACHER + ": " + teacherName[0].user.first_name);
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_TEACHER, { teacher_name: teacherName[0].user.first_name });
     };
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
@@ -125,7 +125,7 @@ const ClassLibrary = () => {
             const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
             const resourceData = await getResourcesOfChapter(chapterId, curriculumId!, selectedTeacher);
             setResources(resourceData);
-            MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER + ": " + chapterName);
+            MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER, { chapter_name: chapterName });
         } catch (error) {
             console.error('Error fetching chapter data:', error);
         }
@@ -155,7 +155,7 @@ const ClassLibrary = () => {
     const handleGradeChange = (grade: number) => {
         setSelectedGrade(grade);
         setSelectedChapter(null)
-        MixpanelTracking.getInstance().trackEvent('Selected grade: ' + grade);
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_GRADE, { grade: grade });
     };
 
     const fetchChapters = async (subjectId: number, gradeId: number) => {
@@ -164,7 +164,7 @@ const ClassLibrary = () => {
     };
 
     const handleResourceTracking = (resourceName: any) => {
-        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_RESOURCE + ": " + resourceName)
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_RESOURCE, { resource_name: resourceName })
     }
 
     const generateSubjectButton = (subject: string, label: string) => (

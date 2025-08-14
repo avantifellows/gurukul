@@ -24,7 +24,7 @@ const Page: React.FC = () => {
   const groupConfig = getGroupConfig(group || 'defaultGroup');
 
   const handleLibraryChange = (library: string) => {
-    MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_LIBRARY + ": " + library);
+    MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_LIBRARY, { library_name: library });
 
     if (
       library === 'NEET Content' ||

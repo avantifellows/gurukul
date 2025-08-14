@@ -126,11 +126,15 @@ export interface User {
   id: number;
   first_name: string;
   last_name: string;
+  gender?: string;
 }
 export interface Student {
   id: number;
-  student_id: string;
+  student_id: string | null;
   user: User;
+  stream?: string;
+  grade_id?: number;
+  category?: string;
 }
 
 export interface Teacher {

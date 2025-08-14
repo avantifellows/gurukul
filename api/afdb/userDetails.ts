@@ -1,12 +1,12 @@
 "use server";
 
 import getFetchConfig from '../fetchConfig';
-import { Student, User } from '@/app/types';
+import { Student } from '@/app/types';
 
-export const getUserName = async (
+export const getUserDetails = async (
     id: string,
     group: string
-): Promise<User | null> => {
+): Promise<Student | null> => {
     const url = process.env.AF_DB_SERVICE_URL;
     const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN!;
 
@@ -20,7 +20,7 @@ export const getUserName = async (
         const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
 
         if (!response.ok) {
-            throw new Error(`Error fetching student data: ${response.statusText}`);
+            throw new Error(`Error fetching user data: ${response.statusText}`);
         }
 
         const data: Student[] = await response.json();
@@ -30,9 +30,9 @@ export const getUserName = async (
             return null;
         }
 
-        return data[0].user;
+        return data[0];
     } catch (error) {
-        console.error('Error fetching student data:', error);
+        console.error('Error fetching user data:', error);
         throw error;
     }
 };
