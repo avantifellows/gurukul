@@ -28,30 +28,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [group, setGroup] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [hasTrackedUser, setHasTrackedUser] = useState(false);
 
     const redirectToPortal = (targetGroup?: string) => {
         const redirectGroup = targetGroup || group || 'DelhiStudents';
         router.push(`${api.portal.frontend.baseUrl}/?group=${redirectGroup}&platform=gurukul`);
-    };
-
-    const trackUserProperties = (userData: Student, userGroup: string) => {
-        const mixpanel = MixpanelTracking.getInstance();
-
-        // Prepare user properties for mixpanel - all the requested fields
-        const userProperties = {
-            auth_group: userGroup,
-            grade_id: userData.grade_id,
-            stream: userData.stream,
-            gender: userData.user.gender,
-            category: userData.category
-        };
-
-        // Track user identification event with all demographic properties
-        mixpanel.trackEvent(MIXPANEL_EVENT.USER_IDENTIFIED, userProperties);
-
-        // Set user properties in mixpanel for future tracking
-        mixpanel.setUserProperties(userProperties);
     };
 
     useEffect(() => {
@@ -61,18 +41,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (result.isValid) {
                     setLoggedIn(true);
                     const userGroup = result.data.data.group;
-                    setUserId(result.data.id);
+                    const verifiedId = result.data.id;
+                    setUserId(verifiedId);
                     setGroup(userGroup);
 
-                    // Fetch user details including the fields we want to track
-                    const userData = await getUserDetails(result.data.id, userGroup);
+                    // Fetch user details
+                    const userData: Student | null = await getUserDetails(verifiedId, userGroup);
                     if (userData) {
                         setUser(userData.user);
 
-                        // Track user properties with mixpanel only once per login session
-                        if (!hasTrackedUser) {
-                            trackUserProperties(userData, userGroup);
-                            setHasTrackedUser(true);
+                        const mixpanel = MixpanelTracking.getInstance();
+                        const userProperties = {
+                            auth_group: userGroup,
+                            grade_id: userData.grade_id,
+                            stream: userData.stream,
+                            gender: userData.user.gender,
+                            category: userData.category,
+                        };
+
+                        // Check if this is a fresh login or session restoration
+                        if (mixpanel.hasUserLoginBeenTracked(verifiedId)) {
+                            // Session restoration - just identify without tracking event
+                            mixpanel.identifyUser(verifiedId, userProperties);
+                        } else {
+                            // Fresh login - track the login event
+                            mixpanel.trackUserLogin(verifiedId, MIXPANEL_EVENT.USER_IDENTIFIED, userProperties);
                         }
                     }
 
@@ -102,10 +95,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const userDbId = user ? user.id : null;
 
     const logout = () => {
+        // Clear the login tracking flag so next login will be tracked
+        MixpanelTracking.getInstance().clearUserLoginTracked(userId);
+        // Reset Mixpanel user data
+        MixpanelTracking.getInstance().reset();
         setLoggedIn(false);
         setUserId(null);
         setUser(null);
-        setHasTrackedUser(false);
         redirectToPortal();
     };
 
