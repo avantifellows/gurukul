@@ -31,7 +31,7 @@ export default function ReportsList({ userId }: ReportsListProps) {
         }
 
         fetchReportsData();
-        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.REPORTS_PAGE_VIEW);
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.REPORTS_PAGE_VIEW, { page: 'reports_list' });
     }, [userId]);
 
     if (isLoading) {

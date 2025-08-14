@@ -39,7 +39,7 @@ const TopBar = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     logout();
-    MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.LOGOUT);
+    MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.LOGOUT, { action: 'logout_clicked' });
   };
 
   const UserNameShimmer = () => (

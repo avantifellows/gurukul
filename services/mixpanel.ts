@@ -27,4 +27,8 @@ export class MixpanelTracking {
     public identify = (userId: string) => {
         mixpanel.identify(userId);
     };
+
+    public setUserProperties = (properties: Record<string, any>) => {
+        mixpanel.people.set(properties);
+    };
 }
