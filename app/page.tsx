@@ -98,6 +98,14 @@ export default function Home() {
       ]);
 
       const sessionIds = [...liveSessionData, ...quizSessionData].map(session => session.session_id);
+
+      // Added Guard Clause to avoid fetching session occurrences if there are no sessions
+      if (sessionIds.length === 0) {
+        setQuizzes([]);
+        setLiveClasses([]);
+        return;
+      }
+
       const sessionOccurrences = await getSessionOccurrences(sessionIds);
 
       const quizSessions = sessionOccurrences.filter((sessionOccurence: SessionOccurrence) => sessionOccurence.session.platform === 'quiz');
