@@ -65,7 +65,7 @@ const ContentLibrary = () => {
 
     const handleTabClick = async (tabName: string) => {
         setActiveTab(tabName);
-        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_TAB + ": " + tabName);
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_TAB, { tab_name: tabName });
         if (activeTab != tabName) {
             setSelectedChapter(null)
         }
@@ -131,7 +131,7 @@ const ContentLibrary = () => {
             setTopics(topics);
             setResources(topicResources);
             setChapterResources(chapterResources);
-            MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER + ": " + chapterName);
+            MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_CHAPTER, { chapter_name: chapterName });
         } catch (error) {
             console.error('Error fetching chapter data:', error);
         }
@@ -166,7 +166,7 @@ const ContentLibrary = () => {
     const handleGradeChange = (grade: number) => {
         setSelectedGrade(grade);
         setSelectedChapter(null)
-        MixpanelTracking.getInstance().trackEvent('Selected grade: ' + grade);
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_GRADE, { grade: grade });
     };
 
     const fetchChapters = async (subjectId: number, gradeId: number) => {
@@ -175,7 +175,7 @@ const ContentLibrary = () => {
     };
 
     const handleResourceTracking = (resourceName: any) => {
-        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_RESOURCE + ": " + resourceName)
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_RESOURCE, { resource_name: resourceName })
     }
 
     const generateSubjectButton = (subject: string, label: string) => (
