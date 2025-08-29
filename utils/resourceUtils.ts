@@ -55,3 +55,19 @@ export const getSubjectName = (subject: Subject): string => {
 export const getTopicName = (topic: Topic): string => {
     return getNameFromArray(topic, 'topic', 'Untitled Topic');
 };
+
+/**
+ * Build final link for a resource.
+ * If resource is a quiz, append apiKey and userId as query params.
+ * apiKey can be provided, otherwise falls back to NEXT_PUBLIC_AF_QUIZ_API_KEY.
+ */
+export const buildResourceLink = (
+    resource: Resource,
+    userId?: string | null,
+    apiKey?: string
+): string => {
+    if (resource.type !== 'quiz') return resource.link;
+    const key = apiKey ?? (process.env.NEXT_PUBLIC_AF_QUIZ_API_KEY || '');
+    const params = new URLSearchParams({ apiKey: key, userId: userId || '' }).toString();
+    return resource.link + (resource.link.includes('?') ? '&' : '?') + params;
+};

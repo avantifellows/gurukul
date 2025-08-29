@@ -19,7 +19,8 @@ import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
 import { Listbox } from '@headlessui/react';
 import { IoIosArrowDown as DropdownArrow } from 'react-icons/io';
-import { getResourceName, getChapterName, getTopicName } from '@/utils/resourceUtils';
+import { getResourceName, getChapterName, getTopicName, buildResourceLink } from '@/utils/resourceUtils';
+import { useAuth } from '@/services/AuthContext';
 
 // Helper to get icon, prefix, and color for a resource
 const getResourceIconAndPrefix = (resource: Resource) => {
@@ -62,6 +63,7 @@ const ContentLibrary = () => {
     const jeeSubjects = ['Physics', 'Chemistry', 'Maths'];
     const caSubjects = ['Accounting', 'Business Economics', 'Quantitative Aptitude'];
     const clatSubjects = ['English', 'Logical Reasoning', 'Legal Reasoning'];
+    const { userId } = useAuth();
 
     const handleTabClick = async (tabName: string) => {
         setActiveTab(tabName);
@@ -302,9 +304,10 @@ const ContentLibrary = () => {
                                                         return 0;
                                                     }).map((resource) => {
                                                         const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
+                                                        const href = buildResourceLink(resource, userId);
                                                         return (
                                                             <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center">
-                                                                <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
+                                                                <Link href={href} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
                                                                     {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {getResourceName(resource)}
                                                                 </Link>
                                                             </li>
