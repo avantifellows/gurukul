@@ -193,9 +193,9 @@ export default function Home() {
           {groupConfig.noTestsMessage ? (
             <div className="flex flex-col items-center justify-center text-center h-72 pb-40">
               <p className="text-center">{groupConfig.noTestsMessage}</p>
-              {group === 'EnableStudents' && (
+              {groupConfig.testsInfoLink && (
                 <p>
-                  <a href="https://www.nvslakshya.org/nvs-test-details" target="_blank" rel="noopener noreferrer" className="underline text-blue-600">Check your test calendar here</a>
+                  <a href={groupConfig.testsInfoLink} target="_blank" rel="noopener noreferrer" className="underline text-blue-600">Check your test calendar here</a>
                 </p>
               )}
             </div>

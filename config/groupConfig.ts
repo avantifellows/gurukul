@@ -21,6 +21,7 @@ const groupConfig: GroupConfigurations = {
         testsSectionTitle: 'NVS Live Test',
         homeTabLabel: 'Tests',
         noTestsMessage: 'There is no NVS live test for today!',
+        testsInfoLink: 'https://www.nvslakshya.org/nvs-test-details',
     },
     EnableSchools: {
         showLiveClasses: false,

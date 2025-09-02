@@ -194,6 +194,7 @@ export interface GroupConfig {
   showHomeTab?: boolean;
   noTestsMessage?: string;
   noReportsMessage?: string;
+  testsInfoLink?: string;
 }
 
 export type GroupConfigurations = {
