@@ -192,9 +192,12 @@ export interface GroupConfig {
   testsSectionTitle?: string;
   homeTabLabel?: string;
   showHomeTab?: boolean;
+  showLibraryTab?: boolean;
+  showReportsTab?: boolean;
   noTestsMessage?: string;
   noReportsMessage?: string;
   testsInfoLink?: string;
+  testsHeaderNote?: string;
 }
 
 export type GroupConfigurations = {
