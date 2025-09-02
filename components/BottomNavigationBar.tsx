@@ -26,15 +26,15 @@ const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
     return pathname.startsWith(path);
   };
 
-  // Navigation items configuration
+  // Navigation items configuration (conditionally include tabs)
   const navItems = [
-    {
+    ...(groupConfig.showLibraryTab === false ? [] : [{
       href: '/library',
       label: 'Library',
       activeIcon: MdLibraryBooks,
       inactiveIcon: MdOutlineLibraryBooks,
       isActive: isActive('/library')
-    },
+    }]),
     ...(groupConfig.showHomeTab !== false ? [{
       href: '/',
       label: displayHomeLabel,
@@ -42,13 +42,13 @@ const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
       inactiveIcon: IoHomeOutline,
       isActive: isActive('/')
     }] : []),
-    {
+    ...(groupConfig.showReportsTab === false ? [] : [{
       href: '/reports',
       label: 'Report',
       activeIcon: RiBarChart2Fill,
       inactiveIcon: RiBarChart2Line,
       isActive: isActive('/reports')
-    }
+    }])
   ];
 
   const renderNavItem = (item: typeof navItems[0]) => {
