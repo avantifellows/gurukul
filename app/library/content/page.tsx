@@ -21,6 +21,7 @@ import { Listbox } from '@headlessui/react';
 import { IoIosArrowDown as DropdownArrow } from 'react-icons/io';
 import { getResourceName, getChapterName, getTopicName, buildResourceLink } from '@/utils/resourceUtils';
 import { useAuth } from '@/services/AuthContext';
+import AccessControlWrapper from '@/components/AccessControlWrapper';
 
 // Helper to get icon, prefix, and color for a resource
 const getResourceIconAndPrefix = (resource: Resource) => {
@@ -191,7 +192,7 @@ const ContentLibrary = () => {
     );
 
     return (
-        <>
+        <AccessControlWrapper tabName="library">
             <main className="max-w-xl mx-auto bg-white min-h-screen">
                 <TopBar />
                 <div className="bg-heading text-primary h-20 flex flex-col">
@@ -359,7 +360,7 @@ const ContentLibrary = () => {
                     </div>
                 )}
             </main>
-        </>
+        </AccessControlWrapper>
     );
 };
 

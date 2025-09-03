@@ -19,6 +19,7 @@ import { MIXPANEL_EVENT } from '@/constants/config';
 import { Listbox } from '@headlessui/react';
 import { IoIosArrowDown as DropdownArrow } from 'react-icons/io';
 import { getResourceName, getChapterName } from '@/utils/resourceUtils';
+import AccessControlWrapper from '@/components/AccessControlWrapper';
 
 const ClassLibrary = () => {
     const [activeTab, setActiveTab] = useState('');
@@ -190,7 +191,7 @@ const ClassLibrary = () => {
     const DROPDOWN_CLASS = "w-32 h-8 rounded-lg text-center bg-white border border-gray-300 shadow focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150";
 
     return (
-        <>
+        <AccessControlWrapper tabName="library">
             <main className="max-w-xl mx-auto bg-white min-h-screen">
                 <TopBar />
                 <div className="bg-heading text-primary h-20 flex flex-col">
@@ -327,7 +328,7 @@ const ClassLibrary = () => {
                     </div>
                 )}
             </main>
-        </>
+        </AccessControlWrapper>
     );
 };
 

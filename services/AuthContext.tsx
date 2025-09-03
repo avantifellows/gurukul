@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
 
     const redirectToPortal = (targetGroup?: string) => {
-        const redirectGroup = targetGroup || group || 'DelhiStudents';
+        const redirectGroup = targetGroup || group || 'EnableStudents';
         router.push(`${api.portal.frontend.baseUrl}/?group=${redirectGroup}&platform=gurukul`);
     };
 

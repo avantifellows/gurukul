@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PrimaryButton from '@/components/Button';
 import TopBar from '@/components/TopBar';
@@ -8,7 +8,6 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Image from 'next/image';
 import StethoscopeIcon from '../../assets/stethoscope.png';
 import BlueprintIcon from '../../assets/blueprint.png';
-import { MdScience } from 'react-icons/md';
 import { GiScales } from 'react-icons/gi';
 import { FaRupeeSign } from 'react-icons/fa';
 import { MixpanelTracking } from '@/services/mixpanel';
@@ -16,6 +15,7 @@ import { MIXPANEL_EVENT } from '@/constants/config';
 import { useAuth } from '@/services/AuthContext';
 import { getGroupConfig } from '@/config/groupConfig';
 import { ReactNode } from 'react';
+import AccessControlWrapper from '@/components/AccessControlWrapper';
 
 const Page: React.FC = () => {
   const [selectedLibrary, setSelectedLibrary] = useState<string | null>('Content');
@@ -115,58 +115,60 @@ const Page: React.FC = () => {
   ];
 
   return (
-    <main className="max-w-xl mx-auto bg-heading min-h-screen">
-      <TopBar />
+    <AccessControlWrapper tabName="library">
+      <main className="max-w-xl mx-auto bg-heading min-h-screen">
+        <TopBar />
 
-      {selectedLibrary !== 'NEET Content' && selectedLibrary !== 'JEE Content' && (
-        <div className="flex flex-row mt-4 mb-4 justify-between md:mx-4 mx-1">
-          <PrimaryButton
-            onClick={() => handleLibraryChange('Content')}
-            className={`${buttonStyle} ${selectedLibrary === 'Content' ? selectedButtonStyle : unselectedButtonStyle}`}
-          >
-            Content Library
-          </PrimaryButton>
-          {groupConfig.showClassLibrary && (
+        {selectedLibrary !== 'NEET Content' && selectedLibrary !== 'JEE Content' && (
+          <div className="flex flex-row mt-4 mb-4 justify-between md:mx-4 mx-1">
             <PrimaryButton
-              onClick={() => handleLibraryChange('Class')}
-              className={`${buttonStyle} ${selectedLibrary === 'Class' ? selectedButtonStyle : unselectedButtonStyle}`}
+              onClick={() => handleLibraryChange('Content')}
+              className={`${buttonStyle} ${selectedLibrary === 'Content' ? selectedButtonStyle : unselectedButtonStyle}`}
             >
-              Class Library
+              Content Library
             </PrimaryButton>
-          )}
-        </div>
-      )}
+            {groupConfig.showClassLibrary && (
+              <PrimaryButton
+                onClick={() => handleLibraryChange('Class')}
+                className={`${buttonStyle} ${selectedLibrary === 'Class' ? selectedButtonStyle : unselectedButtonStyle}`}
+              >
+                Class Library
+              </PrimaryButton>
+            )}
+          </div>
+        )}
 
-      {selectedLibrary === 'Content' && (
-        <div className="bg-white pb-40 pt-4">
-          {contentCourses.map(course => (
-            <LibraryCard
-              key={course.value}
-              icon={course.icon}
-              title={course.title}
-              description={course.description}
-              onClick={() => handleLibraryChange(course.value)}
-            />
-          ))}
-          <BottomNavigationBar />
-        </div>
-      )}
+        {selectedLibrary === 'Content' && (
+          <div className="bg-white pb-40 pt-4">
+            {contentCourses.map(course => (
+              <LibraryCard
+                key={course.value}
+                icon={course.icon}
+                title={course.title}
+                description={course.description}
+                onClick={() => handleLibraryChange(course.value)}
+              />
+            ))}
+            <BottomNavigationBar />
+          </div>
+        )}
 
-      {selectedLibrary === 'Class' && (
-        <div className="bg-white pb-40 pt-4">
-          {classCourses.map(course => (
-            <LibraryCard
-              key={course.value}
-              icon={course.icon}
-              title={course.title}
-              description={course.description}
-              onClick={() => handleLibraryChange(course.value)}
-            />
-          ))}
-          <BottomNavigationBar />
-        </div>
-      )}
-    </main>
+        {selectedLibrary === 'Class' && (
+          <div className="bg-white pb-40 pt-4">
+            {classCourses.map(course => (
+              <LibraryCard
+                key={course.value}
+                icon={course.icon}
+                title={course.title}
+                description={course.description}
+                onClick={() => handleLibraryChange(course.value)}
+              />
+            ))}
+            <BottomNavigationBar />
+          </div>
+        )}
+      </main>
+    </AccessControlWrapper>
   );
 };
 
