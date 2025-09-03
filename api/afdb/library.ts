@@ -32,6 +32,10 @@ const courseToCurriculum = {
   'NEET Content': CURRICULUM_NAMES.NEET,
   'CA Content': CURRICULUM_NAMES.CA,
   'CLAT Content': CURRICULUM_NAMES.CLAT,
+  'Grade 9 Foundation': CURRICULUM_NAMES.GRADE_9,
+  'Grade 10 Foundation': CURRICULUM_NAMES.GRADE_10,
+  'CUET': CURRICULUM_NAMES.CUET,
+  'NDA': CURRICULUM_NAMES.NDA,
 };
 
 type CourseName = keyof typeof courseToCurriculum;

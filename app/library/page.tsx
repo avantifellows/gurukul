@@ -8,7 +8,9 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Image from 'next/image';
 import StethoscopeIcon from '../../assets/stethoscope.png';
 import BlueprintIcon from '../../assets/blueprint.png';
-import { MdScience } from 'react-icons/md';
+import NDAIcon from '../../assets/military_man.png';
+import CUETLogo from '../../assets/cuet_logo.png'
+import { MdSchool } from 'react-icons/md';
 import { GiScales } from 'react-icons/gi';
 import { FaRupeeSign } from 'react-icons/fa';
 import { MixpanelTracking } from '@/services/mixpanel';
@@ -31,7 +33,11 @@ const Page: React.FC = () => {
       library === 'JEE Content' ||
       library === 'JEE Advance Content' ||
       library === 'CLAT Content' ||
-      library === 'CA Content'
+      library === 'CA Content' ||
+      library === 'Grade 9 Foundation' ||
+      library === 'Grade 10 Foundation' ||
+      library === 'CUET' ||
+      library === 'NDA'
     ) {
       push(`/library/content?course=${library}`);
       return;
@@ -97,6 +103,30 @@ const Page: React.FC = () => {
       description: 'Browse all the CA courses',
       icon: <FaRupeeSign className="w-10 h-10 text-yellow-700" />,
     },
+    {
+      value: 'CUET',
+      title: 'CUET course',
+      description: 'Browse all the CUET courses',
+      icon: <Image src={CUETLogo} alt="CUET Icon" className="w-10 h-10 mix-blend-multiply" />,
+    },
+    {
+      value: 'NDA',
+      title: 'NDA course',
+      description: 'Browse all the NDA courses',
+      icon: <Image src={NDAIcon} alt="NDA Icon" className="w-10 h-10" />,
+    },
+    {
+      value: 'Grade 10 Foundation',
+      title: 'Grade 10 Foundation',
+      description: 'Browse all the Grade 10 courses',
+      icon: <MdSchool className="w-10 h-10 text-indigo-700" />,
+    },
+    {
+      value: 'Grade 9 Foundation',
+      title: 'Grade 9 Foundation',
+      description: 'Browse all the Grade 9 courses',
+      icon: <MdSchool className="w-10 h-10 text-purple-700" />,
+    }
   ];
 
   const classCourses = [
@@ -118,7 +148,7 @@ const Page: React.FC = () => {
     <main className="max-w-xl mx-auto bg-heading min-h-screen">
       <TopBar />
 
-      {selectedLibrary !== 'NEET Content' && selectedLibrary !== 'JEE Content' && (
+      {selectedLibrary !== 'NEET Content' && selectedLibrary !== 'JEE Content' && selectedLibrary !== 'Grade 9 Foundation' && selectedLibrary !== 'Grade 10 Foundation' && selectedLibrary !== 'CUET' && selectedLibrary !== 'NDA' && (
         <div className="flex flex-row mt-4 mb-4 justify-between md:mx-4 mx-1">
           <PrimaryButton
             onClick={() => handleLibraryChange('Content')}
