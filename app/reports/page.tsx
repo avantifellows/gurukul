@@ -4,10 +4,22 @@ import ReportsList from "./reports_list";
 import Loading from "../loading";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
 import TopBar from "@/components/TopBar";
-import { useAuth } from "../../services/AuthContext";
+import { useAuth, useAccessControl } from "../../services/AuthContext";
+import { useEffect } from "react";
 
 export default function ReportsPage() {
     const { loggedIn, userId } = useAuth();
+    const { redirectIfNoAccess, groupConfig } = useAccessControl();
+
+    // Access control: redirect if reports tab is hidden for this group
+    useEffect(() => {
+        redirectIfNoAccess('reports');
+    }, [redirectIfNoAccess]);
+
+    // Don't render the page if reports tab is hidden
+    if (groupConfig.showReportsTab === false) {
+        return null;
+    }
 
     if (!loggedIn || !userId) {
         return (

@@ -20,7 +20,7 @@ import { MIXPANEL_EVENT } from '@/constants/config';
 import { Listbox } from '@headlessui/react';
 import { IoIosArrowDown as DropdownArrow } from 'react-icons/io';
 import { getResourceName, getChapterName, getTopicName, buildResourceLink } from '@/utils/resourceUtils';
-import { useAuth } from '@/services/AuthContext';
+import { useAuth, useAccessControl } from '@/services/AuthContext';
 
 // Helper to get icon, prefix, and color for a resource
 const getResourceIconAndPrefix = (resource: Resource) => {
@@ -64,6 +64,17 @@ const ContentLibrary = () => {
     const caSubjects = ['Accounting', 'Business Economics', 'Quantitative Aptitude'];
     const clatSubjects = ['English', 'Logical Reasoning', 'Legal Reasoning'];
     const { userId } = useAuth();
+    const { redirectIfNoAccess, groupConfig } = useAccessControl();
+
+    // Access control: redirect if library tab is hidden for this group
+    useEffect(() => {
+        redirectIfNoAccess('library');
+    }, [redirectIfNoAccess]);
+
+    // Don't render the page if library tab is hidden
+    if (groupConfig.showLibraryTab === false) {
+        return null;
+    }
 
     const handleTabClick = async (tabName: string) => {
         setActiveTab(tabName);

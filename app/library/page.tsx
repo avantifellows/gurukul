@@ -13,15 +13,23 @@ import { GiScales } from 'react-icons/gi';
 import { FaRupeeSign } from 'react-icons/fa';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
-import { useAuth } from '@/services/AuthContext';
-import { getGroupConfig } from '@/config/groupConfig';
+import { useAccessControl } from '@/services/AuthContext';
 import { ReactNode } from 'react';
 
 const Page: React.FC = () => {
   const [selectedLibrary, setSelectedLibrary] = useState<string | null>('Content');
   const { push } = useRouter();
-  const { group } = useAuth();
-  const groupConfig = getGroupConfig(group || 'defaultGroup');
+  const { redirectIfNoAccess, groupConfig } = useAccessControl();
+
+  // Access control: redirect if library tab is hidden for this group
+  useEffect(() => {
+    redirectIfNoAccess('library');
+  }, [redirectIfNoAccess]);
+
+  // Don't render the page if library tab is hidden
+  if (groupConfig.showLibraryTab === false) {
+    return null;
+  }
 
   const handleLibraryChange = (library: string) => {
     MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_LIBRARY, { library_name: library });

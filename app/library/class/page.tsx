@@ -19,6 +19,7 @@ import { MIXPANEL_EVENT } from '@/constants/config';
 import { Listbox } from '@headlessui/react';
 import { IoIosArrowDown as DropdownArrow } from 'react-icons/io';
 import { getResourceName, getChapterName } from '@/utils/resourceUtils';
+import { useAccessControl } from '@/services/AuthContext';
 
 const ClassLibrary = () => {
     const [activeTab, setActiveTab] = useState('');
@@ -38,6 +39,17 @@ const ClassLibrary = () => {
     const selectedCourse = searchParams.get('course');
     const neetSubjects = ['Physics', 'Chemistry', 'Biology'];
     const jeeSubjects = ['Physics', 'Chemistry', 'Maths'];
+    const { redirectIfNoAccess, groupConfig } = useAccessControl();
+
+    // Access control: redirect if library tab is hidden for this group
+    useEffect(() => {
+        redirectIfNoAccess('library');
+    }, [redirectIfNoAccess]);
+
+    // Don't render the page if library tab is hidden
+    if (groupConfig.showLibraryTab === false) {
+        return null;
+    }
 
     const handleTabClick = async (tabName: string) => {
         setActiveTab(tabName);
