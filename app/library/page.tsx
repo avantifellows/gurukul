@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import PrimaryButton from '@/components/Button';
 import TopBar from '@/components/TopBar';
 import BottomNavigationBar from '@/components/BottomNavigationBar';
-import AccessControlWrapper from '@/components/AccessControlWrapper';
 import Image from 'next/image';
 import StethoscopeIcon from '../../assets/stethoscope.png';
 import BlueprintIcon from '../../assets/blueprint.png';
@@ -17,6 +16,7 @@ import { MIXPANEL_EVENT } from '@/constants/config';
 import { useAuth } from '@/services/AuthContext';
 import { getGroupConfig } from '@/config/groupConfig';
 import { ReactNode } from 'react';
+import AccessControlWrapper from '@/components/AccessControlWrapper';
 
 const Page: React.FC = () => {
   const [selectedLibrary, setSelectedLibrary] = useState<string | null>('Content');
