@@ -1,10 +1,11 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PrimaryButton from '@/components/Button';
 import TopBar from '@/components/TopBar';
 import BottomNavigationBar from '@/components/BottomNavigationBar';
+import AccessControlWrapper from '@/components/AccessControlWrapper';
 import Image from 'next/image';
 import StethoscopeIcon from '../../assets/stethoscope.png';
 import BlueprintIcon from '../../assets/blueprint.png';
@@ -13,23 +14,15 @@ import { GiScales } from 'react-icons/gi';
 import { FaRupeeSign } from 'react-icons/fa';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
-import { useAccessControl } from '@/services/AuthContext';
+import { useAuth } from '@/services/AuthContext';
+import { getGroupConfig } from '@/config/groupConfig';
 import { ReactNode } from 'react';
 
 const Page: React.FC = () => {
   const [selectedLibrary, setSelectedLibrary] = useState<string | null>('Content');
   const { push } = useRouter();
-  const { redirectIfNoAccess, groupConfig } = useAccessControl();
-
-  // Access control: redirect if library tab is hidden for this group
-  useEffect(() => {
-    redirectIfNoAccess('library');
-  }, [redirectIfNoAccess]);
-
-  // Don't render the page if library tab is hidden
-  if (groupConfig.showLibraryTab === false) {
-    return null;
-  }
+  const { group } = useAuth();
+  const groupConfig = getGroupConfig(group || 'defaultGroup');
 
   const handleLibraryChange = (library: string) => {
     MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_LIBRARY, { library_name: library });
@@ -123,58 +116,60 @@ const Page: React.FC = () => {
   ];
 
   return (
-    <main className="max-w-xl mx-auto bg-heading min-h-screen">
-      <TopBar />
+    <AccessControlWrapper tabName="library">
+      <main className="max-w-xl mx-auto bg-heading min-h-screen">
+        <TopBar />
 
-      {selectedLibrary !== 'NEET Content' && selectedLibrary !== 'JEE Content' && (
-        <div className="flex flex-row mt-4 mb-4 justify-between md:mx-4 mx-1">
-          <PrimaryButton
-            onClick={() => handleLibraryChange('Content')}
-            className={`${buttonStyle} ${selectedLibrary === 'Content' ? selectedButtonStyle : unselectedButtonStyle}`}
-          >
-            Content Library
-          </PrimaryButton>
-          {groupConfig.showClassLibrary && (
+        {selectedLibrary !== 'NEET Content' && selectedLibrary !== 'JEE Content' && (
+          <div className="flex flex-row mt-4 mb-4 justify-between md:mx-4 mx-1">
             <PrimaryButton
-              onClick={() => handleLibraryChange('Class')}
-              className={`${buttonStyle} ${selectedLibrary === 'Class' ? selectedButtonStyle : unselectedButtonStyle}`}
+              onClick={() => handleLibraryChange('Content')}
+              className={`${buttonStyle} ${selectedLibrary === 'Content' ? selectedButtonStyle : unselectedButtonStyle}`}
             >
-              Class Library
+              Content Library
             </PrimaryButton>
-          )}
-        </div>
-      )}
+            {groupConfig.showClassLibrary && (
+              <PrimaryButton
+                onClick={() => handleLibraryChange('Class')}
+                className={`${buttonStyle} ${selectedLibrary === 'Class' ? selectedButtonStyle : unselectedButtonStyle}`}
+              >
+                Class Library
+              </PrimaryButton>
+            )}
+          </div>
+        )}
 
-      {selectedLibrary === 'Content' && (
-        <div className="bg-white pb-40 pt-4">
-          {contentCourses.map(course => (
-            <LibraryCard
-              key={course.value}
-              icon={course.icon}
-              title={course.title}
-              description={course.description}
-              onClick={() => handleLibraryChange(course.value)}
-            />
-          ))}
-          <BottomNavigationBar />
-        </div>
-      )}
+        {selectedLibrary === 'Content' && (
+          <div className="bg-white pb-40 pt-4">
+            {contentCourses.map(course => (
+              <LibraryCard
+                key={course.value}
+                icon={course.icon}
+                title={course.title}
+                description={course.description}
+                onClick={() => handleLibraryChange(course.value)}
+              />
+            ))}
+            <BottomNavigationBar />
+          </div>
+        )}
 
-      {selectedLibrary === 'Class' && (
-        <div className="bg-white pb-40 pt-4">
-          {classCourses.map(course => (
-            <LibraryCard
-              key={course.value}
-              icon={course.icon}
-              title={course.title}
-              description={course.description}
-              onClick={() => handleLibraryChange(course.value)}
-            />
-          ))}
-          <BottomNavigationBar />
-        </div>
-      )}
-    </main>
+        {selectedLibrary === 'Class' && (
+          <div className="bg-white pb-40 pt-4">
+            {classCourses.map(course => (
+              <LibraryCard
+                key={course.value}
+                icon={course.icon}
+                title={course.title}
+                description={course.description}
+                onClick={() => handleLibraryChange(course.value)}
+              />
+            ))}
+            <BottomNavigationBar />
+          </div>
+        )}
+      </main>
+    </AccessControlWrapper>
   );
 };
 

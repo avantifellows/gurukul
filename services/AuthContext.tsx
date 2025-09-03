@@ -20,39 +20,6 @@ export function useAuth() {
     return context;
 }
 
-// Custom hook for access control
-export const useAccessControl = () => {
-    const { group } = useAuth();
-    const groupConfig = getGroupConfig(group || 'defaultGroup');
-    const router = useRouter();
-
-    const checkAccess = (tabName: 'library' | 'reports' | 'home') => {
-        switch (tabName) {
-            case 'library':
-                return groupConfig.showLibraryTab !== false;
-            case 'reports':
-                return groupConfig.showReportsTab !== false;
-            case 'home':
-                return groupConfig.showHomeTab !== false;
-            default:
-                return true;
-        }
-    };
-
-    const redirectIfNoAccess = (tabName: 'library' | 'reports' | 'home') => {
-        if (!checkAccess(tabName)) {
-            router.push('/');
-            return true; // indicates redirect happened
-        }
-        return false; // indicates no redirect needed
-    };
-
-    return {
-        checkAccess,
-        redirectIfNoAccess,
-        groupConfig
-    };
-};
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
