@@ -53,7 +53,6 @@ const ContentLibrary = () => {
     const [selectedGrade, setSelectedGrade] = useState(11);
     const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
     const [chapterList, setChapterList] = useState<Chapter[]>([]);
-    const gradeOptions = [11, 12];
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isLoading, setIsLoading] = useState(true);
@@ -64,6 +63,21 @@ const ContentLibrary = () => {
     const caSubjects = ['Accounting', 'Business Economics', 'Quantitative Aptitude'];
     const clatSubjects = ['English', 'Logical Reasoning', 'Legal Reasoning'];
     const { userId } = useAuth();
+
+    // Get grade options based on selected course
+    const getGradeOptions = () => {
+        if (selectedCourse === COURSES.GRADE_9) {
+            return [9];
+        } else if (selectedCourse === COURSES.GRADE_10) {
+            return [10];
+        } else if (selectedCourse === COURSES.CUET || selectedCourse === COURSES.NDA) {
+            return [12];
+        } else {
+            return [11, 12];
+        }
+    };
+
+    const gradeOptions = getGradeOptions();
 
     const handleTabClick = async (tabName: string) => {
         setActiveTab(tabName);
@@ -122,8 +136,27 @@ const ContentLibrary = () => {
             defaultTab = 'Accounting';
         } else if (selectedCourse === COURSES.CLAT) {
             defaultTab = 'English';
+        } else if (selectedCourse === COURSES.GRADE_9 || selectedCourse === COURSES.GRADE_10) {
+            defaultTab = 'Maths';
+        } else if (selectedCourse === COURSES.CUET) {
+            defaultTab = 'Physics';
+        } else if (selectedCourse === COURSES.NDA) {
+            defaultTab = 'Maths';
         }
         setActiveTab(defaultTab);
+    }, [selectedCourse]);
+
+    // Set default grade based on course
+    useEffect(() => {
+        if (selectedCourse === COURSES.GRADE_9) {
+            setSelectedGrade(9);
+        } else if (selectedCourse === COURSES.GRADE_10) {
+            setSelectedGrade(10);
+        } else if (selectedCourse === COURSES.CUET || selectedCourse === COURSES.NDA) {
+            setSelectedGrade(12);
+        } else {
+            setSelectedGrade(11);
+        }
     }, [selectedCourse]);
 
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
@@ -202,17 +235,28 @@ const ContentLibrary = () => {
                             {selectedCourse === COURSES.JEE && "JEE Course"}
                             {selectedCourse === COURSES.CA && "CA Course"}
                             {selectedCourse === COURSES.CLAT && "CLAT Course"}
+                            {selectedCourse === COURSES.GRADE_9 && "Grade 9 Foundation Course"}
+                            {selectedCourse === COURSES.GRADE_10 && "Grade 10 Foundation Course"}
+                            {selectedCourse === COURSES.CUET && "CUET Course"}
+                            {selectedCourse === COURSES.NDA && "NDA Course"}
                             <br />
                         </h1>
                     </div>
                     <span className="text-sm ml-[52px] font-normal">Content Library</span>
                 </div>
                 <div className="mx-5">
-                    <div className="grid grid-cols-3 gap-2 mt-4 mb-4">
+                    <div className={`grid gap-2 mt-4 mb-4 ${selectedCourse === COURSES.GRADE_9 || selectedCourse === COURSES.GRADE_10
+                        ? 'grid-cols-2'
+                        : 'grid-cols-3'
+                        }`}>
                         {selectedCourse === COURSES.NEET && neetSubjects.map(subject => generateSubjectButton(subject, subject))}
                         {selectedCourse === COURSES.JEE && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
                         {selectedCourse === COURSES.CA && caSubjects.map(subject => generateSubjectButton(subject, subject))}
                         {selectedCourse === COURSES.CLAT && clatSubjects.map(subject => generateSubjectButton(subject, subject))}
+                        {selectedCourse === COURSES.GRADE_9 && ['Maths', 'Science'].map(subject => generateSubjectButton(subject, subject))}
+                        {selectedCourse === COURSES.GRADE_10 && ['Maths', 'Science'].map(subject => generateSubjectButton(subject, subject))}
+                        {selectedCourse === COURSES.CUET && ['Physics', 'Chemistry', 'Maths'].map(subject => generateSubjectButton(subject, subject))}
+                        {selectedCourse === COURSES.NDA && ['Maths', 'History', 'Geography'].map(subject => generateSubjectButton(subject, subject))}
                     </div>
                 </div>
                 <div className="bg-heading h-20 flex items-center w-full">

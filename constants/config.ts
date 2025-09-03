@@ -3,6 +3,10 @@ export const CURRICULUM_NAMES = {
     NEET: 'NEET',
     CA: 'CA',
     CLAT: 'CLAT',
+    GRADE_9: 'Grade 9 - Foundation',
+    GRADE_10: 'Grade 10 - Foundation',
+    CUET: 'CUET',
+    NDA: 'NDA',
 } as const;
 
 export const COURSES = {
@@ -10,6 +14,10 @@ export const COURSES = {
     NEET: 'NEET Content' as const,
     CA: 'CA Content' as const,
     CLAT: 'CLAT Content' as const,
+    GRADE_9: 'Grade 9 Foundation' as const,
+    GRADE_10: 'Grade 10 Foundation' as const,
+    CUET: 'CUET' as const,
+    NDA: 'NDA' as const,
 } as const;
 
 export const MIXPANEL_EVENT = {
