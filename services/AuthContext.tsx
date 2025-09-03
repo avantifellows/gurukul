@@ -20,7 +20,6 @@ export function useAuth() {
     return context;
 }
 
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();

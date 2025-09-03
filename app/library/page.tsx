@@ -8,7 +8,6 @@ import BottomNavigationBar from '@/components/BottomNavigationBar';
 import Image from 'next/image';
 import StethoscopeIcon from '../../assets/stethoscope.png';
 import BlueprintIcon from '../../assets/blueprint.png';
-import { MdScience } from 'react-icons/md';
 import { GiScales } from 'react-icons/gi';
 import { FaRupeeSign } from 'react-icons/fa';
 import { MixpanelTracking } from '@/services/mixpanel';
