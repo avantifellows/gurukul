@@ -93,9 +93,10 @@ const ContentLibrary = () => {
                 const subjectId = subjectData[0].id;
                 const gradeId = gradeData[0].id;
                 await fetchChapters(subjectId, gradeId);
+                const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
                 const chapterData = selectedChapter
-                    ? await getChapters(subjectId, gradeId, selectedChapter)
-                    : await getChapters(subjectId, gradeId);
+                    ? await getChapters(subjectId, gradeId, selectedChapter, curriculumId!)
+                    : await getChapters(subjectId, gradeId, undefined, curriculumId!);
 
                 if (chapterData.length > 0) {
                     setChapters(chapterData);
@@ -205,7 +206,8 @@ const ContentLibrary = () => {
     };
 
     const fetchChapters = async (subjectId: number, gradeId: number) => {
-        const chapterData = await getChapters(subjectId, gradeId);
+        const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
+        const chapterData = await getChapters(subjectId, gradeId, undefined, curriculumId!);
         setChapterList(chapterData);
     };
 
