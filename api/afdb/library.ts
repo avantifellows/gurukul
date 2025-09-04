@@ -63,28 +63,15 @@ export const getChapters = async (
   id?: number,
   curriculumId?: number
 ): Promise<Chapter[]> => {
-  // Get all chapters for the subject
+  // Get chapters filtered by subject, curriculum, and grade via API
   const queryParams = new URLSearchParams();
   if (id) queryParams.append('id', id.toString());
   if (subjectId) queryParams.append('subject_id', subjectId.toString());
+  if (gradeId) queryParams.append('grade_id', gradeId.toString());
   if (curriculumId) queryParams.append('curriculum_id', curriculumId.toString());
 
-  const allChapters: Chapter[] = await fetchWithParams('chapter', queryParams);
-
-  // If no gradeId is provided, return all chapters
-  if (!gradeId) return allChapters;
-
-  // Filter chapters to include:
-  // 1. Chapters for the specific grade (grade_id matches)
-  // 2. Universal chapters (grade_id is null)
-  const filteredChapters = allChapters.filter(chapter => {
-    // Include chapters for the specific grade or universal chapters
-    if (chapter.grade_id === gradeId || !chapter.grade_id) return true;
-
-    return false;
-  });
-
-  return filteredChapters;
+  const chapters: Chapter[] = await fetchWithParams('chapter', queryParams);
+  return chapters;
 };
 
 export const getTopics = async (chapterIds: number[]): Promise<Topic[]> => {
