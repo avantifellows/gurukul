@@ -71,7 +71,8 @@ export default function Home() {
       quiz.session.meta_data.test_format !== 'chapter_test'
     );
 
-    const chapterTests = regularTests.filter(quiz =>
+    // Hide chapter tests for EnableStudents group
+    const chapterTests = group === 'EnableStudents' ? [] : regularTests.filter(quiz =>
       quiz.session.meta_data.test_format === 'chapter_test'
     );
 
@@ -209,9 +210,6 @@ export default function Home() {
     return (
       <div>
         <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
-        {groupConfig.testsHeaderNote && (
-          <p className="mx-4 mt-2 text-gray-700 text-sm">{groupConfig.testsHeaderNote}</p>
-        )}
         <div className="grid grid-cols-1 gap-4 pb-4">
           {tests.map((data, index) => (
             <div key={index} className="flex items-center mt-4">
