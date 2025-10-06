@@ -2,6 +2,26 @@
 
 const withPWA = require('next-pwa')({
     dest: 'public',
+
+    runtimeCaching: [
+        {
+            // Never cache portal URLs - always fetch from network
+            urlPattern: ({ url }) => {
+                return url.origin === new URL(process.env.NEXT_PUBLIC_PORTAL_URL || 'https://staging-auth.avantifellows.org/').origin;
+            },
+            handler: 'NetworkOnly',
+        },
+        {
+            // Never cache auth-related requests
+            urlPattern: /\/(api\/auth|verify-token)/,
+            handler: 'NetworkOnly',
+        },
+    ],
+
+    // Don't use cached fallback for navigation failures
+    fallbacks: {
+        document: null,
+    },
 });
 
 const nextConfig = {
