@@ -9,6 +9,7 @@ import { getUserDetails } from '@/api/afdb/userDetails';
 import { getGroupConfig } from '@/config/groupConfig';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
+import { navigateToPortal, clearPWACache } from '@/utils/navigation';
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
@@ -31,7 +32,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const redirectToPortal = (targetGroup?: string) => {
         const redirectGroup = targetGroup || group || 'DelhiStudents';
-        router.push(`${api.portal.frontend.baseUrl}/?group=${redirectGroup}&platform=gurukul`);
+        const portalUrl = `${api.portal.frontend.baseUrl}/?group=${redirectGroup}&platform=gurukul`;
+        navigateToPortal(portalUrl);
     };
 
     useEffect(() => {
@@ -94,15 +96,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const userName = `${user?.first_name || ''} ${user?.last_name || ''}`.trim();
     const userDbId = user ? user.id : null;
 
-    const logout = () => {
-        // Clear the login tracking flag so next login will be tracked
-        MixpanelTracking.getInstance().clearUserLoginTracked(userId);
-        // Reset Mixpanel user data
-        MixpanelTracking.getInstance().reset();
-        setLoggedIn(false);
-        setUserId(null);
-        setUser(null);
-        redirectToPortal();
+    const logout = async () => {
+        try {
+            // Clear the login tracking flag so next login will be tracked
+            MixpanelTracking.getInstance().clearUserLoginTracked(userId);
+            // Reset Mixpanel user data
+            MixpanelTracking.getInstance().reset();
+            
+            // Clear local storage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Clear PWA cache (non-blocking)
+            clearPWACache().catch(console.error);
+            
+            // Update state
+            setLoggedIn(false);
+            setUserId(null);
+            setUser(null);
+            
+            // Redirect to portal (this will open in system browser if in PWA)
+            redirectToPortal();
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Still try to redirect even if cleanup fails
+            redirectToPortal();
+        }
     };
 
     return (
