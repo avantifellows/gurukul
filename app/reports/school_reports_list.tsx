@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { SchoolReport, SchoolReportsResponse } from "../types";
+import { SchoolReport, SchoolReportsResponse, ReportUrlResponse } from "../types";
 import { getSchoolReports, getSchoolReportUrl } from "@/api/reporting/schoolReports";
 import { MixpanelTracking } from "@/services/mixpanel";
 import { MIXPANEL_EVENT } from "@/constants/config";
@@ -38,7 +38,7 @@ export default function SchoolReportsList({ schoolCode }: SchoolReportsListProps
         setLoadingReportId(testName);
 
         try {
-            const data = await getSchoolReportUrl(schoolCode, testName);
+            const data: ReportUrlResponse = await getSchoolReportUrl(schoolCode, testName);
 
             // Open PDF in new tab
             window.open(data.url, '_blank');
