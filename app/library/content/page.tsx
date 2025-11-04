@@ -53,6 +53,7 @@ const ContentLibrary = () => {
     const [selectedGrade, setSelectedGrade] = useState(11);
     const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
     const [chapterList, setChapterList] = useState<Chapter[]>([]);
+    const [curriculumId, setCurriculumId] = useState<number | null>(null);
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isLoading, setIsLoading] = useState(true);
@@ -63,6 +64,8 @@ const ContentLibrary = () => {
     const caSubjects = ['Accounting', 'Business Economics', 'Quantitative Aptitude'];
     const clatSubjects = ['English', 'Logical Reasoning', 'Legal Reasoning'];
     const { userId } = useAuth();
+    const subjectsCacheRef = useRef<Map<string, number>>(new Map()); // subject name -> subjectId
+    const chaptersCacheRef = useRef<Map<string, Chapter[]>>(new Map()); // key: `${course}|${subject}|${grade}` -> chapters
 
     // Get grade options based on selected course
     const getGradeOptions = () => {
@@ -87,25 +90,36 @@ const ContentLibrary = () => {
         }
 
         try {
-            const subjectData = await getSubjects(tabName);
-            const gradeData = await getGrades(selectedGrade);
+            const [subjectData, gradeData] = await Promise.all([
+                getSubjects(tabName),
+                getGrades(selectedGrade)
+            ]);
             if (subjectData.length > 0) {
                 const subjectId = subjectData[0].id;
+                subjectsCacheRef.current.set(tabName, subjectId);
                 const gradeId = gradeData[0].id;
-                await fetchChapters(subjectId, gradeId);
-                const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
-                const chapterData = selectedChapter
-                    ? await getChapters(subjectId, gradeId, selectedChapter, curriculumId!)
-                    : await getChapters(subjectId, gradeId, undefined, curriculumId!);
+                const cacheKey = `${selectedCourse}|${tabName}|${gradeId}`;
+                let chapterData: Chapter[] | undefined = chaptersCacheRef.current.get(cacheKey);
+                if (!chapterData) {
+                    chapterData = await getChapters(subjectId, gradeId, undefined, curriculumId!);
+                    chaptersCacheRef.current.set(cacheKey, chapterData);
+                }
+                // If a specific chapter is selected, filter locally
+                if (selectedChapter) {
+                    chapterData = chapterData.filter(ch => ch.id === selectedChapter);
+                }
 
                 if (chapterData.length > 0) {
                     setChapters(chapterData);
+                    setChapterList(chapterData);
                 }
                 else {
                     setChapters([]);
+                    setChapterList([]);
                 }
             } else {
                 setChapters([]);
+                setChapterList([]);
                 console.log("Bad request")
             }
         } catch (error) {
@@ -160,6 +174,15 @@ const ContentLibrary = () => {
         }
     }, [selectedCourse]);
 
+    // Cache curriculumId for selected course
+    useEffect(() => {
+        const loadCurriculum = async () => {
+            const id = selectedCourse ? await getCurriculumId(selectedCourse) : null;
+            setCurriculumId(id);
+        };
+        loadCurriculum();
+    }, [selectedCourse]);
+
     const handleChapterClick = async (chapterId: number, chapterName: string) => {
         try {
             const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
@@ -205,24 +228,36 @@ const ContentLibrary = () => {
         MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_GRADE, { grade: grade });
     };
 
-    const fetchChapters = async (subjectId: number, gradeId: number) => {
-        const curriculumId = selectedCourse ? await getCurriculumId(selectedCourse) : null;
-        const chapterData = await getChapters(subjectId, gradeId, undefined, curriculumId!);
-        setChapterList(chapterData);
-    };
 
     const handleResourceTracking = (resourceName: any) => {
         MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_RESOURCE, { resource_name: resourceName })
     }
 
+    const prefetchChapters = async (subject: string) => {
+        try {
+            const subjectId = subjectsCacheRef.current.get(subject) ?? (await getSubjects(subject))[0]?.id;
+            if (!subjectsCacheRef.current.has(subject) && subjectId) {
+                subjectsCacheRef.current.set(subject, subjectId);
+            }
+            const gradeData = await getGrades(selectedGrade);
+            const gradeId = gradeData[0].id;
+            const cacheKey = `${selectedCourse}|${subject}|${gradeId}`;
+            if (!chaptersCacheRef.current.has(cacheKey) && subjectId && curriculumId) {
+                const data = await getChapters(subjectId, gradeId, undefined, curriculumId);
+                chaptersCacheRef.current.set(cacheKey, data);
+            }
+        } catch (_) { /* noop prefetch */ }
+    };
+
     const generateSubjectButton = (subject: string, label: string) => (
-        <PrimaryButton
-            key={subject}
-            onClick={() => handleTabClick(subject)}
-            className={`py-2 px-2 w-full h-full rounded-lg text-center break-words ${activeTab === subject ? 'bg-heading text-primary font-semibold shadow-sm' : 'bg-white text-slate-600'}`}
-        >
-            {label}
-        </PrimaryButton>
+        <div key={subject} onMouseEnter={() => prefetchChapters(subject)}>
+            <PrimaryButton
+                onClick={() => handleTabClick(subject)}
+                className={`py-2 px-2 w-full h-full rounded-lg text-center break-words ${activeTab === subject ? 'bg-heading text-primary font-semibold shadow-sm' : 'bg-white text-slate-600'}`}
+            >
+                {label}
+            </PrimaryButton>
+        </div>
     );
 
     return (
