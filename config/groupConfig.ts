@@ -14,7 +14,7 @@ const groupConfig: GroupConfigurations = {
     EnableStudents: {
         showLiveClasses: false,
         showTests: true,
-        showPracticeTests: true,
+        showPracticeTests: false,
         showHomework: false,
         showContentLibrary: true,
         showClassLibrary: false,
@@ -22,8 +22,8 @@ const groupConfig: GroupConfigurations = {
         homeTabLabel: 'Tests',
         noTestsMessage: 'There is no NVS live test for today!',
         testsInfoLink: 'https://www.nvslakshya.org/nvs-test-details',
-        showLibraryTab: true,
-        showReportsTab: true,
+        showLibraryTab: false,
+        showReportsTab: false,
         testsHeaderNote: "You’re seeing the test based on the exam preference shared by your school. If you see more than one test, select your preferred one from below",
     },
     EnableSchools: {
