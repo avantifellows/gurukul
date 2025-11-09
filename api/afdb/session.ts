@@ -7,17 +7,14 @@ const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
 
 export const getSessionOccurrences = async (sessionIds: string[]) => {
   try {
-    const queryParams = new URLSearchParams();
-
-    if (sessionIds && sessionIds.length > 0) {
-      queryParams.append('session_ids', sessionIds.join(','));
-    }
-
-    queryParams.append('is_start_time', 'today');
-
-    const urlWithParams = `${url}/session-occurrence?${queryParams.toString()}`;
-
-    const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
+    const response = await fetch(`${url}/session-occurrence/batch-query`, {
+      ...getFetchConfig(bearerToken, { 'Content-Type': 'application/json' }),
+      method: 'POST',
+      body: JSON.stringify({
+        session_ids: sessionIds,
+        is_start_time: 'today'
+      })
+    });
 
     if (!response.ok) {
       throw new Error(`Error in fetching Session Occurrence Details: ${response.statusText}`);
