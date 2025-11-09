@@ -7,7 +7,7 @@ const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
 
 export const getSessionOccurrences = async (sessionIds: string[]) => {
   try {
-    const response = await fetch(`${url}/session-occurrence/batch-query`, {
+    const response = await fetch(`${url}/session-occurrence/search`, {
       ...getFetchConfig(bearerToken, { 'Content-Type': 'application/json' }),
       method: 'POST',
       body: JSON.stringify({
