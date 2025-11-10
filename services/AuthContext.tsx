@@ -43,7 +43,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             try {
                 const result = await verifyToken();
 
-                console.log(result);
                 if (result.isValid) {
                     setLoggedIn(true);
 
