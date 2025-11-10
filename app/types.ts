@@ -10,6 +10,8 @@ export interface AuthContextProps {
   userName: string;
   userDbId: number | null;
   group: string | null;
+  studentId: string | null;
+  apaarId: string | null;
   logout: () => void;
   isLoading: boolean;
 }
