@@ -279,8 +279,10 @@ export default function Home() {
       const isCompleted = quizCompletionStatus.hasOwnProperty(data.platform_id) && quizCompletionStatus[data.platform_id] === true;
       if (isCompleted) {
         return (
-          <div className="text-xs font-semibold text-green-700 bg-green-100 rounded-md px-2 py-1 mr-4">
-            Test Completed
+          <div className="flex flex-col items-center pr-2">
+            <div className="w-[118px] italic md:w-36 h-8 flex items-center justify-center text-xs">
+              Test Submitted
+            </div>
           </div>
         );
       }
