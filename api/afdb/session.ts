@@ -13,7 +13,9 @@ export const getSessionOccurrences = async (sessionIds: string[]) => {
       body: JSON.stringify({
         session_ids: sessionIds,
         is_start_time: 'today'
-      })
+      }),
+      cache: 'no-store',
+      next: { revalidate: 0 }
     });
 
     if (!response.ok) {
@@ -35,7 +37,12 @@ export const fetchUserSession = async (userId: number, isQuiz = false) => {
       urlWithParams += '?quiz=true';
     }
 
-    const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
+    const response = await fetch(urlWithParams, {
+      ...getFetchConfig(bearerToken),
+      cache: 'no-store',
+      next: { revalidate: 0 }
+    });
+
     if (!response.ok) {
       throw new Error('Failed to fetch sessions');
     }
