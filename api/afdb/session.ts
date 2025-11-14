@@ -14,8 +14,7 @@ export const getSessionOccurrences = async (sessionIds: string[]) => {
         session_ids: sessionIds,
         is_start_time: 'today'
       }),
-      cache: 'no-store',
-      next: { revalidate: 0 }
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -39,8 +38,7 @@ export const fetchUserSession = async (userId: number, isQuiz = false) => {
 
     const response = await fetch(urlWithParams, {
       ...getFetchConfig(bearerToken),
-      cache: 'no-store',
-      next: { revalidate: 0 }
+      cache: 'no-store'
     });
 
     if (!response.ok) {
