@@ -60,7 +60,11 @@ export default function Home() {
   const filterAndSortTests = (quizzes: QuizSession[]) => {
     const activeQuizzes = quizzes
       .filter(quiz => isSessionActive(formatQuizSessionTime(quiz.session.end_time)))
-      .filter(quiz => isQuizAttemptable(quiz.session.platform_id));
+      .filter(quiz => {
+        const platformId = quiz.session.platform_id;
+        const isCompleted = quizCompletionStatus[platformId] === true;
+        return isQuizAttemptable(platformId) || isCompleted;
+      });
 
     const regularTests = activeQuizzes.filter(quiz =>
       quiz.session.meta_data.test_type !== 'homework' &&
@@ -272,6 +276,16 @@ export default function Home() {
         );
       }
     } else if (data.platform === 'quiz') {
+      const isCompleted = quizCompletionStatus.hasOwnProperty(data.platform_id) && quizCompletionStatus[data.platform_id] === true;
+      if (isCompleted) {
+        return (
+          <div className="flex flex-col items-center pr-2">
+            <div className="w-[118px] italic md:w-36 h-8 flex items-center justify-center text-xs">
+              Test Submitted
+            </div>
+          </div>
+        );
+      }
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
         const isResumeable = quizCompletionStatus.hasOwnProperty(data.platform_id) && !quizCompletionStatus[data.platform_id];
         const formatType = data.meta_data?.gurukul_format_type || 'both';
