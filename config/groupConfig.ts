@@ -102,6 +102,28 @@ const groupConfig: GroupConfigurations = {
         showHomeTab: false,
         noReportsMessage: 'The reports will be available once the first test has been completed',
     },
+    HimachalStudents: {
+        showLiveClasses: false,
+        showTests: true,
+        showPracticeTests: false,
+        showHomework: false,
+        showContentLibrary: true,
+        showClassLibrary: false,
+        testsSectionTitle: 'Himachal State-wide Test (Live)',
+        homeTabLabel: 'Tests',
+        noTestsMessage: 'There is no Himachal live test for today!',
+    },
+    UttarakhandStudents: {
+        showLiveClasses: false,
+        showTests: true,
+        showPracticeTests: false,
+        showHomework: false,
+        showContentLibrary: true,
+        showClassLibrary: false,
+        testsSectionTitle: 'Uttarakhand State-wide Test (Live)',
+        homeTabLabel: 'Tests',
+        noTestsMessage: 'There is no Uttarakhand live test for today!',
+    },
 };
 
 export const getGroupConfig = (group: string): GroupConfig => {

@@ -60,12 +60,14 @@ export const getTopicName = (topic: Topic): string => {
  * Build final link for a resource.
  * If resource is a quiz, append apiKey and userId as query params.
  * apiKey can be provided, otherwise falls back to NEXT_PUBLIC_AF_QUIZ_API_KEY.
+ * Returns undefined if resource.link is missing.
  */
 export const buildResourceLink = (
     resource: Resource,
     userId?: string | null,
     apiKey?: string
-): string => {
+): string | undefined => {
+    if (!resource.link) return undefined;
     if (resource.type !== 'quiz') return resource.link;
     const key = apiKey ?? (process.env.NEXT_PUBLIC_AF_QUIZ_API_KEY || '');
     const params = new URLSearchParams({ apiKey: key, userId: userId || '' }).toString();
