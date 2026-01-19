@@ -351,6 +351,7 @@ const ContentLibrary = () => {
                                                     }).map((resource) => {
                                                         const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
                                                         const href = buildResourceLink(resource, userId);
+                                                        if (!href) return null;
                                                         return (
                                                             <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center">
                                                                 <Link href={href} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
@@ -370,12 +371,16 @@ const ContentLibrary = () => {
                                                                         resource.link
                                                                 );
 
+                                                                // Only render topic card if it has resources
+                                                                if (videos.length === 0) return null;
+
                                                                 return (
                                                                     <div key={topic.id} className="bg-card rounded-lg shadow-lg shadow-slate-400 p-4 mx-2 mt-2 my-8 text-black font-semibold">
                                                                         <h3>{getTopicName(topic)}</h3>
                                                                         <ul className="text-primary m-2 font-normal">
                                                                             {videos.map((resource) => {
                                                                                 const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
+                                                                                if (!resource.link) return null;
                                                                                 return (
                                                                                     <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary flex items-center">
                                                                                         <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
@@ -388,6 +393,7 @@ const ContentLibrary = () => {
                                                                     </div>
                                                                 );
                                                             })
+                                                            .filter((card) => card !== null)
                                                     ) : (
                                                         // No topics: show all non-module chapter resources directly
                                                         chapterResources.length === 0 && (

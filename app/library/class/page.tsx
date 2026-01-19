@@ -307,13 +307,16 @@ const ClassLibrary = () => {
                                             <ul className="text-primary font-normal">
                                                 {resources
                                                     .filter((resource) => resource.chapter_id === chapter.id && resource.link && resource.type === 'video' && resource.subtype === 'classRecording')
-                                                    .map((resource) => (
-                                                        <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center">
-                                                            <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
-                                                                <MdPlayCircleFilled className="w-10 h-10 mr-2" color="#ef4444" /> {getResourceName(resource)} {resource.type_params?.date ? `- ${resource.type_params.date}` : ''}
-                                                            </Link>
-                                                        </li>
-                                                    ))}
+                                                    .map((resource) => {
+                                                        if (!resource.link) return null;
+                                                        return (
+                                                            <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center">
+                                                                <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
+                                                                    <MdPlayCircleFilled className="w-10 h-10 mr-2" color="#ef4444" /> {getResourceName(resource)} {resource.type_params?.date ? `- ${resource.type_params.date}` : ''}
+                                                                </Link>
+                                                            </li>
+                                                        );
+                                                    })}
                                             </ul>
                                         )}
                                     </div>
