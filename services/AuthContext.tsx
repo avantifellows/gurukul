@@ -33,7 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const redirectToPortal = (targetGroup?: string) => {
         const redirectGroup = targetGroup || group || 'DelhiStudents';
         const portalUrl = `${api.portal.frontend.baseUrl}/?group=${redirectGroup}&platform=gurukul`;
-        // navigateToPortal(portalUrl);
+        navigateToPortal(portalUrl);
     };
 
     useEffect(() => {
