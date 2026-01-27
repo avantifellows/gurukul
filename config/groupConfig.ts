@@ -135,6 +135,19 @@ const groupConfig: GroupConfigurations = {
         homeTabLabel: 'Tests',
         noTestsMessage: 'There is no live test for today!',
     },
+    TNTeachers: {
+        showLiveClasses: false,
+        showTests: true,
+        showPracticeTests: false,
+        showHomework: false,
+        showContentLibrary: false,
+        showClassLibrary: false,
+        testsSectionTitle: 'Live Test',
+        homeTabLabel: 'Tests',
+        noTestsMessage: 'There is no live test for today!',
+        showLibraryTab: false,
+        showReportsTab: false,
+    },
 };
 
 export const getGroupConfig = (group: string): GroupConfig => {
