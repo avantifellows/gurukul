@@ -124,6 +124,17 @@ const groupConfig: GroupConfigurations = {
         homeTabLabel: 'Tests',
         noTestsMessage: 'There is no Uttarakhand live test for today!',
     },
+    MaharashtraStudents: {
+        showLiveClasses: false,
+        showTests: true,
+        showPracticeTests: true,
+        showHomework: false,
+        showContentLibrary: true,
+        showClassLibrary: false,
+        testsSectionTitle: 'Live Test',
+        homeTabLabel: 'Tests',
+        noTestsMessage: 'There is no live test for today!',
+    },
 };
 
 export const getGroupConfig = (group: string): GroupConfig => {
