@@ -28,6 +28,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [userId, setUserId] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [group, setGroup] = useState<string | null>(null);
+    const [studentId, setStudentId] = useState<string | null>(null);
+    const [apaarId, setApaarId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const redirectToPortal = (targetGroup?: string) => {
@@ -40,15 +42,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         async function checkToken() {
             try {
                 const result = await verifyToken();
+
                 if (result.isValid) {
                     setLoggedIn(true);
-                    const userGroup = result.data.data.group;
-                    const verifiedId = result.data.id;
+
+                    const tokenData = result.data?.data ?? {};
+                    const userGroup = tokenData.group ?? null;
+                    const verifiedIdRaw = tokenData.user_id ?? result.data?.id ?? null;
+                    const verifiedId = verifiedIdRaw ? String(verifiedIdRaw) : null;
+                    const resolvedStudentId = tokenData.student_id
+                        ? String(tokenData.student_id)
+                        : null;
+                    const resolvedApaarId = tokenData.apaar_id
+                        ? String(tokenData.apaar_id)
+                        : null;
+
                     setUserId(verifiedId);
+                    setStudentId(resolvedStudentId);
+                    setApaarId(resolvedApaarId);
                     setGroup(userGroup);
 
                     // Fetch user details
-                    const userData: Student | null = await getUserDetails(verifiedId, userGroup);
+                    if (!verifiedId || !userGroup) {
+                        console.warn('Token verification missing identifiers, redirecting to portal');
+                        setLoggedIn(false);
+                        setUserId(null);
+                        setStudentId(null);
+                        setApaarId(null);
+                        redirectToPortal();
+                        return;
+                    }
+
+                    const userData: Student | null = await getUserDetails(verifiedId);
                     if (userData) {
                         setUser(userData.user);
 
@@ -79,12 +104,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 } else {
                     setLoggedIn(false);
                     setUserId(null);
+                    setStudentId(null);
+                    setApaarId(null);
                     redirectToPortal();
                 }
             } catch (error) {
                 console.error('Error verifying token:', error);
                 setLoggedIn(false);
                 setUserId(null);
+                setStudentId(null);
+                setApaarId(null);
             } finally {
                 setIsLoading(false);
             }
@@ -114,6 +143,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setLoggedIn(false);
             setUserId(null);
             setUser(null);
+            setStudentId(null);
+            setApaarId(null);
             
             // Redirect to portal (this will open in system browser if in PWA)
             redirectToPortal();
@@ -125,7 +156,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ loggedIn, userId, userName, userDbId, group, logout, isLoading }}>
+        <AuthContext.Provider
+            value={{
+                loggedIn,
+                userId,
+                userName,
+                userDbId,
+                group,
+                studentId,
+                apaarId,
+                logout,
+                isLoading,
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );
