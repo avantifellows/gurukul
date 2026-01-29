@@ -11,12 +11,18 @@ export const getUserDetails = async (
     const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN!;
 
     try {
-        const queryParams = new URLSearchParams({
-            id,
-            group,
-        });
+        let urlWithParams: string;
 
-        const urlWithParams = `${url}/student?${queryParams.toString()}`;
+        if (group === 'TNTeachers' || group === 'PunjabTeachers') {
+            urlWithParams = `${url}/teacher?teacher_id=${id}`;
+        } else {
+            const queryParams = new URLSearchParams({
+                id,
+                group,
+            });
+            urlWithParams = `${url}/student?${queryParams.toString()}`;
+        }
+
         const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
 
         if (!response.ok) {
