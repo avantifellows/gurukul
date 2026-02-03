@@ -130,6 +130,12 @@ export interface User {
   last_name: string;
   gender?: string;
 }
+
+export interface UserDetails {
+  user: User;
+  student?: Student | null;
+}
+
 export interface Student {
   id: number;
   student_id: string | null;

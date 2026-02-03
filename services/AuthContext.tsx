@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { verifyToken } from '@/services/validation';
 import { usePathname, useRouter } from 'next/navigation';
-import { AuthContextProps, User, Student } from '../app/types';
+import { AuthContextProps, User, UserDetails } from '../app/types';
 import { api } from '@/services/url';
 import { getUserDetails } from '@/api/afdb/userDetails';
 import { getGroupConfig } from '@/config/groupConfig';
@@ -73,17 +73,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         return;
                     }
 
-                    const userData: Student | null = await getUserDetails(verifiedId);
+                    const userData: UserDetails | null = await getUserDetails(
+                        verifiedId,
+                        userGroup
+                    );
                     if (userData) {
                         setUser(userData.user);
+                        const studentInfo = userData.student;
 
                         const mixpanel = MixpanelTracking.getInstance();
                         const userProperties = {
                             auth_group: userGroup,
-                            grade_id: userData.grade_id,
-                            stream: userData.stream,
+                            grade_id: studentInfo?.grade_id,
+                            stream: studentInfo?.stream,
                             gender: userData.user.gender,
-                            category: userData.category,
+                            category: studentInfo?.category,
                         };
 
                         // Check if this is a fresh login or session restoration
