@@ -7,6 +7,7 @@ export interface ReportResponse {
 export interface AuthContextProps {
   loggedIn: boolean;
   userId: string | null;
+  displayId: string | null;
   userName: string;
   userDbId: number | null;
   group: string | null;

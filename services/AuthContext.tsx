@@ -46,6 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const [loggedIn, setLoggedIn] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
+    const [displayId, setDisplayId] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [group, setGroup] = useState<string | null>(null);
     const [studentId, setStudentId] = useState<string | null>(null);
@@ -76,22 +77,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     const resolvedApaarId = tokenData.apaar_id
                         ? String(tokenData.apaar_id)
                         : null;
+                    const resolvedDisplayId = tokenData.display_id
+                        ? String(tokenData.display_id)
+                        : null;
 
                     setUserId(verifiedId);
                     setStudentId(resolvedStudentId);
                     setApaarId(resolvedApaarId);
+                    setDisplayId(resolvedDisplayId);
                     setGroup(userGroup);
 
                     // Fetch user details
                     if (!verifiedId || !userGroup) {
                         console.warn('Token verification missing identifiers, redirecting to portal');
-                        setLoggedIn(false);
-                        setUserId(null);
-                        setStudentId(null);
-                        setApaarId(null);
-                        redirectToPortal();
-                        return;
-                    }
+                    setLoggedIn(false);
+                    setUserId(null);
+                    setStudentId(null);
+                    setApaarId(null);
+                    setDisplayId(null);
+                    redirectToPortal();
+                    return;
+                }
 
                     const userData: UserDetails | null = await getUserDetails(
                         verifiedId,
@@ -130,6 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setUserId(null);
                     setStudentId(null);
                     setApaarId(null);
+                    setDisplayId(null);
                     redirectToPortal();
                 }
             } catch (error) {
@@ -138,6 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setUserId(null);
                 setStudentId(null);
                 setApaarId(null);
+                setDisplayId(null);
             } finally {
                 setIsLoading(false);
             }
@@ -170,6 +178,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(null);
             setStudentId(null);
             setApaarId(null);
+            setDisplayId(null);
             
             // Redirect to portal (this will open in system browser if in PWA)
             redirectToPortal();
@@ -185,6 +194,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             value={{
                 loggedIn,
                 userId,
+                displayId,
                 userName,
                 userDbId,
                 group,
