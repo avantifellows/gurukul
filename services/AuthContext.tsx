@@ -33,6 +33,11 @@ const clearAuthCookies = () => {
     deleteCookie('refresh_token', { path: '/', domain: COOKIE_DOMAIN });
 };
 
+const shouldDebugAuth = () => {
+    if (typeof window === 'undefined') return false;
+    return new URLSearchParams(window.location.search).has('debugAuth');
+};
+
 export function useAuth() {
     const context = useContext(AuthContext);
     if (context === undefined) {
@@ -81,6 +86,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         ? String(tokenData.display_id)
                         : null;
 
+                    if (shouldDebugAuth()) {
+                        console.log('[auth] tokenData', {
+                            userGroup,
+                            verifiedId,
+                            resolvedDisplayId,
+                            tokenData,
+                        });
+                    }
+
                     setUserId(verifiedId);
                     setStudentId(resolvedStudentId);
                     setApaarId(resolvedApaarId);
@@ -103,6 +117,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         verifiedId,
                         userGroup
                     );
+                    if (shouldDebugAuth()) {
+                        console.log('[auth] userData', userData);
+                    }
                     if (userData) {
                         setUser(userData.user);
                         const studentInfo = userData.student;
