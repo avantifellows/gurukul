@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { deleteCookie } from 'cookies-next';
 import { verifyToken } from '@/services/validation';
 import { usePathname, useRouter } from 'next/navigation';
 import { AuthContextProps, User, UserDetails } from '../app/types';
@@ -12,6 +13,25 @@ import { MIXPANEL_EVENT } from '@/constants/config';
 import { navigateToPortal, clearPWACache } from '@/utils/navigation';
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
+const COOKIE_DOMAIN = '.avantifellows.org';
+
+const isLocalHostname = (hostname?: string) => {
+    if (!hostname) return true;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
+    if (hostname === '::1' || hostname === '0.0.0.0') return true;
+    return /^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname);
+};
+
+const clearAuthCookies = () => {
+    deleteCookie('access_token', { path: '/' });
+    deleteCookie('refresh_token', { path: '/' });
+
+    if (typeof window === 'undefined') return;
+    if (isLocalHostname(window.location.hostname)) return;
+
+    deleteCookie('access_token', { path: '/', domain: COOKIE_DOMAIN });
+    deleteCookie('refresh_token', { path: '/', domain: COOKIE_DOMAIN });
+};
 
 export function useAuth() {
     const context = useContext(AuthContext);
@@ -136,6 +156,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Reset Mixpanel user data
             MixpanelTracking.getInstance().reset();
             
+            clearAuthCookies();
             // Clear local storage
             localStorage.clear();
             sessionStorage.clear();

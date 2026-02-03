@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/services/AuthContext";
 import ProfileIcon from '../assets/profile.png';
 import Image from "next/image";
-import { deleteCookie } from "cookies-next";
 import { MixpanelTracking } from "@/services/mixpanel";
 import { MIXPANEL_EVENT } from "@/constants/config";
 
@@ -34,12 +33,6 @@ const TopBar = () => {
   };
 
   const handleLogout = () => {
-    deleteCookie("access_token", { path: '/', domain: '.avantifellows.org' });
-    deleteCookie("refresh_token", { path: '/', domain: '.avantifellows.org' });
-    // deleteCookie("access_token", { path: '/' });
-    // deleteCookie("refresh_token", { path: '/' });
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
     logout();
     MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.LOGOUT, { action: 'logout_clicked' });
   };

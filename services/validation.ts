@@ -2,12 +2,14 @@ import { getCookie, setCookie } from 'cookies-next';
 import { api } from './url';
 import getFetchConfig from '@/api/fetchConfig';
 
+const IS_PROD = process.env.NODE_ENV === 'production';
+
 async function getToken(key: string): Promise<string | null> {
     let token: string | null = getCookie(key) as string | null;
-    if (!token) {
+    if (!token && !IS_PROD && typeof window !== 'undefined') {
         token = localStorage.getItem(key);
     }
-    if (token) {
+    if (token && !IS_PROD && typeof window !== 'undefined') {
         localStorage.setItem(key, token);
     }
     return token;
@@ -40,7 +42,9 @@ export async function verifyToken() {
 
                 const refreshData = await refreshResponse.json();
                 setCookie('access_token', refreshData.access_token, { path: '/', domain: '.avantifellows.org' });
-                localStorage.setItem('access_token', refreshData.access_token);
+                if (!IS_PROD && typeof window !== 'undefined') {
+                    localStorage.setItem('access_token', refreshData.access_token);
+                }
                 window.location.reload();
                 return { isValid: true };
             }
