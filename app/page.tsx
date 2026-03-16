@@ -75,8 +75,7 @@ export default function Home() {
       quiz.session.meta_data.test_format !== 'chapter_test'
     );
 
-    // Hide chapter tests for EnableStudents group
-    const chapterTests = group === 'EnableStudents' ? [] : regularTests.filter(quiz =>
+    const chapterTests = regularTests.filter(quiz =>
       quiz.session.meta_data.test_format === 'chapter_test'
     );
 
