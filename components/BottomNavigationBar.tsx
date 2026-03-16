@@ -76,7 +76,7 @@ const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
             className='h-5 w-auto object-contain md:h-8'
           />
         </div>
-        <div className="flex-1 flex flex-col items-center justify-center gap-0.5 md:gap-1 text-center">
+        <div className="flex-1 flex flex-col items-center justify-center gap-0.5 md:gap-1 md:pb-2 text-center">
           supported by
           <Image
             src={TataMotorsLogo}
