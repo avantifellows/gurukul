@@ -207,3 +207,21 @@ export type GroupConfigurations = {
 export interface BottomNavigationBarProps {
   homeLabel?: string;
 }
+
+export interface SchoolReport {
+  test_name: string;
+  file_name: string;
+}
+
+export interface SchoolReportsResponse {
+  data: SchoolReport[];
+  school: {
+    name: string;
+    code: string;
+  };
+}
+
+export interface ReportUrlResponse {
+  url: string;
+  test_name: string;
+}
