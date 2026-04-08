@@ -5,44 +5,47 @@ import Image from "next/image";
 import Link from "next/link";
 import AvantiLogo from "@/assets/avanti_logo.png";
 import { api } from "@/services/url";
+import groupConfig from "@/config/groupConfig";
 
-const GROUPS = [
-  {
-    region: "Delhi",
-    groups: [
-      { key: "DelhiStudents", label: "Delhi Students" },
-      { key: "DelhiSchools", label: "Delhi Schools" },
-    ],
-  },
-  {
-    region: "Punjab",
-    groups: [
-      { key: "PunjabStudents", label: "Punjab Students" },
-      { key: "PunjabTeachers", label: "Punjab Teachers" },
-    ],
-  },
-  {
-    region: "NVS / Enable",
-    groups: [
-      { key: "EnableStudents", label: "Enable Students (NVS)" },
-      { key: "EnableSchools", label: "Enable Schools" },
-    ],
-  },
-  {
-    region: "Other States",
-    groups: [
-      { key: "AllIndiaStudents", label: "All India" },
-      { key: "ChhattisgarhStudents", label: "Chhattisgarh" },
-      { key: "HimachalStudents", label: "Himachal Pradesh" },
-      { key: "UttarakhandStudents", label: "Uttarakhand" },
-      { key: "MaharashtraStudents", label: "Maharashtra" },
-      { key: "TNTeachers", label: "Tamil Nadu (Teachers)" },
-    ],
-  },
-];
+// Display labels and region grouping for the login page
+const GROUP_METADATA: Record<string, { label: string; region: string }> = {
+  DelhiStudents: { label: "Delhi Students", region: "Delhi" },
+  DelhiSchools: { label: "Delhi Schools", region: "Delhi" },
+  PunjabStudents: { label: "Punjab Students", region: "Punjab" },
+  PunjabTeachers: { label: "Punjab Teachers", region: "Punjab" },
+  EnableStudents: { label: "Enable Students (NVS)", region: "NVS / Enable" },
+  EnableSchools: { label: "Enable Schools", region: "NVS / Enable" },
+  AllIndiaStudents: { label: "All India", region: "Other States" },
+  ChhattisgarhStudents: { label: "Chhattisgarh", region: "Other States" },
+  HimachalStudents: { label: "Himachal Pradesh", region: "Other States" },
+  UttarakhandStudents: { label: "Uttarakhand", region: "Other States" },
+  MaharashtraStudents: { label: "Maharashtra", region: "Other States" },
+  TNTeachers: { label: "Tamil Nadu (Teachers)", region: "Other States" },
+};
+
+const REGION_ORDER = ["Delhi", "Punjab", "NVS / Enable", "Other States"];
+
+// Build groups from groupConfig keys, skipping 'defaultGroup'
+function buildGroupSections() {
+  const regionMap: Record<string, { key: string; label: string }[]> = {};
+
+  Object.keys(groupConfig).forEach((key) => {
+    if (key === "defaultGroup") return;
+    const meta = GROUP_METADATA[key];
+    if (!meta) return;
+
+    if (!regionMap[meta.region]) regionMap[meta.region] = [];
+    regionMap[meta.region].push({ key, label: meta.label });
+  });
+
+  return REGION_ORDER
+    .filter((region) => regionMap[region]?.length > 0)
+    .map((region) => ({ region, groups: regionMap[region] }));
+}
 
 export default function LoginPage() {
   const portalBaseUrl = api.portal.frontend.baseUrl;
+  const sections = buildGroupSections();
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col" style={{ maxWidth: "100vw" }}>
@@ -75,7 +78,7 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-8">
-            {GROUPS.map((section) => (
+            {sections.map((section) => (
               <div key={section.region}>
                 <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">
                   {section.region}

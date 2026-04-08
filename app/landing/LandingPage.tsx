@@ -6,6 +6,7 @@ import Link from "next/link";
 import AvantiLogo from "@/assets/avanti_logo.png";
 import CapgeminiLogo from "@/assets/capgemini_logo.png";
 import TataMotorsLogo from "@/assets/tata_motors_logo.png";
+import { api } from "@/services/url";
 
 const FEATURES = [
   {
@@ -99,6 +100,8 @@ function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: str
 }
 
 export default function LandingPage() {
+  const portalBaseUrl = api.portal.frontend.baseUrl;
+  const registerUrl = `${portalBaseUrl}/?group=AllIndiaStudents&platform=gurukul&signup_form=true&signup_form_id=23&id_generation=true&type=sign-up`;
   const [activeFeature, setActiveFeature] = useState(0);
 
   // Auto-rotate features
@@ -185,7 +188,7 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <a
-                href="https://auth.avantifellows.org/?group=AllIndiaStudents&platform=gurukul&signup_form=true&signup_form_id=23&id_generation=true&type=sign-up"
+                href={registerUrl}
                 className="inline-flex items-center justify-center bg-primary hover:bg-teal-700 text-white font-semibold px-8 py-3.5 rounded-full text-base transition-all duration-200 hover:shadow-xl hover:shadow-teal-200/50 hover:-translate-y-0.5"
               >
                 Get Started Free
@@ -322,6 +325,7 @@ export default function LandingPage() {
                     title="Gurukul Platform Walkthrough"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
+                    loading="lazy"
                   />
                 </div>
               </div>
@@ -357,7 +361,7 @@ export default function LandingPage() {
             Join lakhs of students already using Gurukul to prepare for their exams.
           </p>
           <a
-            href="https://auth.avantifellows.org/?group=AllIndiaStudents&platform=gurukul&signup_form=true&signup_form_id=23&id_generation=true&type=sign-up"
+            href={registerUrl}
             className="inline-flex items-center justify-center bg-primary hover:bg-teal-700 text-white font-semibold px-10 py-4 rounded-full text-lg transition-all duration-200 hover:shadow-xl hover:shadow-teal-200/50 hover:-translate-y-0.5"
           >
             Get Started Now
