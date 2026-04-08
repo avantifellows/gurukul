@@ -184,15 +184,15 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/login"
+              <a
+                href="https://auth.avantifellows.org/?group=AllIndiaStudents&platform=gurukul&signup_form=true&signup_form_id=23&id_generation=true&type=sign-up"
                 className="inline-flex items-center justify-center bg-primary hover:bg-teal-700 text-white font-semibold px-8 py-3.5 rounded-full text-base transition-all duration-200 hover:shadow-xl hover:shadow-teal-200/50 hover:-translate-y-0.5"
               >
                 Get Started Free
                 <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
-              </Link>
+              </a>
               <a
                 href="#tutorial"
                 className="inline-flex items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold px-8 py-3.5 rounded-full text-base transition-all duration-200 border border-gray-200"
@@ -356,15 +356,15 @@ export default function LandingPage() {
           <p className="text-gray-500 text-lg mb-8 max-w-lg mx-auto">
             Join lakhs of students already using Gurukul to prepare for their exams.
           </p>
-          <Link
-            href="/login"
+          <a
+            href="https://auth.avantifellows.org/?group=AllIndiaStudents&platform=gurukul&signup_form=true&signup_form_id=23&id_generation=true&type=sign-up"
             className="inline-flex items-center justify-center bg-primary hover:bg-teal-700 text-white font-semibold px-10 py-4 rounded-full text-lg transition-all duration-200 hover:shadow-xl hover:shadow-teal-200/50 hover:-translate-y-0.5"
           >
             Get Started Now
             <svg className="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
-          </Link>
+          </a>
         </div>
       </section>
 
