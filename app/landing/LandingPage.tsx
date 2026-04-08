@@ -16,6 +16,7 @@ const FEATURES = [
       "Take mock JEE/NEET tests to assess your preparation and practice tests to sharpen your skills. Timed, exam-like conditions so you're ready on the big day.",
     color: "from-teal-500 to-emerald-600",
     accent: "#0d9488",
+    screenshot: "/landing/screenshot_tests.webp",
     icon: (
       <svg viewBox="0 0 48 48" fill="none" className="w-10 h-10">
         <rect x="6" y="4" width="36" height="40" rx="4" stroke="currentColor" strokeWidth="2.5" fill="none" />
@@ -32,6 +33,7 @@ const FEATURES = [
       "Access 5,000+ videos that explain chapters and topics in detail. Curated by expert educators to help you ace JEE, NEET, and board exams.",
     color: "from-amber-500 to-orange-600",
     accent: "#d97706",
+    screenshot: "/landing/screenshot_library.webp",
     icon: (
       <svg viewBox="0 0 48 48" fill="none" className="w-10 h-10">
         <rect x="4" y="8" width="16" height="32" rx="2" stroke="currentColor" strokeWidth="2.5" fill="none" />
@@ -48,6 +50,7 @@ const FEATURES = [
       "Get performance reports with accuracy and attempt rate breakdowns. See subject-wise and chapter-wise analysis to clearly identify your strengths and areas to improve.",
     color: "from-violet-500 to-purple-600",
     accent: "#7c3aed",
+    screenshot: "/landing/screenshot_reports.webp",
     icon: (
       <svg viewBox="0 0 48 48" fill="none" className="w-10 h-10">
         <rect x="6" y="6" width="36" height="36" rx="4" stroke="currentColor" strokeWidth="2.5" fill="none" />
@@ -278,16 +281,17 @@ export default function LandingPage() {
                       {feature.description}
                     </p>
                   </div>
-                  {/* Screenshot placeholder */}
+                  {/* Screenshot */}
                   <div className={`bg-gradient-to-br ${feature.color} p-8 sm:p-12 flex items-center justify-center min-h-[300px] sm:min-h-[400px]`}>
-                    <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-2xl w-full max-w-[280px] h-[420px] flex items-center justify-center">
-                      <div className="text-center text-white/70 px-4">
-                        <svg className="w-16 h-16 mx-auto mb-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
-                        </svg>
-                        <p className="text-sm font-medium">Screenshot placeholder</p>
-                        <p className="text-xs mt-1 opacity-70">{feature.title}</p>
-                      </div>
+                    <div className="w-full max-w-[280px] rounded-2xl overflow-hidden shadow-2xl shadow-black/20 border-2 border-white/20">
+                      <Image
+                        src={feature.screenshot}
+                        alt={`${feature.title} screenshot`}
+                        width={401}
+                        height={781}
+                        className="w-full h-auto"
+                        loading="lazy"
+                      />
                     </div>
                   </div>
                 </div>
