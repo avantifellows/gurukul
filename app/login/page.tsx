@@ -5,40 +5,19 @@ import Image from "next/image";
 import Link from "next/link";
 import AvantiLogo from "@/assets/avanti_logo.png";
 import { api } from "@/services/url";
-import groupConfig from "@/config/groupConfig";
+import groupConfig, { LOGIN_REGION_ORDER } from "@/config/groupConfig";
 
-// Display labels and region grouping for the login page
-const GROUP_METADATA: Record<string, { label: string; region: string }> = {
-  DelhiStudents: { label: "Delhi Students", region: "Delhi" },
-  DelhiSchools: { label: "Delhi Schools", region: "Delhi" },
-  PunjabStudents: { label: "Punjab Students", region: "Punjab" },
-  PunjabTeachers: { label: "Punjab Teachers", region: "Punjab" },
-  EnableStudents: { label: "Enable Students (NVS)", region: "NVS / Enable" },
-  EnableSchools: { label: "Enable Schools", region: "NVS / Enable" },
-  AllIndiaStudents: { label: "All India", region: "Other States" },
-  ChhattisgarhStudents: { label: "Chhattisgarh", region: "Other States" },
-  HimachalStudents: { label: "Himachal Pradesh", region: "Other States" },
-  UttarakhandStudents: { label: "Uttarakhand", region: "Other States" },
-  MaharashtraStudents: { label: "Maharashtra", region: "Other States" },
-  TNTeachers: { label: "Tamil Nadu (Teachers)", region: "Other States" },
-};
-
-const REGION_ORDER = ["Delhi", "Punjab", "NVS / Enable", "Other States"];
-
-// Build groups from groupConfig keys, skipping 'defaultGroup'
 function buildGroupSections() {
   const regionMap: Record<string, { key: string; label: string }[]> = {};
 
-  Object.keys(groupConfig).forEach((key) => {
-    if (key === "defaultGroup") return;
-    const meta = GROUP_METADATA[key];
-    if (!meta) return;
+  Object.entries(groupConfig).forEach(([key, config]) => {
+    if (key === "defaultGroup" || !config.displayLabel || !config.region) return;
 
-    if (!regionMap[meta.region]) regionMap[meta.region] = [];
-    regionMap[meta.region].push({ key, label: meta.label });
+    if (!regionMap[config.region]) regionMap[config.region] = [];
+    regionMap[config.region].push({ key, label: config.displayLabel });
   });
 
-  return REGION_ORDER
+  return LOGIN_REGION_ORDER
     .filter((region) => regionMap[region]?.length > 0)
     .map((region) => ({ region, groups: regionMap[region] }));
 }
