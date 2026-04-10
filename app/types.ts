@@ -198,6 +198,8 @@ export interface GroupConfig {
   noReportsMessage?: string;
   testsInfoLink?: string;
   testsHeaderNote?: string;
+  displayLabel?: string;
+  region?: string;
 }
 
 export type GroupConfigurations = {

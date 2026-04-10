@@ -79,7 +79,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 } else {
                     setLoggedIn(false);
                     setUserId(null);
-                    redirectToPortal();
                 }
             } catch (error) {
                 console.error('Error verifying token:', error);
