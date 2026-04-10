@@ -200,13 +200,13 @@ export default function LandingPage() {
                 </svg>
               </a>
               <a
-                href="#tutorial"
+                href="#promo"
                 className="inline-flex items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold px-8 py-3.5 rounded-full text-base transition-all duration-200 border border-gray-200"
               >
                 <svg className="mr-2 w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
-                Watch Tutorial
+                Watch Video
               </a>
             </div>
           </div>
@@ -225,6 +225,32 @@ export default function LandingPage() {
                 <div className="text-sm text-gray-500 font-medium mt-0.5">{stat.label}</div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== PROMO VIDEO ===== */}
+      <section className="py-16 sm:py-20 bg-white" id="promo">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-10">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight mb-3">
+              See Gurukul in action
+            </h2>
+            <p className="text-gray-500 text-base sm:text-lg">
+              Watch how thousands of students are preparing for their exams with us.
+            </p>
+          </div>
+          <div className="max-w-3xl mx-auto">
+            <div className="relative w-full rounded-2xl overflow-hidden shadow-2xl shadow-teal-100/50 ring-1 ring-gray-200" style={{ paddingBottom: "56.25%" }}>
+              <iframe
+                className="absolute inset-0 w-full h-full"
+                src="https://www.youtube.com/embed/QvgSAkB52WM"
+                title="Gurukul Promo"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                loading="lazy"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -325,8 +351,8 @@ export default function LandingPage() {
                 <div className="relative w-full rounded-2xl overflow-hidden shadow-2xl shadow-black/30" style={{ paddingBottom: "56.25%" }}>
                   <iframe
                     className="absolute inset-0 w-full h-full"
-                    src="https://www.youtube.com/embed/QvgSAkB52WM"
-                    title="Gurukul Platform Walkthrough"
+                    src="https://www.youtube.com/embed/JIozCICyY3s"
+                    title="Gurukul Platform Tutorial"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     loading="lazy"
