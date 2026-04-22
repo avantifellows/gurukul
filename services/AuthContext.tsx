@@ -41,6 +41,28 @@ export function useAuth() {
     return context;
 }
 
+const buildUserFromProfile = (profileUser: any, verifiedId: string | null): User | null => {
+    if (!profileUser || typeof profileUser !== 'object') return null;
+
+    const derivedName =
+        typeof profileUser.name === 'string' ? profileUser.name.trim() : '';
+    const firstName =
+        typeof profileUser.first_name === 'string' && profileUser.first_name.trim()
+            ? profileUser.first_name.trim()
+            : derivedName;
+    const lastName =
+        typeof profileUser.last_name === 'string' ? profileUser.last_name.trim() : '';
+    const numericId = verifiedId ? Number(verifiedId) : NaN;
+
+    return {
+        id: Number.isNaN(numericId) ? 0 : numericId,
+        first_name: firstName || '',
+        last_name: lastName,
+        gender:
+            typeof profileUser.gender === 'string' ? profileUser.gender : undefined,
+    };
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
@@ -80,30 +102,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     const resolvedDisplayId = tokenData.display_id
                         ? String(tokenData.display_id)
                         : null;
+                    const tokenProfile =
+                        tokenData.profile && typeof tokenData.profile === 'object'
+                            ? tokenData.profile
+                            : null;
 
                     setUserId(verifiedId);
-                    setStudentId(resolvedStudentId);
-                    setApaarId(resolvedApaarId);
+                    setStudentId(
+                        resolvedStudentId ??
+                            (tokenProfile?.student?.student_id
+                                ? String(tokenProfile.student.student_id)
+                                : null)
+                    );
+                    setApaarId(
+                        resolvedApaarId ??
+                            (tokenProfile?.student?.apaar_id
+                                ? String(tokenProfile.student.apaar_id)
+                                : null)
+                    );
                     setDisplayId(resolvedDisplayId);
                     setGroup(userGroup);
 
-                    // Fetch user details
                     if (!verifiedId || !userGroup) {
                         console.warn('Token verification missing identifiers, redirecting to portal');
-                    setLoggedIn(false);
-                    setUserId(null);
-                    setStudentId(null);
-                    setApaarId(null);
-                    setDisplayId(null);
-                    redirectToPortal();
-                    return;
-                }
+                        setLoggedIn(false);
+                        setUserId(null);
+                        setStudentId(null);
+                        setApaarId(null);
+                        setDisplayId(null);
+                        redirectToPortal();
+                        return;
+                    }
 
-                    const userData: UserDetails | null = await getUserDetails(
-                        verifiedId,
-                        userGroup
-                    );
-                    if (userData) {
+                    let userData: UserDetails | null = null;
+                    if (tokenProfile) {
+                        userData = {
+                            user: buildUserFromProfile(tokenProfile.user, verifiedId) || {
+                                id: Number(verifiedId),
+                                first_name: '',
+                                last_name: '',
+                            },
+                            student:
+                                tokenProfile.student && typeof tokenProfile.student === 'object'
+                                    ? tokenProfile.student
+                                    : null,
+                        };
+                    } else {
+                        userData = await getUserDetails(verifiedId, userGroup);
+                    }
+
+                    if (userData?.user) {
                         setUser(userData.user);
                         const studentInfo = userData.student;
 
@@ -116,12 +164,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             category: studentInfo?.category,
                         };
 
-                        // Check if this is a fresh login or session restoration
                         if (mixpanel.hasUserLoginBeenTracked(verifiedId)) {
-                            // Session restoration - just identify without tracking event
                             mixpanel.identifyUser(verifiedId, userProperties);
                         } else {
-                            // Fresh login - track the login event
                             mixpanel.trackUserLogin(verifiedId, MIXPANEL_EVENT.USER_IDENTIFIED, userProperties);
                         }
                     }
