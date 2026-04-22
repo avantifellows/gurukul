@@ -29,7 +29,6 @@ export interface NavLinkProps {
 
 export interface Report {
   test_name: string;
-  test_session_id: string;
   rank: string;
   report_link: string;
   start_date: string;
