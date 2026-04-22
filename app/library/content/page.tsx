@@ -60,8 +60,8 @@ const ContentLibrary = () => {
     const selectedCourse = searchParams.get('course');
     const neetSubjects = ['Physics', 'Chemistry', 'Biology'];
     const jeeSubjects = ['Physics', 'Chemistry', 'Maths'];
-    const caSubjects = ['Accounting', 'Business Economics', 'Quantitative Aptitude'];
-    const clatSubjects = ['English', 'Logical Reasoning', 'Legal Reasoning'];
+    const caSubjects = ['Accounting', 'Business Economics', 'Quantitative Aptitude', 'Business Laws'];
+    const clatSubjects = ['English', 'Logical Reasoning', 'Legal Reasoning', 'Quantitative Techniques', 'Current Affairs'];
     const { userId } = useAuth();
 
     // Get grade options based on selected course

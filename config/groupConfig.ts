@@ -10,6 +10,8 @@ const groupConfig: GroupConfigurations = {
         showClassLibrary: false,
         testsSectionTitle: 'Tests',
         homeTabLabel: 'Home',
+        displayLabel: 'All India',
+        region: 'Other States',
     },
     EnableStudents: {
         showLiveClasses: false,
@@ -24,7 +26,9 @@ const groupConfig: GroupConfigurations = {
         testsInfoLink: 'https://www.nvslakshya.org/nvs-test-details',
         showLibraryTab: true,
         showReportsTab: true,
-        testsHeaderNote: "You’re seeing the test based on the exam preference shared by your school. If you see more than one test, select your preferred one from below",
+        testsHeaderNote: "You're seeing the test based on the exam preference shared by your school. If you see more than one test, select your preferred one from below",
+        displayLabel: 'Enable Students (NVS)',
+        region: 'NVS / Enable',
     },
     EnableSchools: {
         showLiveClasses: false,
@@ -36,6 +40,8 @@ const groupConfig: GroupConfigurations = {
         testsSectionTitle: 'Tests',
         homeTabLabel: 'Home',
         showHomeTab: false,
+        displayLabel: 'Enable Schools',
+        region: 'NVS / Enable',
     },
     DelhiStudents: {
         showLiveClasses: false,
@@ -47,6 +53,8 @@ const groupConfig: GroupConfigurations = {
         testsSectionTitle: 'CM Shri Live Test',
         homeTabLabel: 'Tests',
         noTestsMessage: 'There is no CM Shri live test for today!',
+        displayLabel: 'Delhi Students',
+        region: 'Delhi',
     },
     defaultGroup: {
         showLiveClasses: true,
@@ -67,6 +75,8 @@ const groupConfig: GroupConfigurations = {
         showClassLibrary: false,
         testsSectionTitle: 'Tests',
         homeTabLabel: 'Home',
+        displayLabel: 'Chhattisgarh',
+        region: 'Other States',
     },
     PunjabStudents: {
         showLiveClasses: false,
@@ -75,9 +85,12 @@ const groupConfig: GroupConfigurations = {
         showHomework: false,
         showContentLibrary: true,
         showClassLibrary: false,
+        homepageSponsorLogos: 'capgeminiOnly',
         testsSectionTitle: 'PACE State-wide Test (Live)',
         homeTabLabel: 'Tests',
         noTestsMessage: 'There is no PACE live test for today!',
+        displayLabel: 'Punjab Students',
+        region: 'Punjab',
     },
     PunjabTeachers: {
         showLiveClasses: false,
@@ -89,6 +102,8 @@ const groupConfig: GroupConfigurations = {
         showHomeTab: false,
         showLibraryTab: true,
         showReportsTab: false,
+        displayLabel: 'Punjab Teachers',
+        region: 'Punjab',
     },
     DelhiSchools: {
         showLiveClasses: false,
@@ -101,6 +116,8 @@ const groupConfig: GroupConfigurations = {
         homeTabLabel: 'Home',
         showHomeTab: false,
         noReportsMessage: 'The reports will be available once the first test has been completed',
+        displayLabel: 'Delhi Schools',
+        region: 'Delhi',
     },
     HimachalStudents: {
         showLiveClasses: false,
@@ -109,9 +126,12 @@ const groupConfig: GroupConfigurations = {
         showHomework: false,
         showContentLibrary: true,
         showClassLibrary: false,
+        homepageSponsorLogos: 'capgeminiOnly',
         testsSectionTitle: 'Himachal State-wide Test (Live)',
         homeTabLabel: 'Tests',
         noTestsMessage: 'There is no Himachal live test for today!',
+        displayLabel: 'Himachal Pradesh',
+        region: 'Other States',
     },
     UttarakhandStudents: {
         showLiveClasses: false,
@@ -123,6 +143,8 @@ const groupConfig: GroupConfigurations = {
         testsSectionTitle: 'Uttarakhand State-wide Test (Live)',
         homeTabLabel: 'Tests',
         noTestsMessage: 'There is no Uttarakhand live test for today!',
+        displayLabel: 'Uttarakhand',
+        region: 'Other States',
     },
     MaharashtraStudents: {
         showLiveClasses: false,
@@ -134,6 +156,8 @@ const groupConfig: GroupConfigurations = {
         testsSectionTitle: 'Live Test',
         homeTabLabel: 'Tests',
         noTestsMessage: 'There is no live test for today!',
+        displayLabel: 'Maharashtra',
+        region: 'Other States',
     },
     TNTeachers: {
         showLiveClasses: false,
@@ -147,8 +171,12 @@ const groupConfig: GroupConfigurations = {
         noTestsMessage: 'There is no live test for today!',
         showLibraryTab: false,
         showReportsTab: false,
+        displayLabel: 'Tamil Nadu (Teachers)',
+        region: 'Other States',
     },
 };
+
+export const LOGIN_REGION_ORDER = ["Delhi", "Punjab", "NVS / Enable", "Other States"];
 
 export const getGroupConfig = (group: string): GroupConfig => {
     return groupConfig[group] || groupConfig.defaultGroup;

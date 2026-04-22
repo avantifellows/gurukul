@@ -1,6 +1,7 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { AuthProvider } from '../services/AuthContext'
+import AuthGate from './AuthGate'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,7 +23,9 @@ export default function RootLayout({
           <link rel="icon" href="/icons/icon-192x192.png" />
           <meta name="theme-color" content="#ffffff" />
         </head>
-        <body className={`${inter.className} max-w-xl mx-auto border-x-1 shadow-2xl border-gray-300`} suppressHydrationWarning={true}>{children}</body>
+        <body className={inter.className} suppressHydrationWarning={true}>
+          <AuthGate>{children}</AuthGate>
+        </body>
       </AuthProvider>
     </html>
   )

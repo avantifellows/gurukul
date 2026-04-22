@@ -198,6 +198,12 @@ export interface GroupConfig {
   showHomework: boolean;
   showContentLibrary: boolean;
   showClassLibrary: boolean;
+  /**
+   * Controls which sponsor logos appear on the authenticated homepage footer strip.
+   * - `default`: show current "powered by" + "supported by"
+   * - `capgeminiOnly`: show only Capgemini logo centered
+   */
+  homepageSponsorLogos?: 'default' | 'capgeminiOnly';
   testsSectionTitle?: string;
   homeTabLabel?: string;
   showHomeTab?: boolean;
@@ -207,6 +213,8 @@ export interface GroupConfig {
   noReportsMessage?: string;
   testsInfoLink?: string;
   testsHeaderNote?: string;
+  displayLabel?: string;
+  region?: string;
 }
 
 export type GroupConfigurations = {
