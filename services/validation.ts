@@ -2,17 +2,17 @@ import { getCookie, setCookie } from 'cookies-next';
 import { api } from './url';
 import getFetchConfig from '@/api/fetchConfig';
 
-const IS_PROD = process.env.NODE_ENV === 'production';
+const COOKIE_DOMAIN = '.avantifellows.org';
 
 async function getToken(key: string): Promise<string | null> {
-    let token: string | null = getCookie(key) as string | null;
-    if (!token && !IS_PROD && typeof window !== 'undefined') {
-        token = localStorage.getItem(key);
-    }
-    if (token && !IS_PROD && typeof window !== 'undefined') {
-        localStorage.setItem(key, token);
-    }
-    return token;
+    return getCookie(key) as string | null;
+}
+
+function isLocalHostname(hostname?: string): boolean {
+    if (!hostname) return true;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
+    if (hostname === '::1' || hostname === '0.0.0.0') return true;
+    return /^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname);
 }
 
 export async function verifyToken() {
@@ -41,10 +41,11 @@ export async function verifyToken() {
                 }
 
                 const refreshData = await refreshResponse.json();
-                setCookie('access_token', refreshData.access_token, { path: '/', domain: '.avantifellows.org' });
-                if (!IS_PROD && typeof window !== 'undefined') {
-                    localStorage.setItem('access_token', refreshData.access_token);
+                const cookieOptions: { path: string; domain?: string } = { path: '/' };
+                if (typeof window !== 'undefined' && !isLocalHostname(window.location.hostname)) {
+                    cookieOptions.domain = COOKIE_DOMAIN;
                 }
+                setCookie('access_token', refreshData.access_token, cookieOptions);
                 window.location.reload();
                 return { isValid: true };
             }

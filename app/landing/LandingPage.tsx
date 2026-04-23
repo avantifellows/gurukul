@@ -104,7 +104,7 @@ function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: str
 
 export default function LandingPage() {
   const portalBaseUrl = api.portal.frontend.baseUrl;
-  const registerUrl = `${portalBaseUrl}/?group=AllIndiaStudents&platform=gurukul&signup_form=true&signup_form_id=23&id_generation=true&type=sign-up`;
+  const registerUrl = `${portalBaseUrl}/?group=AllIndiaStudents&platform=gurukul&source=gurukul&signup_form=true&signup_form_id=23&id_generation=true&type=sign-up`;
   const [activeFeature, setActiveFeature] = useState(0);
 
   // Auto-rotate features
