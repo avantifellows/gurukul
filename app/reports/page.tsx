@@ -7,10 +7,9 @@ import TopBar from "@/components/TopBar";
 import { useAuth } from "../../services/AuthContext";
 
 export default function ReportsPage() {
-    const { loggedIn, userId, displayId } = useAuth();
-    const reportId = displayId || userId;
+    const { loggedIn, userId } = useAuth();
 
-    if (!loggedIn || !reportId) {
+    if (!loggedIn || !userId) {
         return (
             <main className="max-w-xl mx-auto bg-white">
                 <TopBar />
@@ -25,7 +24,7 @@ export default function ReportsPage() {
             <div className="bg-heading h-20 mb-4">
                 <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Test Reports</h1>
             </div>
-            <ReportsList userId={reportId} />
+            <ReportsList userId={userId} />
             <BottomNavigationBar />
         </main>
     );
