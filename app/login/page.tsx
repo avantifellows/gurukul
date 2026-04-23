@@ -66,7 +66,7 @@ export default function LoginPage() {
                   {section.groups.map((group) => (
                     <a
                       key={group.key}
-                      href={`${portalBaseUrl}/?group=${group.key}&platform=gurukul`}
+                      href={`${portalBaseUrl}/?group=${group.key}&platform=gurukul&source=gurukul`}
                       className="group flex items-center justify-between bg-white border border-gray-200 rounded-xl px-5 py-4 hover:border-primary hover:shadow-md hover:shadow-teal-50 transition-all duration-200"
                     >
                       <span className="font-semibold text-gray-800 group-hover:text-primary transition-colors">

@@ -7,9 +7,12 @@ export interface ReportResponse {
 export interface AuthContextProps {
   loggedIn: boolean;
   userId: string | null;
+  displayId: string | null;
   userName: string;
   userDbId: number | null;
   group: string | null;
+  studentId: string | null;
+  apaarId: string | null;
   logout: () => void;
   isLoading: boolean;
 }
@@ -128,6 +131,12 @@ export interface User {
   last_name: string;
   gender?: string;
 }
+
+export interface UserDetails {
+  user: User;
+  student?: Student | null;
+}
+
 export interface Student {
   id: number;
   student_id: string | null;

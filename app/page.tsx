@@ -261,7 +261,7 @@ export default function Home() {
     if (data.session && data.session.platform === 'meet') {
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
         return (
-          <Link href={`${portalBaseUrl}/?sessionId=${data.session.session_id}`} target="_blank">
+          <Link href={`${portalBaseUrl}/?sessionId=${data.session.session_id}&source=gurukul`} target="_blank">
             <PrimaryButton className="bg-primary text-white text-sm rounded-md w-14 h-8 mr-4 shadow-md shadow-slate-400">
               JOIN
             </PrimaryButton>
@@ -293,7 +293,7 @@ export default function Home() {
 
         const renderQuizButton = formatType !== 'omr' ? (
           <div className="flex flex-col items-center">
-            <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
+            <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}&source=gurukul`} target="_blank">
               <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Start Test"}
               </PrimaryButton>
@@ -304,7 +304,7 @@ export default function Home() {
 
         const renderOmrButton = formatType !== 'qa' ? (
           <div className="flex flex-col items-center">
-            <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}&omrMode=true`} target="_blank">
+            <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}&omrMode=true&source=gurukul`} target="_blank">
               <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Fill OMR"}
               </PrimaryButton>
