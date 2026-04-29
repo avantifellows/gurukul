@@ -16,7 +16,7 @@ import { getGroupConfig } from "@/config/groupConfig";
 import { IoIosArrowDown as ExpandIcon, IoIosArrowUp as CollapseIcon } from 'react-icons/io';
 
 export default function Home() {
-  const { loggedIn, userId, userDbId, group, isLoading: authLoading } = useAuth();
+  const { loggedIn, userId, group, isLoading: authLoading } = useAuth();
   const groupConfig = getGroupConfig(group || 'defaultGroup');
   const [liveClasses, setLiveClasses] = useState<SessionOccurrence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -97,9 +97,11 @@ export default function Home() {
       const groupConfig = getGroupConfig(group || 'defaultGroup');
       const shouldFetchQuizzes = groupConfig.showTests || groupConfig.showPracticeTests || groupConfig.showHomework;
 
+      const numericUserId = Number(userId);
+
       const [liveSessionData, quizSessionData] = await Promise.all([
-        groupConfig.showLiveClasses ? fetchUserSession(userDbId!) : Promise.resolve([]),
-        shouldFetchQuizzes ? fetchUserSession(userDbId!, true) : Promise.resolve([])
+        groupConfig.showLiveClasses ? fetchUserSession(numericUserId) : Promise.resolve([]),
+        shouldFetchQuizzes ? fetchUserSession(numericUserId, true) : Promise.resolve([])
       ]);
 
       const sessionIds = [...liveSessionData, ...quizSessionData].map(session => session.session_id);
@@ -340,7 +342,7 @@ export default function Home() {
       const fetchData = async () => {
         setIsLoading(true);
         try {
-          if (userDbId !== null) {
+          if (userId && !Number.isNaN(Number(userId))) {
             await Promise.all([
               fetchUserSessions(),
               fetchQuizCompletionStatus()
@@ -353,7 +355,7 @@ export default function Home() {
       };
       fetchData();
     }
-  }, [loggedIn, userDbId, authLoading]);
+  }, [loggedIn, userId, authLoading]);
 
   const { nonChapterTests, chapterTests, practiceTests, homework } = filterAndSortTests(quizzes);
 

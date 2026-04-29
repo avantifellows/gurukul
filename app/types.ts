@@ -9,7 +9,6 @@ export interface AuthContextProps {
   userId: string | null;
   displayId: string | null;
   userName: string;
-  userDbId: number | null;
   group: string | null;
   studentId: string | null;
   apaarId: string | null;
@@ -122,7 +121,6 @@ export interface Session {
 
 export interface ReportsListProps {
   userId: string;
-
 }
 
 export interface User {

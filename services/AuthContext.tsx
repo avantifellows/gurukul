@@ -198,7 +198,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const userName = `${user?.first_name || ''} ${user?.last_name || ''}`.trim();
-    const userDbId = user ? user.id : null;
 
     const logout = async () => {
         try {
@@ -236,7 +235,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 userId,
                 displayId,
                 userName,
-                userDbId,
                 group,
                 studentId,
                 apaarId,
