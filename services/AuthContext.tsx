@@ -1,36 +1,36 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { deleteCookie } from 'cookies-next';
 import { verifyToken } from '@/services/validation';
 import { usePathname, useRouter } from 'next/navigation';
-import { AuthContextProps, User, UserDetails } from '../app/types';
+import { AuthContextProps, Student, User, UserDetails } from '../app/types';
 import { api } from '@/services/url';
 import { getUserDetails } from '@/api/afdb/userDetails';
 import { getGroupConfig } from '@/config/groupConfig';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
 import { navigateToPortal, clearPWACache } from '@/utils/navigation';
+import { clearAuthCookies } from '@/services/authCookies';
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
-const COOKIE_DOMAIN = '.avantifellows.org';
 
-const isLocalHostname = (hostname?: string) => {
-    if (!hostname) return true;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
-    if (hostname === '::1' || hostname === '0.0.0.0') return true;
-    return /^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname);
+type TokenProfile = {
+    user?: any;
+    student?: any;
+    teacher?: any;
+    candidate?: any;
+    school?: any;
 };
 
-const clearAuthCookies = () => {
-    deleteCookie('access_token', { path: '/' });
-    deleteCookie('refresh_token', { path: '/' });
-
-    if (typeof window === 'undefined') return;
-    if (isLocalHostname(window.location.hostname)) return;
-
-    deleteCookie('access_token', { path: '/', domain: COOKIE_DOMAIN });
-    deleteCookie('refresh_token', { path: '/', domain: COOKIE_DOMAIN });
+// Portal tokens may include teacher/candidate/school sections too. Gurukul only
+// consumes user and student fields today, so the extra sections are ignored.
+type ResolvedTokenIdentity = {
+    userId: string | null;
+    group: string | null;
+    displayId: string | null;
+    studentId: string | null;
+    apaarId: string | null;
+    profile: TokenProfile | null;
 };
 
 export function useAuth() {
@@ -60,6 +60,65 @@ const buildUserFromProfile = (profileUser: any, verifiedId: string | null): User
         last_name: lastName,
         gender:
             typeof profileUser.gender === 'string' ? profileUser.gender : undefined,
+    };
+};
+
+const toStringOrNull = (value: unknown): string | null => {
+    return value ? String(value) : null;
+};
+
+const isObject = (value: unknown): value is Record<string, any> => {
+    return Boolean(value && typeof value === 'object');
+};
+
+const resolveTokenIdentity = (result: any): ResolvedTokenIdentity => {
+    const tokenData = result.data?.data ?? {};
+    const profile = isObject(tokenData.profile) ? tokenData.profile : null;
+    const studentProfile = isObject(profile?.student) ? profile.student : null;
+
+    return {
+        userId: toStringOrNull(tokenData.user_id ?? result.data?.id),
+        group: tokenData.group ?? null,
+        displayId: toStringOrNull(tokenData.display_id),
+        studentId: toStringOrNull(tokenData.student_id ?? studentProfile?.student_id),
+        apaarId: toStringOrNull(tokenData.apaar_id ?? studentProfile?.apaar_id),
+        profile,
+    };
+};
+
+const buildUserDetailsFromProfile = (
+    profile: TokenProfile,
+    verifiedId: string
+): UserDetails => {
+    const user = buildUserFromProfile(profile.user, verifiedId) || {
+        id: Number(verifiedId),
+        first_name: '',
+        last_name: '',
+    };
+    const profileStudent = isObject(profile.student) ? profile.student : null;
+    const student: Student | null = profileStudent
+        ? {
+              id: Number(profileStudent.id ?? 0),
+              student_id: toStringOrNull(profileStudent.student_id),
+              user,
+              stream:
+                  typeof profileStudent.stream === 'string'
+                      ? profileStudent.stream
+                      : undefined,
+              grade_id:
+                  typeof profileStudent.grade_id === 'number'
+                      ? profileStudent.grade_id
+                      : undefined,
+              category:
+                  typeof profileStudent.category === 'string'
+                      ? profileStudent.category
+                      : undefined,
+          }
+        : null;
+
+    return {
+        user,
+        student,
     };
 };
 
@@ -96,41 +155,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (result.isValid) {
                     setLoggedIn(true);
 
-                    const tokenData = result.data?.data ?? {};
-                    const userGroup = tokenData.group ?? null;
-                    const verifiedIdRaw = tokenData.user_id ?? result.data?.id ?? null;
-                    const verifiedId = verifiedIdRaw ? String(verifiedIdRaw) : null;
-                    const resolvedStudentId = tokenData.student_id
-                        ? String(tokenData.student_id)
-                        : null;
-                    const resolvedApaarId = tokenData.apaar_id
-                        ? String(tokenData.apaar_id)
-                        : null;
-                    const resolvedDisplayId = tokenData.display_id
-                        ? String(tokenData.display_id)
-                        : null;
-                    const tokenProfile =
-                        tokenData.profile && typeof tokenData.profile === 'object'
-                            ? tokenData.profile
-                            : null;
+                    const identity = resolveTokenIdentity(result);
 
-                    setUserId(verifiedId);
-                    setStudentId(
-                        resolvedStudentId ??
-                            (tokenProfile?.student?.student_id
-                                ? String(tokenProfile.student.student_id)
-                                : null)
-                    );
-                    setApaarId(
-                        resolvedApaarId ??
-                            (tokenProfile?.student?.apaar_id
-                                ? String(tokenProfile.student.apaar_id)
-                                : null)
-                    );
-                    setDisplayId(resolvedDisplayId);
-                    setGroup(userGroup);
+                    setUserId(identity.userId);
+                    setStudentId(identity.studentId);
+                    setApaarId(identity.apaarId);
+                    setDisplayId(identity.displayId);
+                    setGroup(identity.group);
 
-                    if (!verifiedId || !userGroup) {
+                    if (!identity.userId || !identity.group) {
                         console.warn('Token verification missing identifiers, redirecting to portal');
                         setLoggedIn(false);
                         clearIdentityState();
@@ -138,22 +171,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         return;
                     }
 
-                    let userDetails: UserDetails | null = null;
-                    if (tokenProfile) {
-                        userDetails = {
-                            user: buildUserFromProfile(tokenProfile.user, verifiedId) || {
-                                id: Number(verifiedId),
-                                first_name: '',
-                                last_name: '',
-                            },
-                            student:
-                                tokenProfile.student && typeof tokenProfile.student === 'object'
-                                    ? tokenProfile.student
-                                    : null,
-                        };
-                    } else {
-                        userDetails = await getUserDetails(verifiedId, userGroup);
-                    }
+                    const userDetails = identity.profile
+                        ? buildUserDetailsFromProfile(identity.profile, identity.userId)
+                        : await getUserDetails(identity.userId, identity.group);
 
                     if (userDetails?.user) {
                         setUser(userDetails.user);
@@ -161,22 +181,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
                         const mixpanel = MixpanelTracking.getInstance();
                         const userProperties = {
-                            auth_group: userGroup,
+                            auth_group: identity.group,
                             grade_id: studentInfo?.grade_id,
                             stream: studentInfo?.stream,
                             gender: userDetails.user.gender,
                             category: studentInfo?.category,
                         };
 
-                        if (mixpanel.hasUserLoginBeenTracked(verifiedId)) {
-                            mixpanel.identifyUser(verifiedId, userProperties);
+                        if (mixpanel.hasUserLoginBeenTracked(identity.userId)) {
+                            mixpanel.identifyUser(identity.userId, userProperties);
                         } else {
-                            mixpanel.trackUserLogin(verifiedId, MIXPANEL_EVENT.USER_IDENTIFIED, userProperties);
+                            mixpanel.trackUserLogin(identity.userId, MIXPANEL_EVENT.USER_IDENTIFIED, userProperties);
                         }
                     }
 
                     // Redirect users to library based on group configuration
-                    const config = getGroupConfig(userGroup);
+                    const config = getGroupConfig(identity.group);
                     if (pathname === '/' && config.showHomeTab === false) {
                         router.replace('/library');
                     }

@@ -4,8 +4,8 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AvantiLogo from "@/assets/avanti_logo.png";
-import { api } from "@/services/url";
 import groupConfig, { LOGIN_REGION_ORDER } from "@/config/groupConfig";
+import { buildGurukulPortalUrl } from "@/utils/portalLinks";
 
 function buildGroupSections() {
   const regionMap: Record<string, { key: string; label: string }[]> = {};
@@ -23,7 +23,6 @@ function buildGroupSections() {
 }
 
 export default function LoginPage() {
-  const portalBaseUrl = api.portal.frontend.baseUrl;
   const sections = buildGroupSections();
 
   return (
@@ -66,7 +65,7 @@ export default function LoginPage() {
                   {section.groups.map((group) => (
                     <a
                       key={group.key}
-                      href={`${portalBaseUrl}/?group=${group.key}&platform=gurukul&source=gurukul`}
+                      href={buildGurukulPortalUrl({ group: group.key })}
                       className="group flex items-center justify-between bg-white border border-gray-200 rounded-xl px-5 py-4 hover:border-primary hover:shadow-md hover:shadow-teal-50 transition-all duration-200"
                     >
                       <span className="font-semibold text-gray-800 group-hover:text-primary transition-colors">

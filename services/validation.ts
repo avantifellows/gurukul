@@ -1,18 +1,10 @@
 import { getCookie, setCookie } from 'cookies-next';
 import { api } from './url';
 import getFetchConfig from '@/api/fetchConfig';
-
-const COOKIE_DOMAIN = '.avantifellows.org';
+import { getAuthCookieOptions } from '@/services/authCookies';
 
 async function getToken(key: string): Promise<string | null> {
     return getCookie(key) as string | null;
-}
-
-function isLocalHostname(hostname?: string): boolean {
-    if (!hostname) return true;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
-    if (hostname === '::1' || hostname === '0.0.0.0') return true;
-    return /^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname);
 }
 
 export async function verifyToken() {
@@ -41,11 +33,7 @@ export async function verifyToken() {
                 }
 
                 const refreshData = await refreshResponse.json();
-                const cookieOptions: { path: string; domain?: string } = { path: '/' };
-                if (typeof window !== 'undefined' && !isLocalHostname(window.location.hostname)) {
-                    cookieOptions.domain = COOKIE_DOMAIN;
-                }
-                setCookie('access_token', refreshData.access_token, cookieOptions);
+                setCookie('access_token', refreshData.access_token, getAuthCookieOptions());
                 window.location.reload();
                 return { isValid: true };
             }

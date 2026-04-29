@@ -6,7 +6,7 @@ import Link from "next/link";
 import AvantiLogo from "@/assets/avanti_logo.png";
 import CapgeminiLogo from "@/assets/capgemini_logo.png";
 import TataMotorsLogo from "@/assets/tata_motors_logo.png";
-import { api } from "@/services/url";
+import { buildGurukulPortalUrl } from "@/utils/portalLinks";
 
 const FEATURES = [
   {
@@ -103,8 +103,13 @@ function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: str
 }
 
 export default function LandingPage() {
-  const portalBaseUrl = api.portal.frontend.baseUrl;
-  const registerUrl = `${portalBaseUrl}/?group=AllIndiaStudents&platform=gurukul&source=gurukul&signup_form=true&signup_form_id=23&id_generation=true&type=sign-up`;
+  const registerUrl = buildGurukulPortalUrl({
+    group: "AllIndiaStudents",
+    signup_form: true,
+    signup_form_id: 23,
+    id_generation: true,
+    type: "sign-up",
+  });
   const [activeFeature, setActiveFeature] = useState(0);
 
   // Auto-rotate features
