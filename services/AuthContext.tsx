@@ -75,6 +75,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [apaarId, setApaarId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    const clearIdentityState = () => {
+        setUserId(null);
+        setStudentId(null);
+        setApaarId(null);
+        setDisplayId(null);
+    };
+
     const redirectToPortal = (targetGroup?: string) => {
         const redirectGroup = targetGroup || group || 'DelhiStudents';
         const portalUrl = `${api.portal.frontend.baseUrl}/?group=${redirectGroup}&platform=gurukul`;
@@ -126,17 +133,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     if (!verifiedId || !userGroup) {
                         console.warn('Token verification missing identifiers, redirecting to portal');
                         setLoggedIn(false);
-                        setUserId(null);
-                        setStudentId(null);
-                        setApaarId(null);
-                        setDisplayId(null);
+                        clearIdentityState();
                         redirectToPortal();
                         return;
                     }
 
-                    let userData: UserDetails | null = null;
+                    let userDetails: UserDetails | null = null;
                     if (tokenProfile) {
-                        userData = {
+                        userDetails = {
                             user: buildUserFromProfile(tokenProfile.user, verifiedId) || {
                                 id: Number(verifiedId),
                                 first_name: '',
@@ -148,19 +152,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                     : null,
                         };
                     } else {
-                        userData = await getUserDetails(verifiedId, userGroup);
+                        userDetails = await getUserDetails(verifiedId, userGroup);
                     }
 
-                    if (userData?.user) {
-                        setUser(userData.user);
-                        const studentInfo = userData.student;
+                    if (userDetails?.user) {
+                        setUser(userDetails.user);
+                        const studentInfo = userDetails.student;
 
                         const mixpanel = MixpanelTracking.getInstance();
                         const userProperties = {
                             auth_group: userGroup,
                             grade_id: studentInfo?.grade_id,
                             stream: studentInfo?.stream,
-                            gender: userData.user.gender,
+                            gender: userDetails.user.gender,
                             category: studentInfo?.category,
                         };
 
@@ -178,19 +182,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     }
                 } else {
                     setLoggedIn(false);
-                    setUserId(null);
-                    setStudentId(null);
-                    setApaarId(null);
-                    setDisplayId(null);
+                    clearIdentityState();
                     redirectToPortal();
                 }
             } catch (error) {
                 console.error('Error verifying token:', error);
                 setLoggedIn(false);
-                setUserId(null);
-                setStudentId(null);
-                setApaarId(null);
-                setDisplayId(null);
+                clearIdentityState();
             } finally {
                 setIsLoading(false);
             }
@@ -219,11 +217,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             
             // Update state
             setLoggedIn(false);
-            setUserId(null);
+            clearIdentityState();
             setUser(null);
-            setStudentId(null);
-            setApaarId(null);
-            setDisplayId(null);
             
             // Redirect to portal (this will open in system browser if in PWA)
             redirectToPortal();
