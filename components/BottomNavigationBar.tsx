@@ -16,6 +16,7 @@ const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
   const pathname = usePathname();
   const { group } = useAuth();
   const groupConfig = getGroupConfig(group || 'defaultGroup');
+  const sponsorLogosMode = groupConfig.homepageSponsorLogos ?? 'default';
 
   // Determine the home label from config or provided prop
   const displayHomeLabel = homeLabel || groupConfig.homeTabLabel || 'Home';
@@ -68,22 +69,35 @@ const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
     <div className="relative">
       {/* Powered by section */}
       <div className="max-w-xl mx-auto fixed bottom-[72px] left-0 right-0 bg-gray-100 border-t-2 shadow-2xl shadow-black px-4 py-2 text-xs text-gray-700 md:px-8 md:py-3 md:text-sm flex items-center">
-        <div className="flex-1 flex flex-col items-center justify-center gap-0.5 md:gap-1 text-center">
-          powered by
-          <Image
-            src={CapgeminiLogo}
-            alt='Capgemini Logo'
-            className='h-5 w-auto object-contain md:h-8'
-          />
-        </div>
-        <div className="flex-1 flex flex-col items-center justify-center gap-0.5 md:gap-1 md:pb-2 text-center">
-          supported by
-          <Image
-            src={TataMotorsLogo}
-            alt='Tata Motors Logo'
-            className='h-5 w-auto object-contain md:h-8'
-          />
-        </div>
+        {sponsorLogosMode === 'capgeminiOnly' ? (
+          <div className="flex-1 flex flex-col items-center justify-center gap-0.5 md:gap-1 text-center">
+            powered by
+            <Image
+              src={CapgeminiLogo}
+              alt="Capgemini Logo"
+              className="h-5 w-auto object-contain md:h-8"
+            />
+          </div>
+        ) : (
+          <>
+            <div className="flex-1 flex flex-col items-center justify-center gap-0.5 md:gap-1 text-center">
+              powered by
+              <Image
+                src={CapgeminiLogo}
+                alt="Capgemini Logo"
+                className="h-5 w-auto object-contain md:h-8"
+              />
+            </div>
+            <div className="flex-1 flex flex-col items-center justify-center gap-0.5 md:gap-1 md:pb-2 text-center">
+              supported by
+              <Image
+                src={TataMotorsLogo}
+                alt="Tata Motors Logo"
+                className="h-5 w-auto object-contain md:h-8"
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Navigation bar */}
