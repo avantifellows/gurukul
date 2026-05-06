@@ -31,3 +31,7 @@ export const MIXPANEL_EVENT = {
     SELECTED_TEACHER: "Selected Teacher",
     USER_IDENTIFIED: "User Identified"
 };
+
+export const GURUKUL_SOURCE_PARAM = {
+    source: 'gurukul',
+} as const;

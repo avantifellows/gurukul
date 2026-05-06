@@ -10,13 +10,13 @@ import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
 import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime, isSessionActive, format12HrSessionTime } from "@/utils/dateUtils";
-import { api } from "@/services/url";
 import { MixpanelTracking } from "@/services/mixpanel";
 import { getGroupConfig } from "@/config/groupConfig";
 import { IoIosArrowDown as ExpandIcon, IoIosArrowUp as CollapseIcon } from 'react-icons/io';
+import { buildGurukulSessionUrl } from "@/utils/portalLinks";
 
 export default function Home() {
-  const { loggedIn, userId, userDbId, group, isLoading: authLoading } = useAuth();
+  const { loggedIn, userId, group, isLoading: authLoading } = useAuth();
   const groupConfig = getGroupConfig(group || 'defaultGroup');
   const [liveClasses, setLiveClasses] = useState<SessionOccurrence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,7 +25,6 @@ export default function Home() {
   const [dataFetched, setDataFetched] = useState(false);
   const commonTextClass = "text-gray-700 text-xs md:text-sm mx-3 md:mx-8 whitespace-nowrap w-12";
   const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
-  const portalBaseUrl = api.portal.frontend.baseUrl;
 
   // Accordion state for Practice Test Accordion UI
   const [expandedFormat, setExpandedFormat] = useState<string | null>(null);
@@ -97,9 +96,11 @@ export default function Home() {
       const groupConfig = getGroupConfig(group || 'defaultGroup');
       const shouldFetchQuizzes = groupConfig.showTests || groupConfig.showPracticeTests || groupConfig.showHomework;
 
+      const numericUserId = Number(userId);
+
       const [liveSessionData, quizSessionData] = await Promise.all([
-        groupConfig.showLiveClasses ? fetchUserSession(userDbId!) : Promise.resolve([]),
-        shouldFetchQuizzes ? fetchUserSession(userDbId!, true) : Promise.resolve([])
+        groupConfig.showLiveClasses ? fetchUserSession(numericUserId) : Promise.resolve([]),
+        shouldFetchQuizzes ? fetchUserSession(numericUserId, true) : Promise.resolve([])
       ]);
 
       const sessionIds = [...liveSessionData, ...quizSessionData].map(session => session.session_id);
@@ -261,7 +262,7 @@ export default function Home() {
     if (data.session && data.session.platform === 'meet') {
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
         return (
-          <Link href={`${portalBaseUrl}/?sessionId=${data.session.session_id}`} target="_blank">
+          <Link href={buildGurukulSessionUrl(data.session.session_id)} target="_blank">
             <PrimaryButton className="bg-primary text-white text-sm rounded-md w-14 h-8 mr-4 shadow-md shadow-slate-400">
               JOIN
             </PrimaryButton>
@@ -293,7 +294,7 @@ export default function Home() {
 
         const renderQuizButton = formatType !== 'omr' ? (
           <div className="flex flex-col items-center">
-            <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}`} target="_blank">
+            <Link href={buildGurukulSessionUrl(data.session_id)} target="_blank">
               <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Start Test"}
               </PrimaryButton>
@@ -304,7 +305,7 @@ export default function Home() {
 
         const renderOmrButton = formatType !== 'qa' ? (
           <div className="flex flex-col items-center">
-            <Link href={`${portalBaseUrl}/?sessionId=${data.session_id}&omrMode=true`} target="_blank">
+            <Link href={buildGurukulSessionUrl(data.session_id, { omrMode: true })} target="_blank">
               <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Fill OMR"}
               </PrimaryButton>
@@ -340,7 +341,7 @@ export default function Home() {
       const fetchData = async () => {
         setIsLoading(true);
         try {
-          if (userDbId !== null) {
+          if (userId && !Number.isNaN(Number(userId))) {
             await Promise.all([
               fetchUserSessions(),
               fetchQuizCompletionStatus()
@@ -353,7 +354,7 @@ export default function Home() {
       };
       fetchData();
     }
-  }, [loggedIn, userDbId, authLoading]);
+  }, [loggedIn, userId, authLoading]);
 
   const { nonChapterTests, chapterTests, practiceTests, homework } = filterAndSortTests(quizzes);
 

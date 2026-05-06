@@ -1,16 +1,10 @@
 import { getCookie, setCookie } from 'cookies-next';
 import { api } from './url';
 import getFetchConfig from '@/api/fetchConfig';
+import { getAuthCookieOptions } from '@/services/authCookies';
 
 async function getToken(key: string): Promise<string | null> {
-    let token: string | null = getCookie(key) as string | null;
-    if (!token) {
-        token = localStorage.getItem(key);
-    }
-    if (token) {
-        localStorage.setItem(key, token);
-    }
-    return token;
+    return getCookie(key) as string | null;
 }
 
 export async function verifyToken() {
@@ -39,8 +33,7 @@ export async function verifyToken() {
                 }
 
                 const refreshData = await refreshResponse.json();
-                setCookie('access_token', refreshData.access_token, { path: '/', domain: '.avantifellows.org' });
-                localStorage.setItem('access_token', refreshData.access_token);
+                setCookie('access_token', refreshData.access_token, getAuthCookieOptions());
                 window.location.reload();
                 return { isValid: true };
             }

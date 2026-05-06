@@ -7,9 +7,11 @@ export interface ReportResponse {
 export interface AuthContextProps {
   loggedIn: boolean;
   userId: string | null;
+  displayId: string | null;
   userName: string;
-  userDbId: number | null;
   group: string | null;
+  studentId: string | null;
+  apaarId: string | null;
   logout: () => void;
   isLoading: boolean;
 }
@@ -119,7 +121,6 @@ export interface Session {
 
 export interface ReportsListProps {
   userId: string;
-
 }
 
 export interface User {
@@ -128,6 +129,12 @@ export interface User {
   last_name: string;
   gender?: string;
 }
+
+export interface UserDetails {
+  user: User;
+  student?: Student | null;
+}
+
 export interface Student {
   id: number;
   student_id: string | null;
@@ -136,6 +143,25 @@ export interface Student {
   grade_id?: number;
   category?: string;
 }
+
+export type TokenProfile = {
+  user?: any;
+  student?: any;
+  teacher?: any;
+  candidate?: any;
+  school?: any;
+};
+
+// Portal tokens may include teacher/candidate/school sections too. Gurukul only
+// consumes user and student fields today, so the extra sections are ignored.
+export type ResolvedTokenIdentity = {
+  userId: string | null;
+  group: string | null;
+  displayId: string | null;
+  studentId: string | null;
+  apaarId: string | null;
+  profile: TokenProfile | null;
+};
 
 export interface Teacher {
   id: number,
