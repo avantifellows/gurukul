@@ -3,7 +3,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { verifyToken } from '@/services/validation';
 import { usePathname, useRouter } from 'next/navigation';
-import { AuthContextProps, Student, User, UserDetails } from '../app/types';
+import {
+    AuthContextProps,
+    ResolvedTokenIdentity,
+    Student,
+    TokenProfile,
+    User,
+    UserDetails,
+} from '../app/types';
 import { api } from '@/services/url';
 import { getUserDetails } from '@/api/afdb/userDetails';
 import { getGroupConfig } from '@/config/groupConfig';
@@ -13,25 +20,6 @@ import { navigateToPortal, clearPWACache } from '@/utils/navigation';
 import { clearAuthCookies } from '@/services/authCookies';
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
-
-type TokenProfile = {
-    user?: any;
-    student?: any;
-    teacher?: any;
-    candidate?: any;
-    school?: any;
-};
-
-// Portal tokens may include teacher/candidate/school sections too. Gurukul only
-// consumes user and student fields today, so the extra sections are ignored.
-type ResolvedTokenIdentity = {
-    userId: string | null;
-    group: string | null;
-    displayId: string | null;
-    studentId: string | null;
-    apaarId: string | null;
-    profile: TokenProfile | null;
-};
 
 export function useAuth() {
     const context = useContext(AuthContext);
@@ -44,14 +32,9 @@ export function useAuth() {
 const buildUserFromProfile = (profileUser: any, verifiedId: string | null): User | null => {
     if (!profileUser || typeof profileUser !== 'object') return null;
 
-    const derivedName =
-        typeof profileUser.name === 'string' ? profileUser.name.trim() : '';
-    const firstName =
-        typeof profileUser.first_name === 'string' && profileUser.first_name.trim()
-            ? profileUser.first_name.trim()
-            : derivedName;
-    const lastName =
-        typeof profileUser.last_name === 'string' ? profileUser.last_name.trim() : '';
+    const derivedName = getTrimmedString(profileUser.name);
+    const firstName = getTrimmedString(profileUser.first_name) || derivedName;
+    const lastName = getTrimmedString(profileUser.last_name);
     const numericId = verifiedId ? Number(verifiedId) : NaN;
 
     return {
@@ -61,6 +44,10 @@ const buildUserFromProfile = (profileUser: any, verifiedId: string | null): User
         gender:
             typeof profileUser.gender === 'string' ? profileUser.gender : undefined,
     };
+};
+
+const getTrimmedString = (value: unknown): string => {
+    return typeof value === 'string' ? value.trim() : '';
 };
 
 const toStringOrNull = (value: unknown): string | null => {

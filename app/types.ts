@@ -144,6 +144,25 @@ export interface Student {
   category?: string;
 }
 
+export type TokenProfile = {
+  user?: any;
+  student?: any;
+  teacher?: any;
+  candidate?: any;
+  school?: any;
+};
+
+// Portal tokens may include teacher/candidate/school sections too. Gurukul only
+// consumes user and student fields today, so the extra sections are ignored.
+export type ResolvedTokenIdentity = {
+  userId: string | null;
+  group: string | null;
+  displayId: string | null;
+  studentId: string | null;
+  apaarId: string | null;
+  profile: TokenProfile | null;
+};
+
 export interface Teacher {
   id: number,
   teacher_id: string,

@@ -1,10 +1,7 @@
 import { api } from '@/services/url';
+import { GURUKUL_SOURCE_PARAM } from '@/constants/config';
 
 type PortalParam = string | number | boolean | null | undefined;
-
-const GURUKUL_SOURCE_PARAM = {
-    source: 'gurukul',
-};
 
 export function buildGurukulPortalUrl(
     params: Record<string, PortalParam> = {},
