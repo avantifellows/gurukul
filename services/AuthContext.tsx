@@ -151,10 +151,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setGroup(identity.group);
 
                     if (!identity.userId || !identity.group) {
-                        console.warn('Token verification missing identifiers, redirecting to portal');
+                        console.warn('Token verification missing identifiers');
                         setLoggedIn(false);
                         clearIdentityState();
-                        redirectToPortal();
                         return;
                     }
 
@@ -190,7 +189,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 } else {
                     setLoggedIn(false);
                     clearIdentityState();
-                    redirectToPortal();
                 }
             } catch (error) {
                 console.error('Error verifying token:', error);
