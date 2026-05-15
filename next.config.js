@@ -13,7 +13,7 @@ const withPWA = require('next-pwa')({
         },
         {
             // Never cache auth-related requests
-            urlPattern: /\/(api\/auth|verify-token)/,
+            urlPattern: /\/(api\/auth|api\/quiz-launch|verify-token)/,
             handler: 'NetworkOnly',
         },
     ],

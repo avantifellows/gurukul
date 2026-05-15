@@ -350,7 +350,7 @@ const ContentLibrary = () => {
                                                         return 0;
                                                     }).map((resource) => {
                                                         const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
-                                                        const href = buildResourceLink(resource, userId);
+                                                        const href = buildResourceLink(resource);
                                                         if (!href) return null;
                                                         return (
                                                             <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center">
@@ -380,10 +380,11 @@ const ContentLibrary = () => {
                                                                         <ul className="text-primary m-2 font-normal">
                                                                             {videos.map((resource) => {
                                                                                 const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
-                                                                                if (!resource.link) return null;
+                                                                                const href = buildResourceLink(resource);
+                                                                                if (!href) return null;
                                                                                 return (
                                                                                     <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary flex items-center">
-                                                                                        <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
+                                                                                        <Link href={href} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
                                                                                             {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {getResourceName(resource)}
                                                                                         </Link>
                                                                                     </li>
