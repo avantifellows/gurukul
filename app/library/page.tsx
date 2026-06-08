@@ -16,14 +16,12 @@ import { FaRupeeSign } from 'react-icons/fa';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
 import { useAuth } from '@/services/AuthContext';
-import { getGroupConfig } from '@/config/groupConfig';
 import { ReactNode } from 'react';
 
 const Page: React.FC = () => {
   const [selectedLibrary, setSelectedLibrary] = useState<string | null>('Content');
   const { push } = useRouter();
-  const { group } = useAuth();
-  const groupConfig = getGroupConfig(group || 'defaultGroup');
+  const { groupConfig } = useAuth();
 
   const handleLibraryChange = (library: string) => {
     MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_LIBRARY, { library_name: library });

@@ -14,6 +14,7 @@ export interface AuthContextProps {
   apaarId: string | null;
   logout: () => void;
   isLoading: boolean;
+  groupConfig: GroupConfig;
 }
 
 export interface CurrentTimeProps {

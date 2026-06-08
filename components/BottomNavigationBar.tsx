@@ -9,13 +9,11 @@ import { IoHome, IoHomeOutline } from 'react-icons/io5';
 import CapgeminiLogo from '../assets/capgemini_logo.png'
 import TataMotorsLogo from '../assets/tata_motors_logo.png'
 import { BottomNavigationBarProps } from '@/app/types';
-import { getGroupConfig } from '@/config/groupConfig';
 import { useAuth } from '@/services/AuthContext';
 
 const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
   const pathname = usePathname();
-  const { group } = useAuth();
-  const groupConfig = getGroupConfig(group || 'defaultGroup');
+  const { groupConfig } = useAuth();
   const sponsorLogosMode = groupConfig.homepageSponsorLogos ?? 'default';
 
   // Determine the home label from config or provided prop
