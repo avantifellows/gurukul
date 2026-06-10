@@ -27,7 +27,7 @@ const groupConfig: GroupConfigurations = {
         showLibraryTab: true,
         showReportsTab: true,
         testsHeaderNote: "You're seeing the test based on the exam preference shared by your school. If you see more than one test, select your preferred one from below",
-        displayLabel: 'Enable Students (NVS)',
+        displayLabel: 'Jawahar Navodaya Vidyalaya - JNV NVS',
         region: 'NVS / Enable',
     },
     EnableSchools: {
