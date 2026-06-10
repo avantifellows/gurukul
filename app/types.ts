@@ -232,6 +232,11 @@ export interface GroupConfig {
   testsInfoLink?: string;
   testsHeaderNote?: string;
   displayLabel?: string;
+  /**
+   * Auth group the login-page button logs into, when it differs from
+   * this entry's key (e.g. JNV CoE/Nodal buttons log in as EnableStudents).
+   */
+  portalGroup?: string;
   region?: string;
 }
 

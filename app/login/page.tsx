@@ -14,7 +14,7 @@ function buildGroupSections() {
     if (key === "defaultGroup" || !config.displayLabel || !config.region) return;
 
     if (!regionMap[config.region]) regionMap[config.region] = [];
-    regionMap[config.region].push({ key, label: config.displayLabel });
+    regionMap[config.region].push({ key: config.portalGroup ?? key, label: config.displayLabel });
   });
 
   return LOGIN_REGION_ORDER
@@ -64,7 +64,7 @@ export default function LoginPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {section.groups.map((group) => (
                     <a
-                      key={group.key}
+                      key={`${group.key}-${group.label}`}
                       href={buildGurukulPortalUrl({ group: group.key })}
                       className="group flex items-center justify-between bg-white border border-gray-200 rounded-xl px-5 py-4 hover:border-primary hover:shadow-md hover:shadow-teal-50 transition-all duration-200"
                     >
