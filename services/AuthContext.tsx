@@ -185,13 +185,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     }
 
                     // Resolve UI config from db-service (batch <- program <-
-                    // defaultgroup). Falls back to the hardcoded group defaults
-                    // when the backend has nothing configured for the user.
+                    // defaultgroup). The backend is the source of truth; the
+                    // local `defaultGroup` entry is only a neutral safety net
+                    // for keys the backend hasn't sent (or a failed fetch), so
+                    // we never leak a token-group's hardcoded branding.
                     const remoteCfg = await fetchGurukulConfig(identity.userId);
                     setRemoteConfig(remoteCfg);
 
                     // Redirect users to library based on group configuration
-                    const config = { ...getGroupConfig(identity.group), ...remoteCfg };
+                    const config = { ...getGroupConfig('defaultGroup'), ...remoteCfg };
                     if (pathname === '/' && config.showHomeTab === false) {
                         router.replace('/library');
                     }
@@ -213,10 +215,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const userName = `${user?.first_name || ''} ${user?.last_name || ''}`.trim();
 
-    // Hardcoded group defaults overlaid with the backend-resolved config.
+    // Backend-resolved config is the source of truth; the neutral
+    // `defaultGroup` entry only backstops keys the backend hasn't sent yet.
+    // We deliberately do NOT key the base off the token group, so a group's
+    // hardcoded branding (e.g. NVS labels) can never bleed through.
     const groupConfig = useMemo(
-        () => ({ ...getGroupConfig(group || 'defaultGroup'), ...remoteConfig }),
-        [group, remoteConfig]
+        () => ({ ...getGroupConfig('defaultGroup'), ...remoteConfig }),
+        [remoteConfig]
     );
 
     const logout = async () => {
