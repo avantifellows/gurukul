@@ -11,13 +11,11 @@ import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
 import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime, isSessionActive, format12HrSessionTime } from "@/utils/dateUtils";
 import { MixpanelTracking } from "@/services/mixpanel";
-import { getGroupConfig } from "@/config/groupConfig";
 import { IoIosArrowDown as ExpandIcon, IoIosArrowUp as CollapseIcon } from 'react-icons/io';
 import { buildGurukulSessionUrl } from "@/utils/portalLinks";
 
 export default function Home() {
-  const { loggedIn, userId, group, isLoading: authLoading } = useAuth();
-  const groupConfig = getGroupConfig(group || 'defaultGroup');
+  const { loggedIn, userId, group, groupConfig, isLoading: authLoading } = useAuth();
   const [liveClasses, setLiveClasses] = useState<SessionOccurrence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
@@ -93,7 +91,6 @@ export default function Home() {
   const fetchUserSessions = async () => {
     setIsLoading(true);
     try {
-      const groupConfig = getGroupConfig(group || 'defaultGroup');
       const shouldFetchQuizzes = groupConfig.showTests || groupConfig.showPracticeTests || groupConfig.showHomework;
 
       const numericUserId = Number(userId);

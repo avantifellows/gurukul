@@ -2,11 +2,9 @@
 
 import { useAuth } from "@/services/AuthContext";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
-import { getGroupConfig } from "@/config/groupConfig";
 
 export default function Loading({ showReportsOnly = false, showLibraryOnly = false, showChapterContentOnly = false, cardCount = 3 }) {
-    const { group } = useAuth();
-    const groupConfig = getGroupConfig(group || 'defaultGroup');
+    const { groupConfig } = useAuth();
 
     const ShimmerCard = ({ showTimeColumn = false }) => (
         <div className="flex mt-4 items-center animate-pulse">

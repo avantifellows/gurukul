@@ -1,10 +1,11 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { verifyToken } from '@/services/validation';
 import { usePathname, useRouter } from 'next/navigation';
 import {
     AuthContextProps,
+    GroupConfig,
     ResolvedTokenIdentity,
     Student,
     TokenProfile,
@@ -13,6 +14,7 @@ import {
 } from '../app/types';
 import { api } from '@/services/url';
 import { getUserDetails } from '@/api/afdb/userDetails';
+import { fetchGurukulConfig } from '@/api/afdb/gurukulConfig';
 import { getGroupConfig } from '@/config/groupConfig';
 import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
@@ -119,6 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [group, setGroup] = useState<string | null>(null);
     const [studentId, setStudentId] = useState<string | null>(null);
     const [apaarId, setApaarId] = useState<string | null>(null);
+    const [remoteConfig, setRemoteConfig] = useState<Partial<GroupConfig>>({});
     const [isLoading, setIsLoading] = useState(true);
 
     const clearIdentityState = () => {
@@ -181,8 +184,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         }
                     }
 
+                    // Resolve UI config from db-service (batch <- program <-
+                    // defaultgroup). The backend is the source of truth; the
+                    // local `defaultGroup` entry is only a neutral safety net
+                    // for keys the backend hasn't sent (or a failed fetch), so
+                    // we never leak a token-group's hardcoded branding.
+                    const remoteCfg = await fetchGurukulConfig(identity.userId);
+                    setRemoteConfig(remoteCfg);
+
                     // Redirect users to library based on group configuration
-                    const config = getGroupConfig(identity.group);
+                    const config = { ...getGroupConfig('defaultGroup'), ...remoteCfg };
                     if (pathname === '/' && config.showHomeTab === false) {
                         router.replace('/library');
                     }
@@ -203,6 +214,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const userName = `${user?.first_name || ''} ${user?.last_name || ''}`.trim();
+
+    // Backend-resolved config is the source of truth; the neutral
+    // `defaultGroup` entry only backstops keys the backend hasn't sent yet.
+    // We deliberately do NOT key the base off the token group, so a group's
+    // hardcoded branding (e.g. NVS labels) can never bleed through.
+    const groupConfig = useMemo(
+        () => ({ ...getGroupConfig('defaultGroup'), ...remoteConfig }),
+        [remoteConfig]
+    );
 
     const logout = async () => {
         try {
@@ -245,6 +265,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 apaarId,
                 logout,
                 isLoading,
+                groupConfig,
             }}
         >
             {children}
