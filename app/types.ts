@@ -174,6 +174,11 @@ export interface Teacher {
 }
 
 export interface QuizSession {
+  // Occurrence-level window for this instance. session.end_time is the schedule
+  // SPAN end (multi-day for weekly); this is *today's* slot end. Optional because
+  // some legacy/non-occurrence shapes only carry the nested session.
+  end_time?: string,
+  start_time?: string,
   session: {
     batch: string,
     end_date: string,

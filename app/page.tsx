@@ -56,7 +56,12 @@ export default function Home() {
  */
   const filterAndSortTests = (quizzes: QuizSession[]) => {
     const activeQuizzes = quizzes
-      .filter(quiz => isSessionActive(quiz.session.end_time))
+      // Use the OCCURRENCE end (top-level end_time), not session.end_time. For a
+      // weekly session, session.end_time is the multi-day schedule span end, while
+      // the occurrence end_time is *today's* slot (e.g. 11am–1pm) — so an 11–1
+      // weekly correctly disappears after 1pm. For a continuous session the two
+      // coincide (one 24h window), so it stays visible across midnight.
+      .filter(quiz => isSessionActive(quiz.end_time ?? quiz.session.end_time))
       .filter(quiz => {
         const platformId = quiz.session.platform_id;
         const isCompleted = quizCompletionStatus[platformId] === true;
@@ -234,7 +239,7 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-center">
-                  {renderButton(data.session)}
+                  {renderButton(data)}
                 </div>
               </div>
             </div>
@@ -245,17 +250,23 @@ export default function Home() {
   };
 
   function renderButton(data: any) {
+    // Callers pass an occurrence ({ end_time, session }) for live classes and the
+    // bare session for quizzes. Normalise: `occurrence` is whichever carries the
+    // occurrence-level end_time, `session` is always the session fields.
+    const occurrence = data;
+    const session = data.session ?? data;
+
     const currentTime = new Date();
-    const sessionStartTimeStr = formatSessionTime(data.start_time);
+    const sessionStartTimeStr = formatSessionTime(occurrence.start_time ?? session.start_time);
     const currentTimeStr = formatCurrentTime(currentTime.toISOString());
 
     const sessionTime = new Date(`2000-01-01T${sessionStartTimeStr}`);
     const currentTimeObj = new Date(`2000-01-01T${currentTimeStr}`);
     const minutesUntilSessionStart = (sessionTime.getTime() - currentTimeObj.getTime()) / (1000 * 60);
-    // Date-aware so continuous / overnight windows (end runs into a later day) keep
-    // their Start button instead of falling back to "Starts at…" once the wall clock
-    // passes the end's time-of-day. See isSessionActive in utils/dateUtils.
-    const hasSessionNotEnded = isSessionActive(data.end_time);
+    // Date-aware AND occurrence-scoped: for a weekly session this is *today's* slot
+    // end (e.g. 1pm) so it hides after 1pm; for a continuous 24h window it stays
+    // visible across midnight. See isSessionActive in utils/dateUtils.
+    const hasSessionNotEnded = isSessionActive(occurrence.end_time ?? session.end_time);
 
     if (data.session && data.session.platform === 'meet') {
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
@@ -274,8 +285,8 @@ export default function Home() {
           </p>
         );
       }
-    } else if (data.platform === 'quiz') {
-      const isCompleted = quizCompletionStatus.hasOwnProperty(data.platform_id) && quizCompletionStatus[data.platform_id] === true;
+    } else if (session.platform === 'quiz') {
+      const isCompleted = quizCompletionStatus.hasOwnProperty(session.platform_id) && quizCompletionStatus[session.platform_id] === true;
       if (isCompleted) {
         return (
           <div className="flex flex-col items-center pr-2">
@@ -286,13 +297,13 @@ export default function Home() {
         );
       }
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
-        const isResumeable = quizCompletionStatus.hasOwnProperty(data.platform_id) && !quizCompletionStatus[data.platform_id];
-        const formatType = data.meta_data?.gurukul_format_type || 'both';
+        const isResumeable = quizCompletionStatus.hasOwnProperty(session.platform_id) && !quizCompletionStatus[session.platform_id];
+        const formatType = session.meta_data?.gurukul_format_type || 'both';
         const showBothButtons = formatType === 'both';
 
         const renderQuizButton = formatType !== 'omr' ? (
           <div className="flex flex-col items-center">
-            <Link href={buildGurukulSessionUrl(data.session_id)} target="_blank">
+            <Link href={buildGurukulSessionUrl(session.session_id)} target="_blank">
               <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Start Test"}
               </PrimaryButton>
@@ -303,7 +314,7 @@ export default function Home() {
 
         const renderOmrButton = formatType !== 'qa' ? (
           <div className="flex flex-col items-center">
-            <Link href={buildGurukulSessionUrl(data.session_id, { omrMode: true })} target="_blank">
+            <Link href={buildGurukulSessionUrl(session.session_id, { omrMode: true })} target="_blank">
               <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Fill OMR"}
               </PrimaryButton>
@@ -322,7 +333,7 @@ export default function Home() {
         return (
           <p className="text-xs italic font-normal mr-4 w-14">
             Starts at <br />
-            {format12HrSessionTime(data.start_time)}
+            {format12HrSessionTime(occurrence.start_time ?? session.start_time)}
           </p>
         );
       }
@@ -447,7 +458,7 @@ export default function Home() {
                                     </div>
                                   </div>
                                   <div className="flex items-center">
-                                    {renderButton(test.session)}
+                                    {renderButton(test)}
                                   </div>
                                 </div>
                               </div>
