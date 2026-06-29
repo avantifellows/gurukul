@@ -56,12 +56,29 @@ export function format12HrSessionTime(time: string): string {
     return `${formattedHours}:${formattedMinutes} ${period}`;
 }
 
+// IST is the wall-clock basis for all session start/end times the backend returns
+// (they arrive as IST-local values tagged with a literal "Z"). Used to express
+// "now" on the same basis when comparing full timestamps.
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
+/**
+ * Whether a session's response window is still open.
+ *
+ * Accepts the FULL end timestamp (e.g. "2026-06-30T17:43:30Z") and compares it
+ * date-and-time-aware against now. Previously this compared only the time-of-day
+ * (both sides pinned to 2000-01-01), which silently treated any session whose end
+ * clock-time had already passed *today* as ended — even when the window actually
+ * runs into tomorrow. That hid every continuous / overnight session (24h windows,
+ * teacher-feedback forms, late-evening tests) once the wall clock passed the end's
+ * HH:MM, despite ~hours still remaining.
+ *
+ * The end string is IST wall-clock tagged "Z", so new Date(endTime).getTime() is
+ * "IST as if UTC"; we shift real-now by +IST so both sides share that basis.
+ */
 export function isSessionActive(endTime: string): boolean {
-    const currentTime = new Date();
-    const currentTimeStr = formatCurrentTime(currentTime.toISOString());
-    const sessionEndTime = new Date(`2000-01-01T${endTime}`);
-    const currentTimeObj = new Date(`2000-01-01T${currentTimeStr}`);
-    return sessionEndTime.getTime() > currentTimeObj.getTime();
+    const sessionEndTime = new Date(endTime).getTime();
+    const nowSameBasis = Date.now() + IST_OFFSET_MS;
+    return sessionEndTime > nowSameBasis;
 }
 
 export function formatDate(dateStr: string): string {

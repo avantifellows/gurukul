@@ -9,7 +9,7 @@ import { QuizSession, SessionOccurrence, MessageDisplayProps, Session, QuizCompl
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
-import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime, isSessionActive, format12HrSessionTime } from "@/utils/dateUtils";
+import { formatCurrentTime, formatSessionTime, formatTime, isSessionActive, format12HrSessionTime } from "@/utils/dateUtils";
 import { MixpanelTracking } from "@/services/mixpanel";
 import { IoIosArrowDown as ExpandIcon, IoIosArrowUp as CollapseIcon } from 'react-icons/io';
 import { buildGurukulSessionUrl } from "@/utils/portalLinks";
@@ -56,7 +56,7 @@ export default function Home() {
  */
   const filterAndSortTests = (quizzes: QuizSession[]) => {
     const activeQuizzes = quizzes
-      .filter(quiz => isSessionActive(formatQuizSessionTime(quiz.session.end_time)))
+      .filter(quiz => isSessionActive(quiz.session.end_time))
       .filter(quiz => {
         const platformId = quiz.session.platform_id;
         const isCompleted = quizCompletionStatus[platformId] === true;
@@ -135,7 +135,7 @@ export default function Home() {
       return <MessageDisplay message="No more live classes are scheduled for today!" />;
     }
 
-    const activeLiveClasses = liveClasses.filter((data) => isSessionActive(formatSessionTime(data.end_time)));
+    const activeLiveClasses = liveClasses.filter((data) => isSessionActive(data.end_time));
 
     if (activeLiveClasses.length === 0) {
       return <MessageDisplay message="No more live classes are scheduled for today!" />;
@@ -247,14 +247,15 @@ export default function Home() {
   function renderButton(data: any) {
     const currentTime = new Date();
     const sessionStartTimeStr = formatSessionTime(data.start_time);
-    const sessionEndTimeStr = formatSessionTime(data.end_time);
     const currentTimeStr = formatCurrentTime(currentTime.toISOString());
 
     const sessionTime = new Date(`2000-01-01T${sessionStartTimeStr}`);
-    const sessionEndTime = new Date(`2000-01-01T${sessionEndTimeStr}`);
     const currentTimeObj = new Date(`2000-01-01T${currentTimeStr}`);
     const minutesUntilSessionStart = (sessionTime.getTime() - currentTimeObj.getTime()) / (1000 * 60);
-    const hasSessionNotEnded = sessionEndTime.getTime() > currentTimeObj.getTime();
+    // Date-aware so continuous / overnight windows (end runs into a later day) keep
+    // their Start button instead of falling back to "Starts at…" once the wall clock
+    // passes the end's time-of-day. See isSessionActive in utils/dateUtils.
+    const hasSessionNotEnded = isSessionActive(data.end_time);
 
     if (data.session && data.session.platform === 'meet') {
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
