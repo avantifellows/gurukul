@@ -9,7 +9,7 @@ import { QuizSession, SessionOccurrence, MessageDisplayProps, Session, QuizCompl
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
-import { formatCurrentTime, formatSessionTime, formatTime, isSessionActive, format12HrSessionTime } from "@/utils/dateUtils";
+import { formatSessionTime, formatTime, isSessionActive, minutesUntilStart, format12HrSessionTime, formatSessionTimeRange } from "@/utils/dateUtils";
 import { MixpanelTracking } from "@/services/mixpanel";
 import { IoIosArrowDown as ExpandIcon, IoIosArrowUp as CollapseIcon } from 'react-icons/io';
 import { buildGurukulSessionUrl } from "@/utils/portalLinks";
@@ -228,7 +228,7 @@ export default function Home() {
 
                 <div className="flex flex-col gap-1 pl-6 sm:w-full w-48 md:w-full text-sm md:text-base">
                   <div className="absolute top-2 left-6 text-gray-700 text-xs md:text-sm whitespace-nowrap">
-                    {format12HrSessionTime(data.session.start_time)} - {format12HrSessionTime(data.session.end_time)}
+                    {formatSessionTimeRange(data.start_time ?? data.session.start_time, data.end_time ?? data.session.end_time)}
                   </div>
                   <div className="font-semibold">
                     {data.session.name}
@@ -256,16 +256,14 @@ export default function Home() {
     const occurrence = data;
     const session = data.session ?? data;
 
-    const currentTime = new Date();
-    const sessionStartTimeStr = formatSessionTime(occurrence.start_time ?? session.start_time);
-    const currentTimeStr = formatCurrentTime(currentTime.toISOString());
+    const occurrenceStart = occurrence.start_time ?? session.start_time;
+    const sessionStartTimeStr = formatSessionTime(occurrenceStart);
 
-    const sessionTime = new Date(`2000-01-01T${sessionStartTimeStr}`);
-    const currentTimeObj = new Date(`2000-01-01T${currentTimeStr}`);
-    const minutesUntilSessionStart = (sessionTime.getTime() - currentTimeObj.getTime()) / (1000 * 60);
-    // Date-aware AND occurrence-scoped: for a weekly session this is *today's* slot
-    // end (e.g. 1pm) so it hides after 1pm; for a continuous 24h window it stays
-    // visible across midnight. See isSessionActive in utils/dateUtils.
+    // Both date-aware (full timestamps), so a continuous / overnight window that
+    // opened on a PREVIOUS day still reads as already-started (negative) and not
+    // yet ended. Time-of-day-only math wrongly showed "Starts at…" the morning
+    // after. See minutesUntilStart / isSessionActive in utils/dateUtils.
+    const minutesUntilSessionStart = minutesUntilStart(occurrenceStart);
     const hasSessionNotEnded = isSessionActive(occurrence.end_time ?? session.end_time);
 
     if (data.session && data.session.platform === 'meet') {
@@ -448,7 +446,7 @@ export default function Home() {
                                   <div className={`${idx % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`} />
                                   <div className="flex flex-col gap-1 pl-6 sm:w-full w-48 md:w-full text-sm md:text-base">
                                     <div className="absolute top-2 left-6 text-gray-700 text-xs md:text-sm whitespace-nowrap">
-                                      {format12HrSessionTime(test.session.start_time)} - {format12HrSessionTime(test.session.end_time)}
+                                      {formatSessionTimeRange(test.start_time ?? test.session.start_time, test.end_time ?? test.session.end_time)}
                                     </div>
                                     <div className="font-semibold">
                                       {test.session.name}
