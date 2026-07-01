@@ -56,12 +56,66 @@ export function format12HrSessionTime(time: string): string {
     return `${formattedHours}:${formattedMinutes} ${period}`;
 }
 
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/**
+ * "5:43 PM - 7:00 PM" for a same-day window, or
+ * "29 Jun 5:43 PM - 30 Jun 5:43 PM" when start and end fall on different days
+ * (e.g. a continuous 24h window). Avoids a 24h span reading as "5:43 - 5:43".
+ * Uses the same UTC-getter basis as format12HrSessionTime (IST-tagged-"Z").
+ */
+export function formatSessionTimeRange(start: string, end: string): string {
+    const s = new Date(start);
+    const e = new Date(end);
+    const sameDay =
+        s.getUTCFullYear() === e.getUTCFullYear() &&
+        s.getUTCMonth() === e.getUTCMonth() &&
+        s.getUTCDate() === e.getUTCDate();
+    const datePrefix = (d: Date) => `${d.getUTCDate()} ${MONTHS_SHORT[d.getUTCMonth()]} `;
+    if (sameDay) {
+        return `${format12HrSessionTime(start)} - ${format12HrSessionTime(end)}`;
+    }
+    return `${datePrefix(s)}${format12HrSessionTime(start)} - ${datePrefix(e)}${format12HrSessionTime(end)}`;
+}
+
+// IST is the wall-clock basis for all session start/end times the backend returns
+// (they arrive as IST-local values tagged with a literal "Z"). Used to express
+// "now" on the same basis when comparing full timestamps.
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
+/**
+ * Whether a session's response window is still open.
+ *
+ * Accepts the FULL end timestamp (e.g. "2026-06-30T17:43:30Z") and compares it
+ * date-and-time-aware against now. Previously this compared only the time-of-day
+ * (both sides pinned to 2000-01-01), which silently treated any session whose end
+ * clock-time had already passed *today* as ended — even when the window actually
+ * runs into tomorrow. That hid every continuous / overnight session (24h windows,
+ * teacher-feedback forms, late-evening tests) once the wall clock passed the end's
+ * HH:MM, despite ~hours still remaining.
+ *
+ * The end string is IST wall-clock tagged "Z", so new Date(endTime).getTime() is
+ * "IST as if UTC"; we shift real-now by +IST so both sides share that basis.
+ */
 export function isSessionActive(endTime: string): boolean {
-    const currentTime = new Date();
-    const currentTimeStr = formatCurrentTime(currentTime.toISOString());
-    const sessionEndTime = new Date(`2000-01-01T${endTime}`);
-    const currentTimeObj = new Date(`2000-01-01T${currentTimeStr}`);
-    return sessionEndTime.getTime() > currentTimeObj.getTime();
+    const sessionEndTime = new Date(endTime).getTime();
+    const nowSameBasis = Date.now() + IST_OFFSET_MS;
+    return sessionEndTime > nowSameBasis;
+}
+
+/**
+ * Minutes from now until a session's start (negative once it has started).
+ *
+ * Accepts the FULL start timestamp and is date-aware, on the same IST-tagged-"Z"
+ * basis as isSessionActive. Previously the caller derived this from time-of-day
+ * only, so a session that started on a PREVIOUS day (e.g. a 24h window opened
+ * yesterday) read as "starts in ~N hours today" and never showed its Start
+ * button the morning after. Now a session already underway is correctly negative.
+ */
+export function minutesUntilStart(startTime: string): number {
+    const start = new Date(startTime).getTime();
+    const nowSameBasis = Date.now() + IST_OFFSET_MS;
+    return (start - nowSameBasis) / (1000 * 60);
 }
 
 export function formatDate(dateStr: string): string {

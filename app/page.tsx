@@ -9,7 +9,7 @@ import { QuizSession, SessionOccurrence, MessageDisplayProps, Session, QuizCompl
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
-import { formatCurrentTime, formatSessionTime, formatQuizSessionTime, formatTime, isSessionActive, format12HrSessionTime } from "@/utils/dateUtils";
+import { formatSessionTime, formatTime, isSessionActive, minutesUntilStart, format12HrSessionTime, formatSessionTimeRange } from "@/utils/dateUtils";
 import { MixpanelTracking } from "@/services/mixpanel";
 import { IoIosArrowDown as ExpandIcon, IoIosArrowUp as CollapseIcon } from 'react-icons/io';
 import { buildGurukulSessionUrl } from "@/utils/portalLinks";
@@ -56,7 +56,12 @@ export default function Home() {
  */
   const filterAndSortTests = (quizzes: QuizSession[]) => {
     const activeQuizzes = quizzes
-      .filter(quiz => isSessionActive(formatQuizSessionTime(quiz.session.end_time)))
+      // Use the OCCURRENCE end (top-level end_time), not session.end_time. For a
+      // weekly session, session.end_time is the multi-day schedule span end, while
+      // the occurrence end_time is *today's* slot (e.g. 11am–1pm) — so an 11–1
+      // weekly correctly disappears after 1pm. For a continuous session the two
+      // coincide (one 24h window), so it stays visible across midnight.
+      .filter(quiz => isSessionActive(quiz.end_time ?? quiz.session.end_time))
       .filter(quiz => {
         const platformId = quiz.session.platform_id;
         const isCompleted = quizCompletionStatus[platformId] === true;
@@ -135,7 +140,7 @@ export default function Home() {
       return <MessageDisplay message="No more live classes are scheduled for today!" />;
     }
 
-    const activeLiveClasses = liveClasses.filter((data) => isSessionActive(formatSessionTime(data.end_time)));
+    const activeLiveClasses = liveClasses.filter((data) => isSessionActive(data.end_time));
 
     if (activeLiveClasses.length === 0) {
       return <MessageDisplay message="No more live classes are scheduled for today!" />;
@@ -223,7 +228,7 @@ export default function Home() {
 
                 <div className="flex flex-col gap-1 pl-6 sm:w-full w-48 md:w-full text-sm md:text-base">
                   <div className="absolute top-2 left-6 text-gray-700 text-xs md:text-sm whitespace-nowrap">
-                    {format12HrSessionTime(data.session.start_time)} - {format12HrSessionTime(data.session.end_time)}
+                    {formatSessionTimeRange(data.start_time ?? data.session.start_time, data.end_time ?? data.session.end_time)}
                   </div>
                   <div className="font-semibold">
                     {data.session.name}
@@ -234,7 +239,7 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-center">
-                  {renderButton(data.session)}
+                  {renderButton(data)}
                 </div>
               </div>
             </div>
@@ -245,16 +250,21 @@ export default function Home() {
   };
 
   function renderButton(data: any) {
-    const currentTime = new Date();
-    const sessionStartTimeStr = formatSessionTime(data.start_time);
-    const sessionEndTimeStr = formatSessionTime(data.end_time);
-    const currentTimeStr = formatCurrentTime(currentTime.toISOString());
+    // Callers pass an occurrence ({ end_time, session }) for live classes and the
+    // bare session for quizzes. Normalise: `occurrence` is whichever carries the
+    // occurrence-level end_time, `session` is always the session fields.
+    const occurrence = data;
+    const session = data.session ?? data;
 
-    const sessionTime = new Date(`2000-01-01T${sessionStartTimeStr}`);
-    const sessionEndTime = new Date(`2000-01-01T${sessionEndTimeStr}`);
-    const currentTimeObj = new Date(`2000-01-01T${currentTimeStr}`);
-    const minutesUntilSessionStart = (sessionTime.getTime() - currentTimeObj.getTime()) / (1000 * 60);
-    const hasSessionNotEnded = sessionEndTime.getTime() > currentTimeObj.getTime();
+    const occurrenceStart = occurrence.start_time ?? session.start_time;
+    const sessionStartTimeStr = formatSessionTime(occurrenceStart);
+
+    // Both date-aware (full timestamps), so a continuous / overnight window that
+    // opened on a PREVIOUS day still reads as already-started (negative) and not
+    // yet ended. Time-of-day-only math wrongly showed "Starts at…" the morning
+    // after. See minutesUntilStart / isSessionActive in utils/dateUtils.
+    const minutesUntilSessionStart = minutesUntilStart(occurrenceStart);
+    const hasSessionNotEnded = isSessionActive(occurrence.end_time ?? session.end_time);
 
     if (data.session && data.session.platform === 'meet') {
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
@@ -273,8 +283,8 @@ export default function Home() {
           </p>
         );
       }
-    } else if (data.platform === 'quiz') {
-      const isCompleted = quizCompletionStatus.hasOwnProperty(data.platform_id) && quizCompletionStatus[data.platform_id] === true;
+    } else if (session.platform === 'quiz') {
+      const isCompleted = quizCompletionStatus.hasOwnProperty(session.platform_id) && quizCompletionStatus[session.platform_id] === true;
       if (isCompleted) {
         return (
           <div className="flex flex-col items-center pr-2">
@@ -285,13 +295,13 @@ export default function Home() {
         );
       }
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
-        const isResumeable = quizCompletionStatus.hasOwnProperty(data.platform_id) && !quizCompletionStatus[data.platform_id];
-        const formatType = data.meta_data?.gurukul_format_type || 'both';
+        const isResumeable = quizCompletionStatus.hasOwnProperty(session.platform_id) && !quizCompletionStatus[session.platform_id];
+        const formatType = session.meta_data?.gurukul_format_type || 'both';
         const showBothButtons = formatType === 'both';
 
         const renderQuizButton = formatType !== 'omr' ? (
           <div className="flex flex-col items-center">
-            <Link href={buildGurukulSessionUrl(data.session_id)} target="_blank">
+            <Link href={buildGurukulSessionUrl(session.session_id)} target="_blank">
               <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Start Test"}
               </PrimaryButton>
@@ -302,7 +312,7 @@ export default function Home() {
 
         const renderOmrButton = formatType !== 'qa' ? (
           <div className="flex flex-col items-center">
-            <Link href={buildGurukulSessionUrl(data.session_id, { omrMode: true })} target="_blank">
+            <Link href={buildGurukulSessionUrl(session.session_id, { omrMode: true })} target="_blank">
               <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
                 {isResumeable ? "Resume" : "Fill OMR"}
               </PrimaryButton>
@@ -321,7 +331,7 @@ export default function Home() {
         return (
           <p className="text-xs italic font-normal mr-4 w-14">
             Starts at <br />
-            {format12HrSessionTime(data.start_time)}
+            {format12HrSessionTime(occurrence.start_time ?? session.start_time)}
           </p>
         );
       }
@@ -436,7 +446,7 @@ export default function Home() {
                                   <div className={`${idx % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`} />
                                   <div className="flex flex-col gap-1 pl-6 sm:w-full w-48 md:w-full text-sm md:text-base">
                                     <div className="absolute top-2 left-6 text-gray-700 text-xs md:text-sm whitespace-nowrap">
-                                      {format12HrSessionTime(test.session.start_time)} - {format12HrSessionTime(test.session.end_time)}
+                                      {formatSessionTimeRange(test.start_time ?? test.session.start_time, test.end_time ?? test.session.end_time)}
                                     </div>
                                     <div className="font-semibold">
                                       {test.session.name}
@@ -446,7 +456,7 @@ export default function Home() {
                                     </div>
                                   </div>
                                   <div className="flex items-center">
-                                    {renderButton(test.session)}
+                                    {renderButton(test)}
                                   </div>
                                 </div>
                               </div>
