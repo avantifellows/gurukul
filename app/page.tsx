@@ -15,7 +15,7 @@ import { IoIosArrowDown as ExpandIcon, IoIosArrowUp as CollapseIcon } from 'reac
 import { buildGurukulSessionUrl } from "@/utils/portalLinks";
 
 export default function Home() {
-  const { loggedIn, userId, group, groupConfig, isLoading: authLoading } = useAuth();
+  const { loggedIn, userId, groupConfig, isLoading: authLoading } = useAuth();
   const [liveClasses, setLiveClasses] = useState<SessionOccurrence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
@@ -77,8 +77,7 @@ export default function Home() {
       quiz.session.meta_data.test_format !== 'chapter_test'
     );
 
-    // Hide chapter tests for EnableStudents group
-    const chapterTests = group === 'EnableStudents' ? [] : regularTests.filter(quiz =>
+    const chapterTests = regularTests.filter(quiz =>
       quiz.session.meta_data.test_format === 'chapter_test'
     );
 
