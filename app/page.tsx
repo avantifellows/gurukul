@@ -182,6 +182,8 @@ export default function Home() {
       switch (title.toLowerCase()) {
         case 'tests':
           return groupConfig.showTests;
+        case 'chapter tests':
+          return groupConfig.showChapterTests;
         case 'practice tests':
           return groupConfig.showPracticeTests;
         case 'homework':
@@ -194,6 +196,17 @@ export default function Home() {
     if (!shouldShow) return null;
 
     if (tests.length === 0) {
+      // noTestsMessage is worded for the main live-test section (e.g. "There is
+      // no NVS live test for today!"), so don't reuse it under Chapter Tests.
+      const isChapterTestSection = title.toLowerCase() === 'chapter tests';
+      if (isChapterTestSection) {
+        return (
+          <div>
+            <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
+            <MessageDisplay message="No more chapter tests are scheduled for today!" />
+          </div>
+        );
+      }
       return (
         <div>
           <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
@@ -415,7 +428,8 @@ export default function Home() {
           )}
 
           <div className="pb-40">
-            {groupConfig.showTests && renderTestSection(groupConfig.testsSectionTitle || "Tests", [...nonChapterTests, ...chapterTests])}
+            {groupConfig.showTests && renderTestSection(groupConfig.testsSectionTitle || "Tests", nonChapterTests)}
+            {groupConfig.showChapterTests && renderTestSection("Chapter Tests", chapterTests)}
             {/* Practice Tests Accordion for all groups */}
             {groupConfig.showPracticeTests && (
               <div>
