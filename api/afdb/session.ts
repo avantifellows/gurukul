@@ -1,18 +1,23 @@
 "use server"
 
 import getFetchConfig from '../fetchConfig';
+import { istNow, istEndOfToday } from '@/utils/dateUtils';
 
 const url = process.env.AF_DB_SERVICE_URL;
 const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN || '';
 
 export const getSessionOccurrences = async (sessionIds: string[]) => {
   try {
+    // Fetch every occurrence overlapping [now, end of today]: sessions open
+    // right now (however long ago they started) plus ones starting later
+    // today. The UI decides what's joinable vs "Starts at ..." client-side.
     const response = await fetch(`${url}/session-occurrence/search`, {
       ...getFetchConfig(bearerToken, { 'Content-Type': 'application/json' }),
       method: 'POST',
       body: JSON.stringify({
         session_ids: sessionIds,
-        is_start_time: 'today'
+        end_time_gte: istNow(),
+        start_time_lte: istEndOfToday()
       }),
       cache: 'no-store'
     });

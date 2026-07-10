@@ -118,6 +118,25 @@ export function minutesUntilStart(startTime: string): number {
     return (start - nowSameBasis) / (1000 * 60);
 }
 
+/**
+ * Current time as an IST-wall-clock ISO string tagged "Z" — the same basis the
+ * backend stores session times in, so it can be sent as a query boundary.
+ */
+export function istNow(): string {
+    return new Date(Date.now() + IST_OFFSET_MS).toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+
+/**
+ * Today's 23:59:59 IST on the same IST-tagged-"Z" basis as istNow. Together
+ * they bound the home page's fetch window: everything still open now through
+ * everything starting later today.
+ */
+export function istEndOfToday(): string {
+    const endOfToday = new Date(Date.now() + IST_OFFSET_MS);
+    endOfToday.setUTCHours(23, 59, 59, 0);
+    return endOfToday.toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+
 export function formatDate(dateStr: string): string {
     const [year, month, day] = dateStr.split('-');
     return `${day}-${month}-${year}`;
