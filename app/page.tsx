@@ -318,7 +318,9 @@ export default function Home() {
       }
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
         const isResumeable = quizCompletionStatus.hasOwnProperty(session.platform_id) && !quizCompletionStatus[session.platform_id];
-        const formatType = session.meta_data?.gurukul_format_type || 'both';
+        // Forms have no OMR variant, so they are always 'qa' regardless of
+        // gurukul_format_type metadata (which is sometimes missing anyway).
+        const formatType = isForm ? 'qa' : (session.meta_data?.gurukul_format_type || 'both');
         const showBothButtons = formatType === 'both';
 
         const renderQuizButton = formatType !== 'omr' ? (
