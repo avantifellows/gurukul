@@ -74,18 +74,12 @@ export default function Home() {
       quiz.session.meta_data.test_type === 'form'
     );
 
-    const regularTests = activeQuizzes.filter(quiz =>
+    // Chapter tests are deliberately NOT split out — they render in the same
+    // Tests section as every other regular test.
+    const tests = activeQuizzes.filter(quiz =>
       quiz.session.meta_data.test_type !== 'homework' &&
       quiz.session.meta_data.test_type !== 'form' &&
       quiz.session.meta_data.test_purpose !== 'practice_test'
-    );
-
-    const nonChapterTests = regularTests.filter(quiz =>
-      quiz.session.meta_data.test_format !== 'chapter_test'
-    );
-
-    const chapterTests = regularTests.filter(quiz =>
-      quiz.session.meta_data.test_format === 'chapter_test'
     );
 
     const practiceTests = activeQuizzes.filter(quiz =>
@@ -96,13 +90,13 @@ export default function Home() {
       quiz.session.meta_data.test_type === 'homework'
     );
 
-    return { forms, nonChapterTests, chapterTests, practiceTests, homework };
+    return { forms, tests, practiceTests, homework };
   };
 
   const fetchUserSessions = async () => {
     setIsLoading(true);
     try {
-      const shouldFetchQuizzes = groupConfig.showTests || groupConfig.showPracticeTests || groupConfig.showHomework;
+      const shouldFetchQuizzes = groupConfig.showTests || groupConfig.showForms || groupConfig.showPracticeTests || groupConfig.showHomework;
 
       const numericUserId = Number(userId);
 
@@ -189,8 +183,8 @@ export default function Home() {
       switch (title.toLowerCase()) {
         case 'tests':
           return groupConfig.showTests;
-        case 'chapter tests':
-          return groupConfig.showChapterTests;
+        case 'forms':
+          return groupConfig.showForms;
         case 'practice tests':
           return groupConfig.showPracticeTests;
         case 'homework':
@@ -203,17 +197,6 @@ export default function Home() {
     if (!shouldShow) return null;
 
     if (tests.length === 0) {
-      // noTestsMessage is worded for the main live-test section (e.g. "There is
-      // no NVS live test for today!"), so don't reuse it under Chapter Tests.
-      const isChapterTestSection = title.toLowerCase() === 'chapter tests';
-      if (isChapterTestSection) {
-        return (
-          <div>
-            <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
-            <MessageDisplay message="No more chapter tests are scheduled for today!" />
-          </div>
-        );
-      }
       return (
         <div>
           <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
@@ -387,7 +370,7 @@ export default function Home() {
     }
   }, [loggedIn, userId, authLoading]);
 
-  const { forms, nonChapterTests, chapterTests, practiceTests, homework } = filterAndSortTests(quizzes);
+  const { forms, tests, practiceTests, homework } = filterAndSortTests(quizzes);
 
   // --- Practice Test Accordion UI for all groups ---
   // Filter and group practice tests by format
@@ -442,9 +425,8 @@ export default function Home() {
           <div className="pb-40">
             {/* Only rendered when there are active forms — no empty-state
                 message, so students never see "no more forms" on a normal day. */}
-            {forms.length > 0 && renderTestSection("Forms", forms)}
-            {groupConfig.showTests && renderTestSection(groupConfig.testsSectionTitle || "Tests", nonChapterTests)}
-            {groupConfig.showChapterTests && renderTestSection("Chapter Tests", chapterTests)}
+            {groupConfig.showForms && forms.length > 0 && renderTestSection("Forms", forms)}
+            {groupConfig.showTests && renderTestSection(groupConfig.testsSectionTitle || "Tests", tests)}
             {/* Practice Tests Accordion for all groups */}
             {groupConfig.showPracticeTests && (
               <div>
