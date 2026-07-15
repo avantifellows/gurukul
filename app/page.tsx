@@ -68,17 +68,18 @@ export default function Home() {
         return isQuizAttemptable(platformId) || isCompleted;
       });
 
-    const regularTests = activeQuizzes.filter(quiz =>
+    // Forms (e.g. feedback questionnaires) ride on the quiz platform with
+    // test_type 'form'; they get their own section above the test sections.
+    const forms = activeQuizzes.filter(quiz =>
+      quiz.session.meta_data.test_type === 'form'
+    );
+
+    // Chapter tests are deliberately NOT split out — they render in the same
+    // Tests section as every other regular test.
+    const tests = activeQuizzes.filter(quiz =>
       quiz.session.meta_data.test_type !== 'homework' &&
+      quiz.session.meta_data.test_type !== 'form' &&
       quiz.session.meta_data.test_purpose !== 'practice_test'
-    );
-
-    const nonChapterTests = regularTests.filter(quiz =>
-      quiz.session.meta_data.test_format !== 'chapter_test'
-    );
-
-    const chapterTests = regularTests.filter(quiz =>
-      quiz.session.meta_data.test_format === 'chapter_test'
     );
 
     const practiceTests = activeQuizzes.filter(quiz =>
@@ -89,13 +90,13 @@ export default function Home() {
       quiz.session.meta_data.test_type === 'homework'
     );
 
-    return { nonChapterTests, chapterTests, practiceTests, homework };
+    return { forms, tests, practiceTests, homework };
   };
 
   const fetchUserSessions = async () => {
     setIsLoading(true);
     try {
-      const shouldFetchQuizzes = groupConfig.showTests || groupConfig.showPracticeTests || groupConfig.showHomework;
+      const shouldFetchQuizzes = groupConfig.showTests || groupConfig.showForms || groupConfig.showPracticeTests || groupConfig.showHomework;
 
       const numericUserId = Number(userId);
 
@@ -182,6 +183,8 @@ export default function Home() {
       switch (title.toLowerCase()) {
         case 'tests':
           return groupConfig.showTests;
+        case 'forms':
+          return groupConfig.showForms;
         case 'practice tests':
           return groupConfig.showPracticeTests;
         case 'homework':
@@ -283,29 +286,34 @@ export default function Home() {
         );
       }
     } else if (session.platform === 'quiz') {
+      // Forms (feedback questionnaires etc.) run on the quiz platform too;
+      // only the copy differs.
+      const isForm = session.meta_data?.test_type === 'form';
       const isCompleted = quizCompletionStatus.hasOwnProperty(session.platform_id) && quizCompletionStatus[session.platform_id] === true;
       if (isCompleted) {
         return (
           <div className="flex flex-col items-center pr-2">
             <div className="w-[118px] italic md:w-36 h-8 flex items-center justify-center text-xs">
-              Test Submitted
+              {isForm ? "Form Submitted" : "Test Submitted"}
             </div>
           </div>
         );
       }
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
         const isResumeable = quizCompletionStatus.hasOwnProperty(session.platform_id) && !quizCompletionStatus[session.platform_id];
-        const formatType = session.meta_data?.gurukul_format_type || 'both';
+        // Forms have no OMR variant, so they are always 'qa' regardless of
+        // gurukul_format_type metadata (which is sometimes missing anyway).
+        const formatType = isForm ? 'qa' : (session.meta_data?.gurukul_format_type || 'both');
         const showBothButtons = formatType === 'both';
 
         const renderQuizButton = formatType !== 'omr' ? (
           <div className="flex flex-col items-center">
             <Link href={buildGurukulSessionUrl(session.session_id)} target="_blank">
               <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
-                {isResumeable ? "Resume" : "Start Test"}
+                {isResumeable ? "Resume" : (isForm ? "Fill Form" : "Start Test")}
               </PrimaryButton>
             </Link>
-            <div className={`text-gray-500 md:text-xs text-[10px] text-center ${showBothButtons ? 'pb-2' : ''}`}>Click to begin online test</div>
+            <div className={`text-gray-500 md:text-xs text-[10px] text-center ${showBothButtons ? 'pb-2' : ''}`}>{isForm ? "Click to fill the form" : "Click to begin online test"}</div>
           </div>
         ) : null;
 
@@ -362,7 +370,7 @@ export default function Home() {
     }
   }, [loggedIn, userId, authLoading]);
 
-  const { nonChapterTests, chapterTests, practiceTests, homework } = filterAndSortTests(quizzes);
+  const { forms, tests, practiceTests, homework } = filterAndSortTests(quizzes);
 
   // --- Practice Test Accordion UI for all groups ---
   // Filter and group practice tests by format
@@ -415,7 +423,10 @@ export default function Home() {
           )}
 
           <div className="pb-40">
-            {groupConfig.showTests && renderTestSection(groupConfig.testsSectionTitle || "Tests", [...nonChapterTests, ...chapterTests])}
+            {/* Only rendered when there are active forms — no empty-state
+                message, so students never see "no more forms" on a normal day. */}
+            {groupConfig.showForms && forms.length > 0 && renderTestSection("Forms", forms)}
+            {groupConfig.showTests && renderTestSection(groupConfig.testsSectionTitle || "Tests", tests)}
             {/* Practice Tests Accordion for all groups */}
             {groupConfig.showPracticeTests && (
               <div>

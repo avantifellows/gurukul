@@ -65,6 +65,7 @@ export interface Chapter {
     chapter: string;
   }>;
   grade_id?: number | null;
+  cms_status_id?: number | null;
 }
 
 export interface Resource {
@@ -217,6 +218,7 @@ export interface QuizCompletionStatus {
 export interface GroupConfig {
   showLiveClasses: boolean;
   showTests: boolean;
+  showForms: boolean;
   showPracticeTests: boolean;
   showHomework: boolean;
   showContentLibrary: boolean;

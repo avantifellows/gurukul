@@ -57,6 +57,38 @@ export const getGrades = async (number: number): Promise<Grade[]> => {
   return fetchData(url);
 };
 
+// Resolve the CMS status id that marks a chapter as "archived".
+// Archived chapters are removed from the exam syllabus in the CMS and must not
+// be shown in Gurukul. The id is stable, so cache the lookup for the lifetime
+// of the server process. Resolves to null if the status is not found, in which
+// case no chapters are filtered out.
+let archivedStatusIdPromise: Promise<number | null> | undefined;
+
+const getArchivedStatusId = (): Promise<number | null> => {
+  if (!archivedStatusIdPromise) {
+    archivedStatusIdPromise = (async () => {
+      try {
+        const queryParams = new URLSearchParams({ name: 'archived' });
+        const statuses: { id: number; name: string }[] = await fetchWithParams('cms-status', queryParams);
+        const archived = statuses.find((status) => status.name === 'archived');
+        return archived ? archived.id : null;
+      } catch {
+        // Don't let a CMS status lookup failure break chapter listing.
+        archivedStatusIdPromise = undefined;
+        return null;
+      }
+    })();
+  }
+  return archivedStatusIdPromise;
+};
+
+// Exclude chapters that have been archived in the CMS.
+const excludeArchivedChapters = async (chapters: Chapter[]): Promise<Chapter[]> => {
+  const archivedStatusId = await getArchivedStatusId();
+  if (archivedStatusId === null) return chapters;
+  return chapters.filter((chapter) => chapter.cms_status_id !== archivedStatusId);
+};
+
 export const getChapters = async (
   subjectId?: number,
   gradeId?: number,
@@ -70,7 +102,10 @@ export const getChapters = async (
   if (subjectId) queryParams.append('subject_id', subjectId.toString());
   if (curriculumId) queryParams.append('curriculum_id', curriculumId.toString());
 
-  const allChapters: Chapter[] = await fetchWithParams('chapter', queryParams);
+  const fetchedChapters: Chapter[] = await fetchWithParams('chapter', queryParams);
+
+  // Drop chapters archived in the CMS (removed from the exam syllabus)
+  const allChapters = await excludeArchivedChapters(fetchedChapters);
 
   // If no gradeId is provided, return all chapters for the curriculum/subject
   if (!gradeId) return allChapters;
@@ -137,7 +172,10 @@ export const getClassChapters = async (
   if (subjectId) queryParams.append('subject_id', subjectId.toString());
   if (gradeId) queryParams.append('grade_id', gradeId.toString());
 
-  const chapterData: Chapter[] = await fetchWithParams('chapter', queryParams);
+  const fetchedChapters: Chapter[] = await fetchWithParams('chapter', queryParams);
+
+  // Drop chapters archived in the CMS (removed from the exam syllabus)
+  const chapterData = await excludeArchivedChapters(fetchedChapters);
 
   const filteredChapters = await Promise.all(
     chapterData.map(async (chapter) => {
