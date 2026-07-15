@@ -218,7 +218,7 @@ export interface QuizCompletionStatus {
 export interface GroupConfig {
   showLiveClasses: boolean;
   showTests: boolean;
-  showChapterTests: boolean;
+  showForms: boolean;
   showPracticeTests: boolean;
   showHomework: boolean;
   showContentLibrary: boolean;

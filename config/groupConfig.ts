@@ -4,7 +4,7 @@ const groupConfig: GroupConfigurations = {
     AllIndiaStudents: {
         showLiveClasses: false,
         showTests: true,
-        showChapterTests: true,
+        showForms: true,
         showPracticeTests: true,
         showHomework: false,
         showContentLibrary: true,
@@ -17,7 +17,7 @@ const groupConfig: GroupConfigurations = {
     EnableStudents: {
         showLiveClasses: false,
         showTests: true,
-        showChapterTests: true,
+        showForms: true,
         showPracticeTests: true,
         showHomework: false,
         showContentLibrary: true,
@@ -35,7 +35,7 @@ const groupConfig: GroupConfigurations = {
     EnableStudentsCoE: {
         showLiveClasses: false,
         showTests: true,
-        showChapterTests: true,
+        showForms: true,
         showPracticeTests: true,
         showHomework: false,
         showContentLibrary: true,
@@ -54,7 +54,7 @@ const groupConfig: GroupConfigurations = {
     EnableStudentsNodal: {
         showLiveClasses: false,
         showTests: true,
-        showChapterTests: true,
+        showForms: true,
         showPracticeTests: true,
         showHomework: false,
         showContentLibrary: true,
@@ -73,7 +73,7 @@ const groupConfig: GroupConfigurations = {
     EnableSchools: {
         showLiveClasses: false,
         showTests: false,
-        showChapterTests: false,
+        showForms: false,
         showPracticeTests: false,
         showHomework: false,
         showContentLibrary: true,
@@ -87,7 +87,7 @@ const groupConfig: GroupConfigurations = {
     DelhiStudents: {
         showLiveClasses: false,
         showTests: true,
-        showChapterTests: true,
+        showForms: true,
         showPracticeTests: true,
         showHomework: false,
         showContentLibrary: true,
@@ -101,7 +101,7 @@ const groupConfig: GroupConfigurations = {
     defaultGroup: {
         showLiveClasses: true,
         showTests: true,
-        showChapterTests: true,
+        showForms: true,
         showPracticeTests: true,
         showHomework: true,
         showContentLibrary: true,
@@ -112,7 +112,7 @@ const groupConfig: GroupConfigurations = {
     ChhattisgarhStudents: {
         showLiveClasses: false,
         showTests: true,
-        showChapterTests: true,
+        showForms: true,
         showPracticeTests: true,
         showHomework: false,
         showContentLibrary: true,
@@ -125,7 +125,7 @@ const groupConfig: GroupConfigurations = {
     PunjabStudents: {
         showLiveClasses: false,
         showTests: true,
-        showChapterTests: true,
+        showForms: true,
         showPracticeTests: false,
         showHomework: false,
         showContentLibrary: true,
@@ -139,7 +139,7 @@ const groupConfig: GroupConfigurations = {
     PunjabTeachers: {
         showLiveClasses: false,
         showTests: false,
-        showChapterTests: false,
+        showForms: false,
         showPracticeTests: false,
         showHomework: false,
         showContentLibrary: true,
@@ -153,7 +153,7 @@ const groupConfig: GroupConfigurations = {
     DelhiSchools: {
         showLiveClasses: false,
         showTests: false,
-        showChapterTests: false,
+        showForms: false,
         showPracticeTests: false,
         showHomework: false,
         showContentLibrary: true,
@@ -168,7 +168,7 @@ const groupConfig: GroupConfigurations = {
     HimachalStudents: {
         showLiveClasses: false,
         showTests: true,
-        showChapterTests: true,
+        showForms: true,
         showPracticeTests: false,
         showHomework: false,
         showContentLibrary: true,
@@ -182,7 +182,7 @@ const groupConfig: GroupConfigurations = {
     UttarakhandStudents: {
         showLiveClasses: false,
         showTests: true,
-        showChapterTests: true,
+        showForms: true,
         showPracticeTests: false,
         showHomework: false,
         showContentLibrary: true,
@@ -196,7 +196,7 @@ const groupConfig: GroupConfigurations = {
     MaharashtraStudents: {
         showLiveClasses: false,
         showTests: true,
-        showChapterTests: true,
+        showForms: true,
         showPracticeTests: true,
         showHomework: false,
         showContentLibrary: true,
@@ -210,7 +210,7 @@ const groupConfig: GroupConfigurations = {
     TNTeachers: {
         showLiveClasses: false,
         showTests: true,
-        showChapterTests: true,
+        showForms: true,
         showPracticeTests: false,
         showHomework: false,
         showContentLibrary: false,
