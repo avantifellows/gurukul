@@ -6,7 +6,12 @@ import {
     resolveSameOriginUrl,
 } from '../launchToken';
 
-const REPORTS_URL = process.env.AF_REPORTS_URL || '';
+// The public origin students browse, which is what the reports listing embeds in
+// report_link. Deliberately NOT AF_REPORTS_URL: that is Gurukul's server-side
+// API base (an API Gateway host), so validating against it would reject every
+// real report link.
+const REPORTS_PUBLIC_URL =
+    process.env.NEXT_PUBLIC_AF_REPORTS_URL || 'https://reports.avantifellows.org';
 
 /**
  * The reports listing hands us links of the form
@@ -26,11 +31,14 @@ function toLaunchPath(pathname: string): string | null {
 }
 
 export async function GET(request: NextRequest) {
-    if (!isLaunchConfigured() || !REPORTS_URL) {
+    if (!isLaunchConfigured()) {
         return NextResponse.json({ error: 'Report launch is not configured' }, { status: 500 });
     }
 
-    const reportUrl = resolveSameOriginUrl(request.nextUrl.searchParams.get('url'), REPORTS_URL);
+    const reportUrl = resolveSameOriginUrl(
+        request.nextUrl.searchParams.get('url'),
+        REPORTS_PUBLIC_URL
+    );
     if (!reportUrl) {
         return NextResponse.json({ error: 'Invalid report URL' }, { status: 400 });
     }
