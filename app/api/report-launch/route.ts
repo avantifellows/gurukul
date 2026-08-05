@@ -5,6 +5,7 @@ import {
     resolvePortalSession,
     resolveSameOriginUrl,
 } from '../launchToken';
+import { toLaunchPath } from './launchPath';
 
 // The public origin students browse, which is what the reports listing embeds in
 // report_link. Deliberately NOT AF_REPORTS_URL: that is Gurukul's server-side
@@ -12,23 +13,6 @@ import {
 // real report link.
 const REPORTS_PUBLIC_URL =
     process.env.NEXT_PUBLIC_AF_REPORTS_URL || 'https://reports.avantifellows.org';
-
-/**
- * The reports listing hands us links of the form
- *   /reports/student_quiz_report/{session_id}/{user_id}
- * which are unauthenticated and therefore render without a "Review Quiz"
- * button. Reporting only exposes that button when it can resolve the student
- * from a launch token, which it accepts on the session-only route:
- *   /reports/student_quiz_report/{session_id}?launchToken=...
- * Drop the trailing user_id so the token becomes the source of identity.
- */
-function toLaunchPath(pathname: string): string | null {
-    const match = pathname.match(/^(.*\/student_quiz_report(?:\/v3)?)\/([^/]+)\/([^/]+)\/?$/);
-    if (!match) return null;
-
-    const [, prefix, sessionId] = match;
-    return `${prefix}/${sessionId}`;
-}
 
 export async function GET(request: NextRequest) {
     if (!isLaunchConfigured()) {
