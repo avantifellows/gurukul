@@ -68,3 +68,15 @@ export const buildResourceLink = (resource: Resource): string | undefined => {
     const params = new URLSearchParams({ url: resource.link }).toString();
     return `/api/quiz-launch?${params}`;
 };
+
+/**
+ * Build final link for a student report.
+ * Reports go through a Gurukul server route that mints a short-lived report
+ * launch token from the existing portal auth cookie, so the report resolves
+ * the student itself and can offer the "Review Quiz" handoff.
+ */
+export const buildReportLink = (reportLink: string): string => {
+    if (!reportLink) return reportLink;
+    const params = new URLSearchParams({ url: reportLink }).toString();
+    return `/api/report-launch?${params}`;
+};

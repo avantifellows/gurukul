@@ -6,6 +6,7 @@ import { ReportsListProps } from "../types";
 import { MixpanelTracking } from "@/services/mixpanel";
 import { MIXPANEL_EVENT } from "@/constants/config";
 import { formatDate } from "@/utils/dateUtils";
+import { buildReportLink } from "@/utils/resourceUtils";
 import { useAuth } from "@/services/AuthContext";
 
 export default function ReportsList({ userId }: ReportsListProps) {
@@ -63,7 +64,7 @@ export default function ReportsList({ userId }: ReportsListProps) {
             {responseData.reports.length > 0 ? (
                 <>
                     {responseData.reports.map((report: Report, index: number) => (
-                        <Link href={report.report_link} target="_blank" key={index} className="bg-card rounded-lg shadow-lg h-24 mx-4 relative flex items-center my-1 md:my-2">
+                        <Link href={buildReportLink(report.report_link)} target="_blank" key={index} className="bg-card rounded-lg shadow-lg h-24 mx-4 relative flex items-center my-1 md:my-2">
                             <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
                             <div className="text-left mx-6 md:mx-8">
                                 <p className="text-sm md:text-base font-semibold">{report.test_name}</p>
