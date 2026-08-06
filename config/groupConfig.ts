@@ -223,9 +223,24 @@ const groupConfig: GroupConfigurations = {
         displayLabel: 'Tamil Nadu (Teachers)',
         region: 'Other States',
     },
+    EMRSStudents: {
+        showLiveClasses: false,
+        showTests: true,
+        showForms: true,
+        showPracticeTests: true,
+        showHomework: false,
+        showContentLibrary: false,
+        showClassLibrary: false,
+        testsSectionTitle: 'Live Test',
+        homeTabLabel: 'Tests',
+        noTestsMessage: 'There is no live test for today!',
+        showLibraryTab: false,
+        displayLabel: 'Eklavya Model Residential Schools - EMRS',
+        region: 'EMRS',
+    },
 };
 
-export const LOGIN_REGION_ORDER = ["Delhi", "Punjab", "NVS / Enable", "Other States"];
+export const LOGIN_REGION_ORDER = ["Delhi", "Punjab", "NVS / Enable", "EMRS", "Other States"];
 
 export const getGroupConfig = (group: string): GroupConfig => {
     return groupConfig[group] || groupConfig.defaultGroup;
