@@ -20,12 +20,12 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid quiz URL' }, { status: 400 });
     }
 
-    const verifiedToken = await resolvePortalSession();
-    if (!verifiedToken) {
+    const session = await resolvePortalSession();
+    if (!session) {
         return NextResponse.json({ error: 'Unable to verify Gurukul session' }, { status: 401 });
     }
 
-    const launchToken = await createLaunchToken(verifiedToken, 'quiz');
+    const launchToken = await createLaunchToken(session, 'quiz');
     if (!launchToken) {
         return NextResponse.json({ error: 'Unable to create quiz launch token' }, { status: 502 });
     }
