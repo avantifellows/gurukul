@@ -4,7 +4,7 @@ const PORTAL_BACKEND_URL = process.env.NEXT_PUBLIC_AF_PORTAL_BACKEND_URL || '';
 
 const VERIFY_PATH = '/auth/verify';
 const REFRESH_PATH = '/auth/refresh-token';
-const CREATE_TOKEN_PATH = '/auth/create-access-token';
+const LAUNCH_TOKEN_PATH = '/auth/launch-token';
 
 export const isLaunchConfigured = (): boolean => Boolean(PORTAL_BACKEND_URL);
 
@@ -13,17 +13,15 @@ type VerifiedPortalToken = {
     data?: Record<string, any>;
 };
 
+export type PortalSession = {
+    token: VerifiedPortalToken;
+    accessToken: string;
+};
+
 function bearerHeaders(token: string): HeadersInit {
     return {
         Authorization: `Bearer ${token}`,
         Accept: 'application/json',
-    };
-}
-
-function jsonHeaders(): HeadersInit {
-    return {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
     };
 }
 
@@ -53,75 +51,48 @@ async function refreshAccessToken(refreshToken: string): Promise<string | null> 
     return typeof data.access_token === 'string' ? data.access_token : null;
 }
 
-function buildLaunchData(tokenData: Record<string, any>, canonicalUserId: string) {
-    const launchData: Record<string, any> = {
-        group: tokenData.group,
-        user_id: canonicalUserId,
-    };
-
-    for (const key of [
-        'student_id',
-        'apaar_id',
-        'teacher_id',
-        'candidate_id',
-        'school_code',
-        'display_id',
-        'display_id_type',
-        'profile',
-        'user_type',
-    ]) {
-        if (tokenData[key] !== undefined && tokenData[key] !== null) {
-            launchData[key] = tokenData[key];
-        }
-    }
-
-    return launchData;
-}
-
 /**
  * Resolve the signed-in student from the httpOnly portal auth cookies,
  * refreshing the access token once if it has gone stale.
  */
-export async function resolvePortalSession(): Promise<VerifiedPortalToken | null> {
+export async function resolvePortalSession(): Promise<PortalSession | null> {
     const cookieStore = cookies();
     const accessToken = cookieStore.get('access_token')?.value;
     const refreshToken = cookieStore.get('refresh_token')?.value;
 
-    const verifiedToken = accessToken ? await verifyPortalToken(accessToken) : null;
-    if (verifiedToken) return verifiedToken;
+    if (accessToken) {
+        const token = await verifyPortalToken(accessToken);
+        if (token) return { token, accessToken };
+    }
 
     if (!refreshToken) return null;
 
     const refreshedAccessToken = await refreshAccessToken(refreshToken);
-    return refreshedAccessToken ? verifyPortalToken(refreshedAccessToken) : null;
+    if (!refreshedAccessToken) return null;
+
+    const token = await verifyPortalToken(refreshedAccessToken);
+    return token ? { token, accessToken: refreshedAccessToken } : null;
 }
 
 /**
- * Mint a short-lived launch token for the given audience, carrying the
- * student's canonical identifiers across to the destination app.
+ * Ask portal-backend for a short-lived launch token for the given audience.
+ * Claims are copied server-side from the verified access token.
  */
 export async function createLaunchToken(
-    verifiedToken: VerifiedPortalToken,
+    session: PortalSession,
     audience: 'quiz' | 'report'
 ): Promise<string | null> {
-    const tokenData = verifiedToken.data || {};
-    const canonicalUserId = String(tokenData.user_id ?? verifiedToken.id ?? '');
-
-    if (!PORTAL_BACKEND_URL || !canonicalUserId || !tokenData.group) {
+    if (!PORTAL_BACKEND_URL || !session?.accessToken) {
         return null;
     }
 
-    const response = await fetch(portalBackendUrl(CREATE_TOKEN_PATH), {
+    const response = await fetch(portalBackendUrl(LAUNCH_TOKEN_PATH), {
         method: 'POST',
-        headers: jsonHeaders(),
-        body: JSON.stringify({
-            type: 'user',
-            is_user_valid: true,
-            id: canonicalUserId,
-            data: buildLaunchData(tokenData, canonicalUserId),
-            session_mode: 'launch',
-            audience,
-        }),
+        headers: {
+            ...bearerHeaders(session.accessToken),
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ audience }),
         cache: 'no-store',
     });
 
