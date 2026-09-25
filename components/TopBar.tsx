@@ -1,16 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/services/AuthContext";
 import ProfileIcon from '../assets/profile.png';
 import Image from "next/image";
 import { MixpanelTracking } from "@/services/mixpanel";
 import { MIXPANEL_EVENT } from "@/constants/config";
+import { getPageHeading } from "./useNavItems";
 
 const TopBar = () => {
-  const { userName, logout } = useAuth();
+  const { userName, logout, groupConfig } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [today, setToday] = useState("");
+
+  // Formatted on the client only: the server renders in UTC, and around
+  // midnight IST that would disagree with the browser and trip hydration.
+  useEffect(() => {
+    setToday(
+      new Date().toLocaleDateString(undefined, {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      })
+    );
+  }, []);
 
   const formatUserName = (userName: string) => {
     const names = userName.split(' ');
@@ -65,25 +79,46 @@ const TopBar = () => {
     );
   };
 
+  const heading = getPageHeading(pathname, groupConfig.homeTabLabel || "Home");
+  // On the home page the schedule is the content, so the date is the most
+  // useful thing the header can say; identity already lives in the rail.
+  const subtitle = pathname === "/" ? today : heading.subtitle;
+
   return (
-    <div className="max-w-xl mx-auto text-white p-4 h-24 flex items-center justify-between bg-primary">
-      <div className="text-lg font-semibold">
-        {getRouteNameContent()}
+    <>
+      {/* Phone: the original greeting bar, unchanged. */}
+      <div className="lg:hidden max-w-xl mx-auto text-white p-4 h-24 flex items-center justify-between bg-primary">
+        <div className="text-lg font-semibold">
+          {getRouteNameContent()}
+        </div>
+        <div className="relative">
+          <Image
+            src={ProfileIcon}
+            alt="Profile"
+            className="w-6 h-6 cursor-pointer"
+            onClick={toggleDropdown}
+          />
+          {isDropdownOpen && (
+            <div className="absolute top-full right-1 bg-white p-2 shadow-md text-black rounded-lg text-base w-32 grid grid-cols-1 gap-2 z-50">
+              <button onClick={handleLogout}>Logout</button>
+            </div>
+          )}
+        </div>
       </div>
-      <div className="relative">
-        <Image
-          src={ProfileIcon}
-          alt="Profile"
-          className="w-6 h-6 cursor-pointer"
-          onClick={toggleDropdown}
-        />
-        {isDropdownOpen && (
-          <div className="absolute top-full right-1 bg-white p-2 shadow-md text-black rounded-lg text-base w-32 grid grid-cols-1 gap-2">
-            <button onClick={handleLogout}>Logout</button>
-          </div>
-        )}
-      </div>
-    </div>
+
+      {/* Desktop: a page header. Navigation and identity sit in the rail, so
+          this only has to say where you are and, on the home page, when. */}
+      <header className="hidden lg:block sticky top-0 z-30 bg-surface/85 backdrop-blur-md border-b border-line">
+        <div className="mx-auto max-w-6xl px-10 h-20 flex flex-col justify-center">
+          <h1 className="text-[28px] leading-none font-bold tracking-tight text-ink">
+            {heading.title}
+          </h1>
+          <p className="text-sm text-slate-500 mt-1.5 min-h-[1.25rem]" suppressHydrationWarning>
+            {subtitle}
+          </p>
+        </div>
+      </header>
+    </>
   );
 };
 
