@@ -21,8 +21,8 @@ export default function Home() {
   const [quizzes, setQuizzes] = useState<QuizSession[]>([]);
   const [quizCompletionStatus, setQuizCompletionStatus] = useState<QuizCompletionStatus>({});
   const [dataFetched, setDataFetched] = useState(false);
-  const commonTextClass = "text-gray-700 text-xs md:text-sm mx-3 md:mx-8 whitespace-nowrap w-12";
-  const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40";
+  const commonTextClass = "text-gray-700 text-xs md:text-sm mx-3 md:mx-8 whitespace-nowrap w-12 tnum lg:mx-0 lg:w-auto lg:text-sm";
+  const infoMessageClass = "flex items-center justify-center text-center h-72 mx-4 pb-40 lg:h-auto lg:py-10 lg:mx-0 lg:pb-0 lg:justify-start lg:text-left lg:text-slate-500";
 
   // Accordion state for Practice Test Accordion UI
   const [expandedFormat, setExpandedFormat] = useState<string | null>(null);
@@ -131,6 +131,79 @@ export default function Home() {
     }
   };
 
+  /**
+   * Section label. On a phone it is a plain teal heading; on desktop it becomes
+   * a quieter label with a rule running out to the right, so several sections
+   * stacked in one wide column stay visually separable.
+   */
+  function SectionHeading({ children }: { children: React.ReactNode }) {
+    return (
+      <div className="flex items-baseline gap-4 pt-6 lg:pt-10 lg:pb-1">
+        <h2 className="text-primary ml-4 font-semibold text-xl lg:ml-0 lg:text-ink lg:text-base">
+          {children}
+        </h2>
+        <span aria-hidden className="hidden lg:block flex-1 h-px bg-line" />
+      </div>
+    );
+  }
+
+  /**
+   * Wraps a run of session rows. On desktop it draws the hairline the time
+   * gutter hangs off, so the day reads top-to-bottom as a schedule.
+   */
+  function Schedule({ children }: { children: React.ReactNode }) {
+    return (
+      <div className="relative lg:pt-3">
+        <span aria-hidden className="hidden lg:block absolute left-[7.25rem] top-0 bottom-0 w-px bg-line" />
+        {children}
+      </div>
+    );
+  }
+
+  /** The start/end pair that sits in the desktop time gutter. */
+  function TimeGutter({ start, end }: { start: string; end: string }) {
+    return (
+      <div className="hidden lg:flex w-[7.25rem] shrink-0 flex-col items-end pr-4 pt-4 text-sm leading-tight tnum">
+        <span className="font-medium text-ink">{format12HrSessionTime(start)}</span>
+        <span className="text-slate-500">{format12HrSessionTime(end)}</span>
+      </div>
+    );
+  }
+
+  /**
+   * One test / form / homework row. Shared by the plain sections and the
+   * practice-test accordion so both stay in step.
+   */
+  function TestRow({ data, index, formatLabel, inset = true }: { data: QuizSession; index: number; formatLabel?: string; inset?: boolean }) {
+    const start = data.start_time ?? data.session.start_time;
+    const end = data.end_time ?? data.session.end_time;
+
+    return (
+      <div className="flex items-center mt-4 lg:mt-0 lg:mb-3 lg:items-start">
+        <TimeGutter start={start} end={end} />
+        <div className={`bg-white rounded-lg shadow-lg min-h-24 h-auto min-h-[120px] py-3 relative w-full flex flex-row justify-between ${inset ? "mx-4" : ""} items-center lg:mx-0 lg:ml-5 lg:min-h-0 lg:py-4 lg:pr-4 lg:rounded-xl lg:shadow-none lg:border lg:border-line`}>
+          <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md lg:rounded-s-xl`} />
+
+          <div className="flex flex-col gap-1 pl-6 sm:w-full w-48 md:w-full text-sm md:text-base lg:pl-7">
+            <div className="absolute top-2 left-6 text-gray-700 text-xs md:text-sm whitespace-nowrap lg:hidden">
+              {formatSessionTimeRange(start, end)}
+            </div>
+            <div className="font-semibold lg:text-[15px] lg:text-ink">
+              {data.session.name}
+            </div>
+            <div className="text-gray-600 lg:text-sm">
+              {formatLabel ?? data.session.meta_data.test_format}
+            </div>
+          </div>
+
+          <div className="flex items-center shrink-0">
+            {renderButton(data)}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const renderLiveClasses = () => {
     if (isLoading) return null;
 
@@ -147,30 +220,32 @@ export default function Home() {
     }
 
     return (
-      <div className="grid grid-cols-1 gap-4 pb-16">
-        {activeLiveClasses.map((data, index) => (
-          <div key={index} className="flex mt-4 items-center">
-            <div>
-              <p className={commonTextClass}>
-                {format12HrSessionTime(data.start_time)}
-              </p>
-              <p className={commonTextClass}>
-                {format12HrSessionTime(data.end_time)}
-              </p>
-            </div>
-            <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 md:mr-8 items-center">
-              <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`}></div>
-              <div className="text-sm md:text-base mx-6 md:mx-8 w-32 md:w-72">
-                <span className="font-semibold">{data.session.meta_data.subject ?? "Science"}</span>
-                <div className="text-sm md:text-base break-words">
-                  {data.session.name}
-                </div>
+      <Schedule>
+        <div className="grid grid-cols-1 gap-4 pb-16 lg:gap-0 lg:pb-0">
+          {activeLiveClasses.map((data, index) => (
+            <div key={index} className="flex mt-4 items-center lg:mt-0 lg:mb-3 lg:items-start">
+              <div className="lg:w-[7.25rem] lg:shrink-0 lg:flex lg:flex-col lg:items-end lg:pr-4 lg:pt-4 lg:leading-tight">
+                <p className={`${commonTextClass} lg:font-medium lg:text-ink`}>
+                  {format12HrSessionTime(data.start_time)}
+                </p>
+                <p className={`${commonTextClass} lg:text-slate-500`}>
+                  {format12HrSessionTime(data.end_time)}
+                </p>
               </div>
-              {renderButton(data)}
+              <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto py-6 relative w-full flex flex-row justify-between mr-4 md:mr-8 items-center lg:mr-0 lg:ml-5 lg:min-h-0 lg:py-4 lg:rounded-xl lg:shadow-none lg:border lg:border-line">
+                <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md lg:rounded-s-xl`}></div>
+                <div className="text-sm md:text-base mx-6 md:mx-8 w-32 md:w-72 lg:mx-0 lg:pl-7 lg:w-auto lg:flex-1">
+                  <span className="font-semibold">{data.session.meta_data.subject ?? "Science"}</span>
+                  <div className="text-sm md:text-base break-words lg:text-slate-600">
+                    {data.session.name}
+                  </div>
+                </div>
+                {renderButton(data)}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </Schedule>
     );
   };
 
@@ -199,10 +274,10 @@ export default function Home() {
     if (tests.length === 0) {
       return (
         <div>
-          <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
+          <SectionHeading>{title}</SectionHeading>
           {groupConfig.noTestsMessage ? (
-            <div className="flex flex-col items-center justify-center text-center h-72 pb-40">
-              <p className="text-center">{groupConfig.noTestsMessage}</p>
+            <div className="flex flex-col items-center justify-center text-center h-72 pb-40 lg:h-auto lg:items-start lg:text-left lg:py-10 lg:pb-0">
+              <p className="text-center lg:text-left lg:text-slate-500">{groupConfig.noTestsMessage}</p>
               {groupConfig.testsInfoLink && (
                 <p>
                   <a href={groupConfig.testsInfoLink} target="_blank" rel="noopener noreferrer" className="underline text-blue-600">Check your test calendar here</a>
@@ -218,35 +293,17 @@ export default function Home() {
 
     return (
       <div>
-        <h2 className="text-primary ml-4 font-semibold text-xl mt-6">{title}</h2>
+        <SectionHeading>{title}</SectionHeading>
         {/* {groupConfig.testsHeaderNote && (
           <p className="mx-4 mt-2 text-gray-700 text-sm">{groupConfig.testsHeaderNote}</p>
         )} */}
-        <div className="grid grid-cols-1 gap-4 pb-4">
-          {tests.map((data, index) => (
-            <div key={index} className="flex items-center mt-4">
-              <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto min-h-[120px] py-3 relative w-full flex flex-row justify-between mx-4 items-center">
-                <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`} />
-
-                <div className="flex flex-col gap-1 pl-6 sm:w-full w-48 md:w-full text-sm md:text-base">
-                  <div className="absolute top-2 left-6 text-gray-700 text-xs md:text-sm whitespace-nowrap">
-                    {formatSessionTimeRange(data.start_time ?? data.session.start_time, data.end_time ?? data.session.end_time)}
-                  </div>
-                  <div className="font-semibold">
-                    {data.session.name}
-                  </div>
-                  <div className="text-gray-600">
-                    {data.session.meta_data.test_format}
-                  </div>
-                </div>
-
-                <div className="flex items-center">
-                  {renderButton(data)}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <Schedule>
+          <div className="grid grid-cols-1 gap-4 pb-4 lg:gap-0 lg:pb-0">
+            {tests.map((data, index) => (
+              <TestRow key={index} data={data} index={index} />
+            ))}
+          </div>
+        </Schedule>
       </div>
     );
   };
@@ -272,14 +329,14 @@ export default function Home() {
       if (minutesUntilSessionStart <= 5 && hasSessionNotEnded) {
         return (
           <Link href={buildGurukulSessionUrl(data.session.session_id)} target="_blank">
-            <PrimaryButton className="bg-primary text-white text-sm rounded-md w-14 h-8 mr-4 shadow-md shadow-slate-400">
+            <PrimaryButton className="bg-primary text-white text-sm rounded-md w-14 h-8 mr-4 shadow-md shadow-slate-400 lg:shadow-none lg:w-20 lg:font-medium lg:hover:bg-primary-dark lg:transition-colors">
               JOIN
             </PrimaryButton>
           </Link>
         );
       } else {
         return (
-          <p className="text-xs italic font-normal mr-4">
+          <p className="text-xs italic font-normal mr-4 lg:not-italic lg:text-slate-500">
             Starts at <br />
             {formatTime(sessionStartTimeStr)}
           </p>
@@ -292,8 +349,8 @@ export default function Home() {
       const isCompleted = quizCompletionStatus.hasOwnProperty(session.platform_id) && quizCompletionStatus[session.platform_id] === true;
       if (isCompleted) {
         return (
-          <div className="flex flex-col items-center pr-2">
-            <div className="w-[118px] italic md:w-36 h-8 flex items-center justify-center text-xs">
+          <div className="flex flex-col items-center pr-2 lg:pr-0">
+            <div className="w-[118px] italic md:w-36 h-8 flex items-center justify-center text-xs lg:not-italic lg:text-slate-500 lg:justify-end lg:w-auto lg:pl-4">
               {isForm ? "Form Submitted" : "Test Submitted"}
             </div>
           </div>
@@ -309,7 +366,7 @@ export default function Home() {
         const renderQuizButton = formatType !== 'omr' ? (
           <div className="flex flex-col items-center">
             <Link href={buildGurukulSessionUrl(session.session_id)} target="_blank">
-              <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
+              <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400 lg:font-medium lg:transition-opacity lg:hover:opacity-90`}>
                 {isResumeable ? "Resume" : (isForm ? "Fill Form" : "Start Test")}
               </PrimaryButton>
             </Link>
@@ -320,7 +377,7 @@ export default function Home() {
         const renderOmrButton = formatType !== 'qa' ? (
           <div className="flex flex-col items-center">
             <Link href={buildGurukulSessionUrl(session.session_id, { omrMode: true })} target="_blank">
-              <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400`}>
+              <PrimaryButton className={`${isResumeable ? "bg-resumeable" : "bg-primary"} text-white text-sm rounded-md w-[118px] md:w-36 h-8 shadow-slate-400 lg:font-medium lg:transition-opacity lg:hover:opacity-90`}>
                 {isResumeable ? "Resume" : "Fill OMR"}
               </PrimaryButton>
             </Link>
@@ -329,14 +386,14 @@ export default function Home() {
         ) : null;
 
         return (
-          <div className="flex flex-col pr-2">
+          <div className="flex flex-col pr-2 lg:pr-0 lg:pl-4">
             {renderQuizButton}
             {renderOmrButton}
           </div>
         );
       } else {
         return (
-          <p className="text-xs italic font-normal mr-4 w-14">
+          <p className="text-xs italic font-normal mr-4 w-14 lg:not-italic lg:mr-0 lg:w-auto lg:pl-4 lg:text-right lg:text-slate-500">
             Starts at <br />
             {format12HrSessionTime(occurrence.start_time ?? session.start_time)}
           </p>
@@ -408,82 +465,78 @@ export default function Home() {
   return (
     <>
       {(isLoading || authLoading) ? (
-        <div className="max-w-xl mx-auto">
+        <div className="max-w-xl mx-auto lg:max-w-none">
           <TopBar />
           <Loading />
         </div>
       ) : (
-        <main className="min-h-screen max-w-xl mx-auto md:mx-auto bg-heading">
+        <main className="min-h-screen max-w-xl mx-auto md:mx-auto bg-heading lg:max-w-none lg:bg-transparent">
           <TopBar />
-          {groupConfig.showLiveClasses && (
-            <div>
-              <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Live Classes</h1>
-              {renderLiveClasses()}
-            </div>
-          )}
-
-          <div className="pb-40">
-            {/* Only rendered when there are active forms — no empty-state
-                message, so students never see "no more forms" on a normal day. */}
-            {groupConfig.showForms && forms.length > 0 && renderTestSection("Forms", forms)}
-            {groupConfig.showTests && renderTestSection(groupConfig.testsSectionTitle || "Tests", tests)}
-            {/* Practice Tests Accordion for all groups */}
-            {groupConfig.showPracticeTests && (
+          {/* Below `lg` this is a no-op and the phone column is unchanged;
+              above it, the day sits in one left-aligned reading column. */}
+          <div className="lg:mx-auto lg:max-w-6xl lg:px-10 lg:pb-16">
+            {groupConfig.showLiveClasses && (
               <div>
-                <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Practice Tests</h1>
-                <div className="mt-4">
-                  {formatOrder.map((format) => (
-                    groupedPracticeTests[format] && groupedPracticeTests[format].length > 0 && (
-                      <div key={format} className="mx-5 mb-4">
-                        <div
-                          className="text-md font-semibold bg-primary text-white cursor-pointer px-4 py-4 flex flex-row justify-between items-center"
-                          onClick={() => handleAccordionToggle(format)}
-                        >
-                          <div>{formatDisplayNames[format] || format}</div>
-                          <div className="w-8 flex justify-center">
-                            {expandedFormat === format ? (
-                              <CollapseIcon className="w-6 h-6" />
-                            ) : (
-                              <ExpandIcon className="w-6 h-6" />
-                            )}
-                          </div>
-                        </div>
-                        {expandedFormat === format && (
-                          <div>
-                            {groupedPracticeTests[format].map((test, idx) => (
-                              <div key={test.session.platform_id} className="flex items-center mt-4">
-                                <div className="bg-white rounded-lg shadow-lg min-h-24 h-auto min-h-[120px] py-3 relative w-full flex flex-row justify-between items-center">
-                                  <div className={`${idx % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md`} />
-                                  <div className="flex flex-col gap-1 pl-6 sm:w-full w-48 md:w-full text-sm md:text-base">
-                                    <div className="absolute top-2 left-6 text-gray-700 text-xs md:text-sm whitespace-nowrap">
-                                      {formatSessionTimeRange(test.start_time ?? test.session.start_time, test.end_time ?? test.session.end_time)}
-                                    </div>
-                                    <div className="font-semibold">
-                                      {test.session.name}
-                                    </div>
-                                    <div className="text-gray-600">
-                                      {formatDisplayNames[test.session.meta_data.test_format] || test.session.meta_data.test_format}
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center">
-                                    {renderButton(test)}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  ))}
-                  {/* If no tests at all, show message */}
-                  {formatOrder.every(format => !groupedPracticeTests[format] || groupedPracticeTests[format].length === 0) && (
-                    <MessageDisplay message="No Practice Tests available!" />
-                  )}
-                </div>
+                <SectionHeading>Live Classes</SectionHeading>
+                {renderLiveClasses()}
               </div>
             )}
-            {groupConfig.showHomework && renderTestSection("Homework", homework)}
+
+            <div className="pb-40 lg:pb-0">
+              {/* Only rendered when there are active forms — no empty-state
+                  message, so students never see "no more forms" on a normal day. */}
+              {groupConfig.showForms && forms.length > 0 && renderTestSection("Forms", forms)}
+              {groupConfig.showTests && renderTestSection(groupConfig.testsSectionTitle || "Tests", tests)}
+              {/* Practice Tests Accordion for all groups */}
+              {groupConfig.showPracticeTests && (
+                <div>
+                  <SectionHeading>Practice Tests</SectionHeading>
+                  <div className="mt-4 lg:mt-3">
+                    {formatOrder.map((format) => (
+                      groupedPracticeTests[format] && groupedPracticeTests[format].length > 0 && (
+                        <div key={format} className="mx-5 mb-4 lg:mx-0 lg:mb-3">
+                          <button
+                            type="button"
+                            aria-expanded={expandedFormat === format}
+                            className={`w-full text-md font-semibold bg-primary text-white cursor-pointer px-4 py-4 flex flex-row justify-between items-center text-left lg:rounded-lg lg:py-3 lg:text-[15px] lg:transition-colors ${expandedFormat === format
+                              ? 'lg:bg-primary lg:text-white'
+                              : 'lg:bg-white lg:text-ink lg:border lg:border-line lg:hover:border-primary'}`}
+                            onClick={() => handleAccordionToggle(format)}
+                          >
+                            <div>{formatDisplayNames[format] || format}</div>
+                            <div className="w-8 flex justify-center">
+                              {expandedFormat === format ? (
+                                <CollapseIcon className="w-6 h-6" />
+                              ) : (
+                                <ExpandIcon className="w-6 h-6" />
+                              )}
+                            </div>
+                          </button>
+                          {expandedFormat === format && (
+                            <Schedule>
+                              {groupedPracticeTests[format].map((test, idx) => (
+                                <TestRow
+                                  key={test.session.platform_id}
+                                  data={test}
+                                  index={idx}
+                                  inset={false}
+                                  formatLabel={formatDisplayNames[test.session.meta_data.test_format] || test.session.meta_data.test_format}
+                                />
+                              ))}
+                            </Schedule>
+                          )}
+                        </div>
+                      )
+                    ))}
+                    {/* If no tests at all, show message */}
+                    {formatOrder.every(format => !groupedPracticeTests[format] || groupedPracticeTests[format].length === 0) && (
+                      <MessageDisplay message="No Practice Tests available!" />
+                    )}
+                  </div>
+                </div>
+              )}
+              {groupConfig.showHomework && renderTestSection("Homework", homework)}
+            </div>
           </div>
           <BottomNavigationBar />
         </main>

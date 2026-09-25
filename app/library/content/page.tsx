@@ -41,7 +41,7 @@ const getResourceIconAndPrefix = (resource: Resource) => {
 };
 
 // Common dropdown class for consistent styling
-const DROPDOWN_CLASS = "w-32 h-8 rounded-lg text-center bg-white border border-gray-300 shadow focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150";
+const DROPDOWN_CLASS = "w-32 h-8 rounded-lg text-center bg-white border border-gray-300 shadow focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150 lg:h-9 lg:shadow-none lg:border-line";
 
 const ContentLibrary = () => {
     const [activeTab, setActiveTab] = useState('');
@@ -219,7 +219,7 @@ const ContentLibrary = () => {
         <PrimaryButton
             key={subject}
             onClick={() => handleTabClick(subject)}
-            className={`py-2 px-2 w-full h-full rounded-lg text-center break-words ${activeTab === subject ? 'bg-heading text-primary font-semibold shadow-sm' : 'bg-white text-slate-600'}`}
+            className={`py-2 px-2 w-full h-full rounded-lg text-center break-words lg:w-auto lg:px-5 lg:whitespace-nowrap ${activeTab === subject ? 'bg-heading text-primary font-semibold shadow-sm lg:bg-primary lg:text-white' : 'bg-white text-slate-600 lg:border lg:border-line lg:hover:border-slate-400 lg:transition-colors'}`}
         >
             {label}
         </PrimaryButton>
@@ -227,11 +227,12 @@ const ContentLibrary = () => {
 
     return (
         <>
-            <main className="max-w-xl mx-auto bg-white min-h-screen">
+            <main className="max-w-xl mx-auto bg-white min-h-screen lg:max-w-none lg:bg-transparent">
                 <TopBar />
-                <div className="bg-heading text-primary h-20 flex flex-col">
-                    <div className='flex items-center mx-4 mt-4'>
-                        <IoArrowBack onClick={handleBackClick} className="w-7 h-7 cursor-pointer" />
+                <div className="lg:mx-auto lg:max-w-6xl lg:px-10 lg:pb-16">
+                <div className="bg-heading text-primary h-20 flex flex-col lg:bg-transparent lg:h-auto lg:pt-8 lg:pb-2">
+                    <div className='flex items-center mx-4 mt-4 lg:mx-0 lg:mt-0'>
+                        <IoArrowBack onClick={handleBackClick} role="button" tabIndex={0} aria-label="Back to library" onKeyDown={(e) => e.key === 'Enter' && handleBackClick()} className="w-7 h-7 cursor-pointer" />
                         <h1 className="font-semibold ml-2 text-xl">
                             {selectedCourse === COURSES.NEET && "NEET Course"}
                             {selectedCourse === COURSES.JEE && "JEE Course"}
@@ -244,10 +245,10 @@ const ContentLibrary = () => {
                             <br />
                         </h1>
                     </div>
-                    <span className="text-sm ml-[52px] font-normal">Content Library</span>
+                    <span className="text-sm ml-[52px] font-normal lg:ml-9 lg:text-slate-500">Content Library</span>
                 </div>
-                <div className="mx-5">
-                    <div className={`grid gap-2 mt-4 mb-4 ${selectedCourse === COURSES.GRADE_9 || selectedCourse === COURSES.GRADE_10
+                <div className="mx-5 lg:mx-0">
+                    <div className={`grid gap-2 mt-4 mb-4 lg:flex lg:flex-wrap lg:gap-2 lg:mb-6 ${selectedCourse === COURSES.GRADE_9 || selectedCourse === COURSES.GRADE_10
                         ? 'grid-cols-2'
                         : 'grid-cols-3'
                         }`}>
@@ -261,8 +262,8 @@ const ContentLibrary = () => {
                         {selectedCourse === COURSES.NDA && ['Maths', 'History', 'Geography'].map(subject => generateSubjectButton(subject, subject))}
                     </div>
                 </div>
-                <div className="bg-heading h-20 flex items-center w-full">
-                    <div className="mx-5 w-full flex justify-between items-center">
+                <div className="bg-heading h-20 flex items-center w-full lg:bg-transparent lg:h-auto lg:pb-6">
+                    <div className="mx-5 w-full flex justify-between items-center lg:mx-0 lg:justify-start lg:gap-3">
                         <Listbox value={selectedGrade} onChange={handleGradeChange}>
                             <div className="relative">
                                 <Listbox.Button className={`${DROPDOWN_CLASS} pr-6`}>
@@ -317,14 +318,18 @@ const ContentLibrary = () => {
                 {isLoading ? (
                     <Loading showLibraryOnly={true} />
                 ) : (
-                    <div className="mt-4 pb-40 mx-5">
+                    <div className="mt-4 pb-40 mx-5 lg:mx-0 lg:mt-0 lg:pb-0">
                         {chapters.length === 0 ? (
                             <div className="text-center pt-10">No chapters available</div>
                         ) : (
                             chapters.map((chapter) => (
                                 <div key={chapter.id}>
-                                    <div
-                                        className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
+                                    <button
+                                        type="button"
+                                        aria-expanded={!!expandedChapters[chapter.id]}
+                                        className={`w-full text-left text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center lg:rounded-lg lg:py-3 lg:mb-3 lg:transition-colors ${expandedChapters[chapter.id]
+                                        ? 'lg:bg-primary lg:text-white'
+                                        : 'lg:bg-white lg:text-ink lg:border lg:border-line lg:hover:border-primary'}`}
                                         onClick={() => toggleChapterExpansion(chapter.id, getChapterName(chapter))}
                                     >
                                         <div className="flex-1 min-w-0 mr-4 break-words">{getChapterName(chapter)}</div>
@@ -335,13 +340,13 @@ const ContentLibrary = () => {
                                                 <ExpandIcon className="w-6 h-6" />
                                             )}
                                         </div>
-                                    </div>
+                                    </button>
                                     {expandedChapters[chapter.id] && (
                                         <div className="mb-8">
                                             {expandedChapterLoading[chapter.id] ? (
                                                 <Loading showChapterContentOnly={true} />
                                             ) : (
-                                                <ul>
+                                                <ul className="lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-x-8">
                                                     {/* Render modules for the chapter */}
                                                     {[...chapterResources].sort((a, b) => {
                                                         // Modules first
@@ -353,7 +358,7 @@ const ContentLibrary = () => {
                                                         const href = buildResourceLink(resource);
                                                         if (!href) return null;
                                                         return (
-                                                            <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center">
+                                                            <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center lg:pl-1 lg:hover:underline">
                                                                 <Link href={href} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
                                                                     {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {getResourceName(resource)}
                                                                 </Link>
@@ -375,15 +380,15 @@ const ContentLibrary = () => {
                                                                 if (videos.length === 0) return null;
 
                                                                 return (
-                                                                    <div key={topic.id} className="bg-card rounded-lg shadow-lg shadow-slate-400 p-4 mx-2 mt-2 my-8 text-black font-semibold">
+                                                                    <div key={topic.id} className="bg-card rounded-lg shadow-lg shadow-slate-400 p-4 mx-2 mt-2 my-8 text-black font-semibold lg:col-span-2 lg:mx-0 lg:my-4 lg:p-5 lg:rounded-xl lg:bg-white lg:border lg:border-line lg:shadow-none">
                                                                         <h3>{getTopicName(topic)}</h3>
-                                                                        <ul className="text-primary m-2 font-normal">
+                                                                        <ul className="text-primary m-2 font-normal lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-x-8 lg:m-0 lg:mt-3">
                                                                             {videos.map((resource) => {
                                                                                 const { icon: Icon, prefix, color } = getResourceIconAndPrefix(resource);
                                                                                 const href = buildResourceLink(resource);
                                                                                 if (!href) return null;
                                                                                 return (
-                                                                                    <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary flex items-center">
+                                                                                    <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary flex items-center lg:hover:underline">
                                                                                         <Link href={href} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
                                                                                             {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {getResourceName(resource)}
                                                                                         </Link>
@@ -411,6 +416,7 @@ const ContentLibrary = () => {
                         <BottomNavigationBar />
                     </div>
                 )}
+                </div>
             </main>
         </>
     );

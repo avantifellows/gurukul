@@ -1,57 +1,28 @@
 "use client"
 
-import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import NavLink from './NavLink';
-import { MdOutlineLibraryBooks, MdLibraryBooks } from 'react-icons/md';
-import { RiBarChart2Fill, RiBarChart2Line } from 'react-icons/ri';
-import { IoHome, IoHomeOutline } from 'react-icons/io5';
 import CapgeminiLogo from '../assets/capgemini_logo.png'
 import TataMotorsLogo from '../assets/tata_motors_logo.png'
 import { BottomNavigationBarProps } from '@/app/types';
 import { useAuth } from '@/services/AuthContext';
+import { useNavItems, NavItem } from './useNavItems';
 
 const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
-  const pathname = usePathname();
   const { groupConfig } = useAuth();
   const sponsorLogosMode = groupConfig.homepageSponsorLogos ?? 'default';
 
-  // Determine the home label from config or provided prop
-  const displayHomeLabel = homeLabel || groupConfig.homeTabLabel || 'Home';
-
-  const isActive = (path: string) => {
-    if (path === '/') {
-      return pathname === path;
-    }
-    return pathname.startsWith(path);
-  };
-
-  // Navigation items configuration (conditionally include tabs)
+  // Shared with the desktop rail, then re-ordered: on a phone Home belongs in
+  // the middle, within thumb reach.
+  const items = useNavItems(homeLabel);
+  const home = items.find(item => item.href === '/');
   const navItems = [
-    ...(groupConfig.showLibraryTab === false ? [] : [{
-      href: '/library',
-      label: 'Library',
-      activeIcon: MdLibraryBooks,
-      inactiveIcon: MdOutlineLibraryBooks,
-      isActive: isActive('/library')
-    }]),
-    ...(groupConfig.showHomeTab !== false ? [{
-      href: '/',
-      label: displayHomeLabel,
-      activeIcon: IoHome,
-      inactiveIcon: IoHomeOutline,
-      isActive: isActive('/')
-    }] : []),
-    ...(groupConfig.showReportsTab === false ? [] : [{
-      href: '/reports',
-      label: 'Report',
-      activeIcon: RiBarChart2Fill,
-      inactiveIcon: RiBarChart2Line,
-      isActive: isActive('/reports')
-    }])
+    ...items.filter(item => item.href === '/library'),
+    ...(home ? [home] : []),
+    ...items.filter(item => item.href === '/reports'),
   ];
 
-  const renderNavItem = (item: typeof navItems[0]) => {
+  const renderNavItem = (item: NavItem) => {
     const IconComponent = item.isActive ? item.activeIcon : item.inactiveIcon;
     const iconClass = `h-8 w-8 ${item.isActive ? 'fill-primary' : ''}`;
 
@@ -64,7 +35,7 @@ const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative lg:hidden">
       {/* Powered by section */}
       <div className="max-w-xl mx-auto fixed bottom-[72px] left-0 right-0 bg-gray-100 border-t-2 shadow-2xl shadow-black px-4 py-2 text-xs text-gray-700 md:px-8 md:py-3 md:text-sm flex items-center">
         {sponsorLogosMode === 'capgeminiOnly' ? (
