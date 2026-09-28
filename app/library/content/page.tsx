@@ -354,7 +354,7 @@ const ContentLibrary = () => {
                                                         if (!href) return null;
                                                         return (
                                                             <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center">
-                                                                <Link href={href} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
+                                                                <Link href={href} prefetch={false} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
                                                                     {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {getResourceName(resource)}
                                                                 </Link>
                                                             </li>
@@ -384,7 +384,7 @@ const ContentLibrary = () => {
                                                                                 if (!href) return null;
                                                                                 return (
                                                                                     <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary flex items-center">
-                                                                                        <Link href={href} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
+                                                                                        <Link href={href} prefetch={false} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
                                                                                             {React.createElement(Icon, { className: 'w-10 h-10 mr-2', color })} {prefix} {getResourceName(resource)}
                                                                                         </Link>
                                                                                     </li>
