@@ -74,13 +74,17 @@ export async function resolvePortalSession(): Promise<PortalSession | null> {
     return token ? { token, accessToken: refreshedAccessToken } : null;
 }
 
+/** Where a direct launch came from and what it opens, for the attendance log. */
+export type LaunchSource = { source: string; target: string };
+
 /**
  * Ask portal-backend for a short-lived launch token for the given audience.
  * Claims are copied server-side from the verified access token.
  */
 export async function createLaunchToken(
     session: PortalSession,
-    audience: 'quiz' | 'report'
+    audience: 'quiz' | 'report',
+    launch?: LaunchSource
 ): Promise<string | null> {
     if (!PORTAL_BACKEND_URL || !session?.accessToken) {
         return null;
@@ -92,7 +96,7 @@ export async function createLaunchToken(
             ...bearerHeaders(session.accessToken),
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ audience }),
+        body: JSON.stringify({ audience, ...launch }),
         cache: 'no-store',
     });
 
