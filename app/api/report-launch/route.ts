@@ -37,7 +37,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Unable to verify Gurukul session' }, { status: 401 });
     }
 
-    const launchToken = await createLaunchToken(session, 'report');
+    const launchToken = await createLaunchToken(session, 'report', {
+        source: 'gurukul-reports',
+        target: launchPath.split('/').pop() ?? '',
+    });
     if (!launchToken) {
         return NextResponse.json({ error: 'Unable to create report launch token' }, { status: 502 });
     }
