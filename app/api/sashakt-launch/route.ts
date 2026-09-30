@@ -3,7 +3,7 @@ import { isLaunchConfigured, resolvePortalSession } from '../launchToken';
 
 const PORTAL_BACKEND_URL = process.env.NEXT_PUBLIC_AF_PORTAL_BACKEND_URL || '';
 const SASHAKT_BASE_URL =
-    process.env.NEXT_PUBLIC_AF_SASHAKT_URL || 'https://sashakt.projecttech4dev.org';
+    process.env.NEXT_PUBLIC_AF_SASHAKT_URL || 'https://assessment.sashakt.in';
 
 /**
  * Pull the test link uuid out of a Sashakt url (.../test/<uuid>).
