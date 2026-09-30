@@ -68,8 +68,9 @@ export const buildResourceLink = (resource: Resource): string | undefined => {
     const params = new URLSearchParams({ url: resource.link }).toString();
     // A quiz resource can point at either quiz engine or Sashakt; each has its
     // own launch route because the two mint a session in different ways.
-    const sashaktUrl = process.env.NEXT_PUBLIC_AF_SASHAKT_URL;
-    if (sashaktUrl && resource.link.startsWith(sashaktUrl)) {
+    const sashaktUrl =
+        process.env.NEXT_PUBLIC_AF_SASHAKT_URL || 'https://sashakt.projecttech4dev.org';
+    if (resource.link.startsWith(sashaktUrl)) {
         return `/api/sashakt-launch?${params}`;
     }
     return `/api/quiz-launch?${params}`;

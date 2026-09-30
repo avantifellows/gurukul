@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isLaunchConfigured, resolvePortalSession } from '../launchToken';
 
 const PORTAL_BACKEND_URL = process.env.NEXT_PUBLIC_AF_PORTAL_BACKEND_URL || '';
-const SASHAKT_BASE_URL = process.env.NEXT_PUBLIC_AF_SASHAKT_URL || '';
+const SASHAKT_BASE_URL =
+    process.env.NEXT_PUBLIC_AF_SASHAKT_URL || 'https://sashakt.projecttech4dev.org';
 
 /**
  * Pull the test link uuid out of a Sashakt url (.../test/<uuid>).
@@ -23,7 +24,7 @@ function resolveTestLinkUuid(rawUrl: string | null): string | null {
 }
 
 export async function GET(request: NextRequest) {
-    if (!isLaunchConfigured() || !SASHAKT_BASE_URL) {
+    if (!isLaunchConfigured()) {
         return NextResponse.json({ error: 'Sashakt launch is not configured' }, { status: 500 });
     }
 
