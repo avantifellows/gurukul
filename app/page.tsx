@@ -379,18 +379,21 @@ export default function Home() {
     'major_test',
     'full_syllabus_test',
     'mock_test',
+    'previous_year_test',
   ];
   const formatOrder = [
     'part_test',
     'major_test',
     'full_syllabus_test',
     'mock_test',
+    'previous_year_test',
   ];
   const formatDisplayNames: { [key: string]: string } = {
     part_test: 'Part Test',
     major_test: 'Major Test',
     full_syllabus_test: 'Full Syllabus Test',
     mock_test: 'Mock Test',
+    previous_year_test: 'Previous Year Test',
   };
   // Group tests by format
   const groupedPracticeTests: { [format: string]: QuizSession[] } = {};
