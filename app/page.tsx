@@ -67,10 +67,6 @@ export default function Home() {
         const isCompleted = quizCompletionStatus[platformId] === true;
         return isQuizAttemptable(platformId) || isCompleted;
       })
-      // Sessions reached some other way than this home screen -- e.g. the AIAT
-      // surveys, which students get from the scorecard via next_step_url -- set
-      // hide_in_gurukul to stay off it while remaining live and launchable.
-      // Tested against `true` so a missing or malformed value stays visible.
       .filter(quiz => quiz.session.meta_data?.hide_in_gurukul !== true);
 
     // Forms (e.g. feedback questionnaires) ride on the quiz platform with
@@ -148,8 +144,6 @@ export default function Home() {
     const activeLiveClasses = liveClasses.filter(
       (data) =>
         isSessionActive(data.end_time) &&
-        // Same opt-out as the quiz sections; live classes come down a separate
-        // array that never passes through filterAndSortTests.
         data.session.meta_data?.hide_in_gurukul !== true
     );
 

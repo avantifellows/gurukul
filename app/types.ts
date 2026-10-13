@@ -110,7 +110,6 @@ export interface Session {
     batch: string;
     stream: string;
     test_type: string;
-    /** See the note on QuizSession.session.meta_data.hide_in_gurukul. */
     hide_in_gurukul?: boolean;
   };
   start_time: string;
@@ -190,12 +189,6 @@ export interface QuizSession {
       test_format: string,
       test_purpose: string,
       test_type: string,
-      /**
-       * Set on the session to keep it off the Gurukul home screen while leaving
-       * it live: the link still works and the batch still matches. Absent on
-       * almost every session, so the filter tests for `=== true` and anything
-       * missing or malformed stays visible.
-       */
       hide_in_gurukul?: boolean
     }
     start_date: string,
