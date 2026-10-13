@@ -110,6 +110,7 @@ export interface Session {
     batch: string;
     stream: string;
     test_type: string;
+    hide_in_gurukul?: boolean;
   };
   start_time: string;
   end_time: string;
@@ -187,7 +188,8 @@ export interface QuizSession {
     meta_data: {
       test_format: string,
       test_purpose: string,
-      test_type: string
+      test_type: string,
+      hide_in_gurukul?: boolean
     }
     start_date: string,
     start_time: string,
