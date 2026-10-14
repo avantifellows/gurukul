@@ -58,6 +58,20 @@ export interface Grade {
   number: number;
 }
 
+// Chapters are prioritised per curriculum, so the same chapter can be "high"
+// for one exam and "low" for another. Not every chapter is tagged.
+export type ChapterPriority = 'high' | 'medium' | 'low';
+
+// One row of the chapter_curriculum join table, as returned by db-service.
+// `/chapter` returns every curriculum a chapter is mapped to, not just the one
+// that was requested.
+export interface ChapterCurriculum {
+  curriculum_id: number;
+  priority?: number | null;
+  priority_text?: string | null;
+  weightage?: number | null;
+}
+
 export interface Chapter {
   id: number;
   name: Array<{
@@ -66,6 +80,9 @@ export interface Chapter {
   }>;
   grade_id?: number | null;
   cms_status_id?: number | null;
+  // Resolved by getChapters for the curriculum that was asked for; null when
+  // that curriculum has no priority recorded for the chapter.
+  priority?: ChapterPriority | null;
 }
 
 export interface Resource {

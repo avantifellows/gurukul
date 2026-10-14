@@ -1,6 +1,7 @@
 "use server"
 
-import { Curriculum, Subject, Grade, Chapter, Resource, Topic, Teacher } from '../../app/types';
+import { Curriculum, Subject, Grade, Chapter, ChapterCurriculum, Resource, Topic, Teacher } from '../../app/types';
+import { resolveChapterPriority } from '@/utils/resourceUtils';
 import getFetchConfig from '../fetchConfig';
 import { CURRICULUM_NAMES } from '@/constants/config';
 
@@ -82,6 +83,21 @@ const getArchivedStatusId = (): Promise<number | null> => {
   return archivedStatusIdPromise;
 };
 
+// db-service returns a chapter's mapping to every curriculum it belongs to.
+// Collapse that down to the priority for the curriculum actually being viewed
+// and drop the rest, so a caller can't accidentally render another exam's
+// priority. Chapters with no priority recorded resolve to null.
+type FetchedChapter = Chapter & { curriculums?: ChapterCurriculum[] };
+
+const attachCurriculumPriority = (
+  chapters: FetchedChapter[],
+  curriculumId?: number
+): Chapter[] =>
+  chapters.map(({ curriculums, ...chapter }) => ({
+    ...chapter,
+    priority: resolveChapterPriority(curriculums, curriculumId),
+  }));
+
 // Exclude chapters that have been archived in the CMS.
 const excludeArchivedChapters = async (chapters: Chapter[]): Promise<Chapter[]> => {
   const archivedStatusId = await getArchivedStatusId();
@@ -102,10 +118,12 @@ export const getChapters = async (
   if (subjectId) queryParams.append('subject_id', subjectId.toString());
   if (curriculumId) queryParams.append('curriculum_id', curriculumId.toString());
 
-  const fetchedChapters: Chapter[] = await fetchWithParams('chapter', queryParams);
+  const fetchedChapters: FetchedChapter[] = await fetchWithParams('chapter', queryParams);
 
   // Drop chapters archived in the CMS (removed from the exam syllabus)
-  const allChapters = await excludeArchivedChapters(fetchedChapters);
+  const allChapters = await excludeArchivedChapters(
+    attachCurriculumPriority(fetchedChapters, curriculumId)
+  );
 
   // If no gradeId is provided, return all chapters for the curriculum/subject
   if (!gradeId) return allChapters;
@@ -172,10 +190,12 @@ export const getClassChapters = async (
   if (subjectId) queryParams.append('subject_id', subjectId.toString());
   if (gradeId) queryParams.append('grade_id', gradeId.toString());
 
-  const fetchedChapters: Chapter[] = await fetchWithParams('chapter', queryParams);
+  const fetchedChapters: FetchedChapter[] = await fetchWithParams('chapter', queryParams);
 
   // Drop chapters archived in the CMS (removed from the exam syllabus)
-  const chapterData = await excludeArchivedChapters(fetchedChapters);
+  const chapterData = await excludeArchivedChapters(
+    attachCurriculumPriority(fetchedChapters, curriculumId)
+  );
 
   const filteredChapters = await Promise.all(
     chapterData.map(async (chapter) => {
