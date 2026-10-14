@@ -17,12 +17,13 @@ module.exports = {
         "card": "#f7f7f7",
         "heading": "#f5f5f5",
         "resumeable": "#E5AC49",
-        // Desktop chrome. Derived from the brand teal rather than neutral greys,
-        // so the wide layout still reads as Gurukul and not as a generic shell.
+        // Desktop chrome. The navigation rail uses the brand teal itself; these
+        // are the supporting tints and the tinted neutrals that go with it.
         "primary-dark": "#006A6A",
         "primary-soft": "#E4F0F0",
+        // Body text on light surfaces. Near-black with a faint green cast so it
+        // sits with the teal instead of against it; not used as a fill.
         "ink": "#04302F",
-        "ink-soft": "#0B4442",
         "surface": "#EEF2F2",
         "line": "#DDE5E5",
       },

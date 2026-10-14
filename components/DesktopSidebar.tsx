@@ -42,12 +42,12 @@ const DesktopSidebar = () => {
   };
 
   return (
-    <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-rail flex-col bg-ink text-white">
+    <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-rail flex-col bg-primary text-white">
       <div className="flex items-center gap-3 px-6 h-20 shrink-0">
         <Image src={AvantiLogo} alt="" aria-hidden className="w-9 h-9 shrink-0" />
         <div className="leading-tight">
           <div className="text-lg font-bold tracking-tight">Gurukul</div>
-          <div className="text-[11px] text-white/45">by Avanti Fellows</div>
+          <div className="text-[11px] text-white/80">by Avanti Fellows</div>
         </div>
       </div>
 
@@ -62,8 +62,8 @@ const DesktopSidebar = () => {
                   aria-current={item.isActive ? "page" : undefined}
                   className={`relative flex items-center gap-3 h-11 px-3 rounded-lg text-[15px] transition-colors ${
                     item.isActive
-                      ? "bg-white/[0.09] text-white font-semibold"
-                      : "text-white/60 hover:text-white hover:bg-white/[0.05]"
+                      ? "bg-white/20 text-white font-semibold"
+                      : "text-white hover:bg-white/10"
                   }`}
                 >
                   {item.isActive && (
@@ -79,10 +79,10 @@ const DesktopSidebar = () => {
       </nav>
 
       <div className="px-4 pb-4 shrink-0">
-        <div className="rounded-xl bg-white/[0.04] px-4 py-3 mb-3">
+        <div className="rounded-xl bg-white/10 px-4 py-3 mb-3">
           <div className="flex items-center justify-around gap-3">
             <div className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] text-white/40">powered by</span>
+              <span className="text-[10px] text-white/80">powered by</span>
               <span className="bg-white rounded px-2 py-1">
                 <Image
                   src={CapgeminiLogo}
@@ -93,7 +93,7 @@ const DesktopSidebar = () => {
             </div>
             {sponsorLogosMode !== "capgeminiOnly" && (
               <div className="flex flex-col items-center gap-1.5">
-                <span className="text-[10px] text-white/40">supported by</span>
+                <span className="text-[10px] text-white/80">supported by</span>
                 <span className="bg-white rounded px-2 py-1">
                   <Image
                     src={TataMotorsLogo}
@@ -106,9 +106,9 @@ const DesktopSidebar = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 border-t border-white/10 pt-3">
+        <div className="flex items-center gap-3 border-t border-white/25 pt-3">
           <div
-            className="w-9 h-9 shrink-0 rounded-full bg-primary flex items-center justify-center text-sm font-semibold"
+            className="w-9 h-9 shrink-0 rounded-full bg-white/20 flex items-center justify-center text-sm font-semibold"
             aria-hidden
           >
             {userName ? initialsOf(userName) : ""}
@@ -119,7 +119,7 @@ const DesktopSidebar = () => {
             </div>
             <button
               onClick={handleLogout}
-              className="text-xs text-white/50 hover:text-white transition-colors"
+              className="text-xs text-white/85 hover:text-white transition-colors"
             >
               Log out
             </button>
