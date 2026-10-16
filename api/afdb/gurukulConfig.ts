@@ -2,6 +2,7 @@
 
 import getFetchConfig from '../fetchConfig';
 import { GroupConfig } from '@/app/types';
+import { requireSession } from '@/api/auth/requireSession';
 
 /**
  * Fetches the resolved Gurukul UI configuration for a user from db-service.
@@ -15,13 +16,17 @@ import { GroupConfig } from '@/app/types';
  * a failure) simply leaves the existing defaults in place.
  */
 export const fetchGurukulConfig = async (
-    user_id: string
+    _userId?: string
 ): Promise<Partial<GroupConfig>> => {
     const url = process.env.AF_DB_SERVICE_URL;
     const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN!;
 
     try {
-        const queryParams = new URLSearchParams({ user_id });
+        // Identity comes from the verified session, not the caller, so the
+        // config returned is always the signed-in user's own. An unauthenticated
+        // call throws here and is caught below, leaving the defaults in place.
+        const { userId } = await requireSession();
+        const queryParams = new URLSearchParams({ user_id: userId });
         const urlWithParams = `${url}/gurukul-config?${queryParams.toString()}`;
         const response = await fetch(urlWithParams, {
             ...getFetchConfig(bearerToken),
