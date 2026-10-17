@@ -64,7 +64,7 @@ export default function ReportsList({ userId }: ReportsListProps) {
             {responseData.reports.length > 0 ? (
                 <>
                     {responseData.reports.map((report: Report, index: number) => (
-                        <Link href={buildReportLink(report.report_link)} target="_blank" key={index} className="bg-card rounded-lg shadow-lg h-24 mx-4 relative flex items-center my-1 md:my-2 lg:mx-0 lg:my-0 lg:mb-3 lg:h-auto lg:py-4 lg:pr-6 lg:justify-between lg:bg-white lg:border lg:border-line lg:rounded-xl lg:shadow-none lg:hover:border-primary lg:transition-colors group">
+                        <Link href={buildReportLink(report.report_link)} prefetch={false} target="_blank" key={index} className="bg-card rounded-lg shadow-lg h-24 mx-4 relative flex items-center my-1 md:my-2 lg:mx-0 lg:my-0 lg:mb-3 lg:h-auto lg:py-4 lg:pr-6 lg:justify-between lg:bg-white lg:border lg:border-line lg:rounded-xl lg:shadow-none lg:hover:border-primary lg:transition-colors group">
                             <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md lg:rounded-s-xl`}></div>
                             <div className="text-left mx-6 md:mx-8 lg:ml-7 lg:mr-0">
                                 <p className="text-sm md:text-base font-semibold lg:text-[15px] lg:text-ink">{report.test_name}</p>

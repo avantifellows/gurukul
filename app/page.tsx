@@ -66,7 +66,8 @@ export default function Home() {
         const platformId = quiz.session.platform_id;
         const isCompleted = quizCompletionStatus[platformId] === true;
         return isQuizAttemptable(platformId) || isCompleted;
-      });
+      })
+      .filter(quiz => quiz.session.meta_data?.hide_in_gurukul !== true);
 
     // Forms (e.g. feedback questionnaires) ride on the quiz platform with
     // test_type 'form'; they get their own section above the test sections.
@@ -213,7 +214,11 @@ export default function Home() {
       return <MessageDisplay message="No more live classes are scheduled for today!" />;
     }
 
-    const activeLiveClasses = liveClasses.filter((data) => isSessionActive(data.end_time));
+    const activeLiveClasses = liveClasses.filter(
+      (data) =>
+        isSessionActive(data.end_time) &&
+        data.session.meta_data?.hide_in_gurukul !== true
+    );
 
     if (activeLiveClasses.length === 0) {
       return <MessageDisplay message="No more live classes are scheduled for today!" />;
@@ -436,18 +441,21 @@ export default function Home() {
     'major_test',
     'full_syllabus_test',
     'mock_test',
+    'previous_year_test',
   ];
   const formatOrder = [
     'part_test',
     'major_test',
     'full_syllabus_test',
     'mock_test',
+    'previous_year_test',
   ];
   const formatDisplayNames: { [key: string]: string } = {
     part_test: 'Part Test',
     major_test: 'Major Test',
     full_syllabus_test: 'Full Syllabus Test',
     mock_test: 'Mock Test',
+    previous_year_test: 'Previous Year Test',
   };
   // Group tests by format
   const groupedPracticeTests: { [format: string]: QuizSession[] } = {};

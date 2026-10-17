@@ -25,7 +25,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Unable to verify Gurukul session' }, { status: 401 });
     }
 
-    const launchToken = await createLaunchToken(session, 'quiz');
+    const launchToken = await createLaunchToken(session, 'quiz', {
+        source: 'gurukul-library',
+        target: quizUrl.pathname.split('/').filter(Boolean).pop() ?? '',
+    });
     if (!launchToken) {
         return NextResponse.json({ error: 'Unable to create quiz launch token' }, { status: 502 });
     }

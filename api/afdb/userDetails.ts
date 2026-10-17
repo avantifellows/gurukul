@@ -2,18 +2,27 @@
 
 import getFetchConfig from '../fetchConfig';
 import { Student, User, UserDetails } from '@/app/types';
+import { requireSession } from '@/api/auth/requireSession';
 
+/**
+ * Returns the signed-in user's own student or teacher record.
+ *
+ * Identity is resolved from the verified session cookie, never from the caller,
+ * so this action cannot be driven to read another user's record by id. The
+ * parameters are ignored and kept only so existing callers still type-check.
+ */
 export const getUserDetails = async (
-    user_id: string,
-    group?: string | null
+    _userId?: string,
+    _group?: string | null
 ): Promise<UserDetails | null> => {
+    const { userId, group } = await requireSession();
     const url = process.env.AF_DB_SERVICE_URL;
     const bearerToken = process.env.AF_DB_SERVICE_BEARER_TOKEN!;
 
     try {
         const isTeacherGroup = Boolean(group && group.toLowerCase().includes('teacher'));
         const endpoint = isTeacherGroup ? 'teacher' : 'student';
-        const queryParams = new URLSearchParams({ user_id });
+        const queryParams = new URLSearchParams({ user_id: userId });
         const urlWithParams = `${url}/${endpoint}?${queryParams.toString()}`;
         const response = await fetch(urlWithParams, getFetchConfig(bearerToken));
 
@@ -26,7 +35,7 @@ export const getUserDetails = async (
             const teacher = data[0] ?? null;
             if (!teacher || !teacher.user) {
                 const groupInfo = group ? `, group: ${group}` : '';
-                console.warn(`No teacher found for user id: ${user_id}${groupInfo}`);
+                console.warn(`No teacher found for user id: ${userId}${groupInfo}`);
                 return null;
             }
             return { user: teacher.user };
@@ -37,7 +46,7 @@ export const getUserDetails = async (
 
         if (!student || !student.user) {
             const groupInfo = group ? `, group: ${group}` : '';
-            console.warn(`No student found for user id: ${user_id}${groupInfo}`);
+            console.warn(`No student found for user id: ${userId}${groupInfo}`);
             return null;
         }
 

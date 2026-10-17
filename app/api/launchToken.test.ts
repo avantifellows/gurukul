@@ -46,6 +46,22 @@ describe('createLaunchToken', () => {
         expect(JSON.parse(init.body)).toEqual({ audience: 'quiz' });
     });
 
+    it('passes the launch source and target so portal-backend can log the open', async () => {
+        vi.stubEnv('NEXT_PUBLIC_AF_PORTAL_BACKEND_URL', 'https://portal-backend.test/');
+        const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ access_token: 't' }) });
+        vi.stubGlobal('fetch', fetchMock);
+
+        vi.resetModules();
+        const { createLaunchToken } = await import('./launchToken');
+        await createLaunchToken(session, 'report', { source: 'gurukul-reports', target: 'S1' });
+
+        expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({
+            audience: 'report',
+            source: 'gurukul-reports',
+            target: 'S1',
+        });
+    });
+
     it('returns null when portal-backend rejects the request', async () => {
         vi.stubEnv('NEXT_PUBLIC_AF_PORTAL_BACKEND_URL', 'https://portal-backend.test/');
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, json: async () => ({}) }));
