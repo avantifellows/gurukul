@@ -26,3 +26,37 @@
 body {
   color: rgb(var(--foreground-rgb));
 }
+
+/* On desktop the app canvas extends past the old phone-width column, so the
+   page behind it should not flash white at the edges. */
+@media (min-width: 1024px) {
+  body {
+    background-color: #EEF2F2;
+  }
+}
+
+/* Session times sit in a fixed gutter and must align digit-for-digit down the
+   column, which proportional figures do not do. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Keyboard focus is invisible in the mobile build because nothing is focusable
+   by keyboard in practice. On desktop it is the primary way to move around. */
+:focus-visible {
+  outline: 2px solid #008181;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

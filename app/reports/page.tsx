@@ -11,7 +11,7 @@ export default function ReportsPage() {
 
     if (!loggedIn || !userId) {
         return (
-            <main className="max-w-xl mx-auto bg-white">
+            <main className="max-w-xl mx-auto bg-white lg:max-w-none lg:bg-transparent">
                 <TopBar />
                 <Loading showReportsOnly={true} />
             </main>
@@ -19,12 +19,16 @@ export default function ReportsPage() {
     }
 
     return (
-        <main className="max-w-xl mx-auto bg-white min-h-screen">
+        <main className="max-w-xl mx-auto bg-white min-h-screen lg:max-w-none lg:bg-transparent">
             <TopBar />
-            <div className="bg-heading h-20 mb-4">
+            {/* The desktop header already names the page, so this band is for
+                the phone layout only. */}
+            <div className="bg-heading h-20 mb-4 lg:hidden">
                 <h1 className="text-primary ml-4 font-semibold text-xl pt-6">Test Reports</h1>
             </div>
-            <ReportsList userId={userId} />
+            <div className="lg:mx-auto lg:max-w-6xl lg:px-10 lg:pt-8 lg:pb-16">
+                <ReportsList userId={userId} />
+            </div>
             <BottomNavigationBar />
         </main>
     );
