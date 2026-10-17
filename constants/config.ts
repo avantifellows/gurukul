@@ -26,6 +26,7 @@ export const MIXPANEL_EVENT = {
     SELECTED_TAB: "Selected Tab",
     SELECTED_CHAPTER: "Selected Chapter",
     SELECTED_GRADE: "Selected Grade",
+    SELECTED_PRIORITY: "Selected Chapter Priority",
     SELECTED_RESOURCE: "Selected Resource",
     LOGOUT: "User logged out",
     SELECTED_TEACHER: "Selected Teacher",
