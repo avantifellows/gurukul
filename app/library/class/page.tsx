@@ -171,7 +171,7 @@ const ClassLibrary = () => {
         <PrimaryButton
             key={subject}
             onClick={() => handleTabClick(subject)}
-            className={`py-2 px-4 rounded-lg ${activeTab === subject ? 'bg-heading text-primary font-semibold shadow-sm' : 'bg-white text-slate-600'}`}
+            className={`py-2 px-4 rounded-lg lg:px-5 ${activeTab === subject ? 'bg-heading text-primary font-semibold shadow-sm lg:bg-primary lg:text-white' : 'bg-white text-slate-600 lg:border lg:border-line lg:hover:border-slate-400 lg:transition-colors'}`}
         >
             {label}
         </PrimaryButton>
@@ -187,25 +187,27 @@ const ClassLibrary = () => {
     }, [selectedCourse]);
 
     // Common dropdown class for consistent styling
-    const DROPDOWN_CLASS = "w-32 h-8 rounded-lg text-center bg-white border border-gray-300 shadow focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150";
+    const DROPDOWN_CLASS = "w-32 h-8 rounded-lg text-center bg-white border border-gray-300 shadow focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150 lg:h-9 lg:shadow-none lg:border-line";
 
     return (
         <>
-            <main className="max-w-xl mx-auto bg-white min-h-screen">
+            <main className="max-w-xl mx-auto bg-white min-h-screen lg:max-w-none lg:bg-transparent">
                 <TopBar />
-                <div className="bg-heading text-primary h-20 flex flex-col">
-                    <div className='flex items-center mx-4 mt-4'>
-                        <IoArrowBack onClick={handleBackClick} className="w-7 h-7 cursor-pointer" />
+                <div className="lg:mx-auto lg:max-w-6xl lg:px-10 lg:pb-16">
+                <div className="bg-heading text-primary h-20 flex flex-col lg:bg-transparent lg:h-auto lg:pt-8 lg:pb-2">
+                    <div className='flex items-center mx-4 mt-4 lg:mx-0 lg:mt-0'>
+                        <IoArrowBack onClick={handleBackClick} role="button" tabIndex={0} aria-label="Back to library" onKeyDown={(e) => e.key === 'Enter' && handleBackClick()} className="w-7 h-7 cursor-pointer" />
                         <h1 className="font-semibold ml-2 text-xl">{selectedCourse === 'NEET Classes' ? "NEET Classes" : "JEE Classes"}<br /></h1>
                     </div>
-                    <span className="text-sm ml-[52px] font-normal">Class Library</span>
+                    <span className="text-sm ml-[52px] font-normal lg:ml-9 lg:text-slate-500">Class Library</span>
                 </div>
-                <div className="flex flex-row my-4 justify-between mx-6">
+                <div className="flex flex-row my-4 justify-between mx-6 lg:mx-0 lg:mt-0 lg:mb-6 lg:justify-start lg:gap-2">
                     {selectedCourse === 'NEET Classes' && neetSubjects.map(subject => generateSubjectButton(subject, subject))}
                     {selectedCourse === 'JEE Classes' && jeeSubjects.map(subject => generateSubjectButton(subject, subject))}
                 </div>
-                <div className="bg-heading h-20 flex items-center w-full">
-                    <div className="mx-5 w-full flex justify-between items-center">
+                <div className="lg:flex lg:items-center lg:gap-3 lg:pb-6">
+                <div className="bg-heading h-20 flex items-center w-full lg:bg-transparent lg:h-auto lg:w-auto">
+                    <div className="mx-5 w-full flex justify-between items-center lg:mx-0 lg:w-auto lg:gap-3">
                         <Listbox value={selectedGrade} onChange={handleGradeChange}>
                             <div className="relative">
                                 <Listbox.Button className={`${DROPDOWN_CLASS} pr-6`}>
@@ -255,8 +257,8 @@ const ClassLibrary = () => {
                         </Listbox>
                     </div>
                 </div>
-                <div className="bg-heading h-20 flex items-center w-full -mt-8">
-                    <div className="mx-5 w-full flex justify-between items-center">
+                <div className="bg-heading h-20 flex items-center w-full -mt-8 lg:bg-transparent lg:h-auto lg:w-auto lg:mt-0">
+                    <div className="mx-5 w-full flex justify-between items-center lg:mx-0 lg:w-auto">
                         <Listbox value={selectedTeacher} onChange={handleTeacherChange}>
                             <div className="relative">
                                 <Listbox.Button className={`${DROPDOWN_CLASS} pr-6`}>
@@ -280,17 +282,22 @@ const ClassLibrary = () => {
                         </Listbox>
                     </div>
                 </div>
+                </div>
                 {isLoading ? (
                     <Loading showLibraryOnly={true} />
                 ) : (
-                    <div className="mt-4 pb-40">
+                    <div className="mt-4 pb-40 lg:mt-0 lg:pb-0">
                         {chapters.length > 0 ? (chapters.map((chapter) => (
-                            <div key={chapter.id} className="mx-5">
-                                <div
-                                    className="text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center"
+                            <div key={chapter.id} className="mx-5 lg:mx-0">
+                                <button
+                                    type="button"
+                                    aria-expanded={!!expandedChapters[chapter.id]}
+                                    className={`w-full text-left text-md font-semibold mt-2 bg-primary text-white cursor-pointer px-4 py-4 mb-4 flex flex-row justify-between items-center lg:rounded-lg lg:py-3 lg:mb-3 lg:transition-colors ${expandedChapters[chapter.id]
+                                    ? 'lg:bg-primary lg:text-white'
+                                    : 'lg:bg-white lg:text-ink lg:border lg:border-line lg:hover:border-primary'}`}
                                     onClick={() => toggleChapterExpansion(chapter.id, getChapterName(chapter))}
                                 >
-                                    <div className="w-52">{getChapterName(chapter)}</div>
+                                    <div className="w-52 lg:w-auto">{getChapterName(chapter)}</div>
                                     <div className="w-8 flex justify-center">
                                         {expandedChapters[chapter.id] ? (
                                             <CollapseIcon className="w-6 h-6" />
@@ -298,19 +305,19 @@ const ClassLibrary = () => {
                                             <ExpandIcon className="w-6 h-6" />
                                         )}
                                     </div>
-                                </div>
+                                </button>
                                 {expandedChapters[chapter.id] && (
-                                    <div className="m-2">
+                                    <div className="m-2 lg:m-0 lg:mb-6">
                                         {loadingChapters[chapter.id] ? (
                                             <Loading showChapterContentOnly={true} cardCount={2} />
                                         ) : (
-                                            <ul className="text-primary font-normal">
+                                            <ul className="text-primary font-normal lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-x-8">
                                                 {resources
                                                     .filter((resource) => resource.chapter_id === chapter.id && resource.link && resource.type === 'video' && resource.subtype === 'classRecording')
                                                     .map((resource) => {
                                                         if (!resource.link) return null;
                                                         return (
-                                                            <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center">
+                                                            <li key={resource.id} onClick={() => handleResourceTracking(getResourceName(resource))} className="py-2 text-primary pl-4 flex items-center lg:pl-1 lg:hover:underline">
                                                                 <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="flex flex-row items-center">
                                                                     <MdPlayCircleFilled className="w-10 h-10 mr-2" color="#ef4444" /> {getResourceName(resource)} {resource.type_params?.date ? `- ${resource.type_params.date}` : ''}
                                                                 </Link>
@@ -329,6 +336,7 @@ const ClassLibrary = () => {
                         <BottomNavigationBar />
                     </div>
                 )}
+                </div>
             </main>
         </>
     );
