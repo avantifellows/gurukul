@@ -21,6 +21,13 @@ const groupConfig: GroupConfigurations = {
                 href: '/library/content?course=JEE Content',
                 icon: 'list',
             },
+            {
+                title: 'Futures Tool',
+                subtitle: 'Explore colleges and careers',
+                href: 'https://futures.avantifellows.org',
+                icon: 'compass',
+                external: true,
+            },
         ],
     },
     EnableStudents: {
