@@ -13,6 +13,15 @@ const groupConfig: GroupConfigurations = {
         homeTabLabel: 'Home',
         displayLabel: 'All India',
         region: 'Other States',
+        showResources: true,
+        resources: [
+            {
+                title: 'JEE Chapter Priority List',
+                subtitle: 'Which chapters to study first',
+                href: '/library/content?course=JEE Content',
+                icon: 'list',
+            },
+        ],
     },
     EnableStudents: {
         showLiveClasses: false,

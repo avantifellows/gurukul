@@ -234,6 +234,22 @@ export interface QuizCompletionStatus {
   [key: string]: boolean;
 }
 
+/**
+ * A tile in the homepage "Resources" section (design Option B). Each links to a
+ * study resource — a library view, an external tool, a handbook, etc. The list
+ * is supplied per group via GroupConfig, so content/product controls what shows
+ * where without a code change.
+ */
+export interface ResourceTile {
+  title: string;
+  subtitle?: string;
+  href: string;
+  // true opens href in a new tab (external tools); omit for in-app navigation.
+  external?: boolean;
+  // Icon shown in the tile's leading chip; falls back to a generic list icon.
+  icon?: 'list' | 'compass' | 'book';
+}
+
 export interface GroupConfig {
   showLiveClasses: boolean;
   showTests: boolean;
@@ -264,6 +280,10 @@ export interface GroupConfig {
    */
   portalGroup?: string;
   region?: string;
+  // Homepage "Resources" section (Option B). Hidden unless showResources is
+  // true and resources has at least one tile.
+  showResources?: boolean;
+  resources?: ResourceTile[];
 }
 
 export type GroupConfigurations = {

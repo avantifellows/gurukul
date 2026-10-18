@@ -5,13 +5,14 @@ import TopBar from "@/components/TopBar";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
 import { getSessionOccurrences, fetchUserSession } from "@/api/afdb/session";
 import { useState, useEffect } from "react";
-import { QuizSession, SessionOccurrence, MessageDisplayProps, Session, QuizCompletionStatus } from "./types";
+import { QuizSession, SessionOccurrence, MessageDisplayProps, Session, QuizCompletionStatus, ResourceTile } from "./types";
 import Link from "next/link";
 import PrimaryButton from "@/components/Button";
 import Loading from "./loading";
 import { formatSessionTime, formatTime, isSessionActive, minutesUntilStart, format12HrSessionTime, formatSessionTimeRange } from "@/utils/dateUtils";
 import { MixpanelTracking } from "@/services/mixpanel";
-import { IoIosArrowDown as ExpandIcon, IoIosArrowUp as CollapseIcon } from 'react-icons/io';
+import { MIXPANEL_EVENT } from "@/constants/config";
+import { IoIosArrowDown as ExpandIcon, IoIosArrowUp as CollapseIcon, IoIosArrowForward } from 'react-icons/io';
 import { buildGurukulSessionUrl } from "@/utils/portalLinks";
 
 export default function Home() {
@@ -408,6 +409,46 @@ export default function Home() {
     return null;
   }
 
+  // Homepage "Resources" section (design Option B): a list of study-resource
+  // tiles supplied per group via groupConfig.resources. Icons are a small fixed
+  // set keyed by the tile's `icon`; anything unknown falls back to the list glyph.
+  const resourceTileIcon = (icon?: ResourceTile["icon"]) => {
+    const common = { width: 22, height: 22, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+    if (icon === "compass") {
+      return (<svg {...common}><circle cx="12" cy="12" r="9" /><path d="M15.5 8.5l-2 5-5 2 2-5z" /></svg>);
+    }
+    if (icon === "book") {
+      return (<svg {...common}><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" /><path d="M4 21V5" /><path d="M9 8h6" /></svg>);
+    }
+    return (<svg {...common}><path d="M10 6h10M10 12h10M10 18h10" /><path d="M4 6h1M4 12h1M4 18h1" /></svg>);
+  };
+
+  const renderResources = (resources: ResourceTile[]) => (
+    <div className="mt-4 flex flex-col gap-3 mx-5 lg:mx-0 lg:mt-3">
+      {resources.map((tile, index) => {
+        const inner = (
+          <>
+            <span className="w-10 h-10 flex-shrink-0 rounded-[10px] bg-primary-soft text-primary flex items-center justify-center">
+              {resourceTileIcon(tile.icon)}
+            </span>
+            <span className="flex-grow flex flex-col gap-0.5">
+              <span className="text-[15px] font-semibold text-ink">{tile.title}</span>
+              {tile.subtitle && <span className="text-[12.5px] text-slate-500">{tile.subtitle}</span>}
+            </span>
+            <IoIosArrowForward className="w-4 h-4 text-slate-500" />
+          </>
+        );
+        const className = "min-h-[64px] box-border px-3.5 py-3 bg-white border border-line rounded-xl flex items-center gap-3.5 lg:hover:border-primary lg:transition-colors";
+        const onClick = () => MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_RESOURCE, { resource: tile.title });
+        return tile.external ? (
+          <a key={index} href={tile.href} target="_blank" rel="noopener noreferrer" onClick={onClick} className={className}>{inner}</a>
+        ) : (
+          <Link key={index} href={tile.href} prefetch={false} onClick={onClick} className={className}>{inner}</Link>
+        );
+      })}
+    </div>
+  );
+
   function MessageDisplay({ message }: MessageDisplayProps) {
     return <p className={infoMessageClass}>{message}</p>;
   }
@@ -495,6 +536,12 @@ export default function Home() {
                   message, so students never see "no more forms" on a normal day. */}
               {groupConfig.showForms && forms.length > 0 && renderTestSection("Forms", forms)}
               {groupConfig.showTests && renderTestSection(groupConfig.testsSectionTitle || "Tests", tests)}
+              {groupConfig.showResources && groupConfig.resources && groupConfig.resources.length > 0 && (
+                <div>
+                  <SectionHeading>Resources</SectionHeading>
+                  {renderResources(groupConfig.resources)}
+                </div>
+              )}
               {/* Practice Tests Accordion for all groups */}
               {groupConfig.showPracticeTests && (
                 <div>
