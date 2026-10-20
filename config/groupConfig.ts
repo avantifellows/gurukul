@@ -28,6 +28,13 @@ const groupConfig: GroupConfigurations = {
                 icon: 'compass',
                 external: true,
             },
+            {
+                title: 'Student Handbook',
+                subtitle: 'Rules, schedule and FAQs',
+                href: 'https://drive.google.com/file/d/1A8AuG9nQIQ92N4peBxz5LroDhUvN7ryE/view',
+                icon: 'book',
+                external: true,
+            },
         ],
     },
     EnableStudents: {
