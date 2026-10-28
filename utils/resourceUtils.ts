@@ -1,4 +1,4 @@
-import { Resource, Chapter, Subject, Topic } from '../app/types';
+import { Resource, Chapter, ChapterCurriculum, ChapterPriority, Subject, Topic } from '../app/types';
 
 /**
  * Generic helper function to get name from any resource with a name array
@@ -54,6 +54,34 @@ export const getSubjectName = (subject: Subject): string => {
  */
 export const getTopicName = (topic: Topic): string => {
     return getNameFromArray(topic, 'topic', 'Untitled Topic');
+};
+
+const CHAPTER_PRIORITIES: ChapterPriority[] = ['high', 'medium', 'low'];
+
+/**
+ * Normalise the free-text priority recorded in db-service into one of the
+ * three values the UI knows how to render. The column is a plain string with
+ * no constraint, so anything unexpected is treated as "not prioritised"
+ * rather than rendered raw.
+ */
+export const normalizeChapterPriority = (value?: string | null): ChapterPriority | null => {
+    if (!value) return null;
+    const normalized = value.trim().toLowerCase();
+    return CHAPTER_PRIORITIES.find((priority) => priority === normalized) ?? null;
+};
+
+/**
+ * Pick the priority a chapter carries for one specific curriculum.
+ * `/chapter` returns every curriculum mapping for a chapter, so reading the
+ * first entry would show another exam's priority.
+ */
+export const resolveChapterPriority = (
+    curriculums: ChapterCurriculum[] | undefined,
+    curriculumId?: number | null
+): ChapterPriority | null => {
+    if (!Array.isArray(curriculums) || !curriculumId) return null;
+    const match = curriculums.find((curriculum) => curriculum.curriculum_id === curriculumId);
+    return normalizeChapterPriority(match?.priority_text);
 };
 
 /**

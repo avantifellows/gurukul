@@ -58,6 +58,20 @@ export interface Grade {
   number: number;
 }
 
+// Chapters are prioritised per curriculum, so the same chapter can be "high"
+// for one exam and "low" for another. Not every chapter is tagged.
+export type ChapterPriority = 'high' | 'medium' | 'low';
+
+// One row of the chapter_curriculum join table, as returned by db-service.
+// `/chapter` returns every curriculum a chapter is mapped to, not just the one
+// that was requested.
+export interface ChapterCurriculum {
+  curriculum_id: number;
+  priority?: number | null;
+  priority_text?: string | null;
+  weightage?: number | null;
+}
+
 export interface Chapter {
   id: number;
   name: Array<{
@@ -66,6 +80,9 @@ export interface Chapter {
   }>;
   grade_id?: number | null;
   cms_status_id?: number | null;
+  // Resolved by getChapters for the curriculum that was asked for; null when
+  // that curriculum has no priority recorded for the chapter.
+  priority?: ChapterPriority | null;
 }
 
 export interface Resource {
@@ -217,6 +234,22 @@ export interface QuizCompletionStatus {
   [key: string]: boolean;
 }
 
+/**
+ * A tile in the homepage "Resources" section (design Option B). Each links to a
+ * study resource — a library view, an external tool, a handbook, etc. The list
+ * is supplied per group via GroupConfig, so content/product controls what shows
+ * where without a code change.
+ */
+export interface ResourceTile {
+  title: string;
+  subtitle?: string;
+  href: string;
+  // true opens href in a new tab (external tools); omit for in-app navigation.
+  external?: boolean;
+  // Icon shown in the tile's leading chip; falls back to a generic list icon.
+  icon?: 'list' | 'compass' | 'book';
+}
+
 export interface GroupConfig {
   showLiveClasses: boolean;
   showTests: boolean;
@@ -247,6 +280,10 @@ export interface GroupConfig {
    */
   portalGroup?: string;
   region?: string;
+  // Homepage "Resources" section (Option B). Hidden unless showResources is
+  // true and resources has at least one tile.
+  showResources?: boolean;
+  resources?: ResourceTile[];
 }
 
 export type GroupConfigurations = {
