@@ -7,7 +7,7 @@ import Loading from '../../loading';
 import TopBar from '@/components/TopBar';
 import PrimaryButton from '@/components/Button';
 import { getSubjects, getChapters, getGrades, getChapterResourcesComplete, getCurriculumId } from '../../../api/afdb/library';
-import { Chapter, Resource, Topic } from '../../types';
+import { Chapter, ChapterPriority, Resource, Topic } from '../../types';
 import Link from 'next/link';
 import { MdMenuBook, MdQuiz, MdPlayCircleFilled, MdInsertDriveFile } from 'react-icons/md';
 import { GiArchiveRegister } from 'react-icons/gi';
@@ -40,6 +40,29 @@ const getResourceIconAndPrefix = (resource: Resource) => {
     return { icon: MdInsertDriveFile, prefix: '', color: '#64748b' };
 };
 
+// Chapters are tagged high/medium/low per curriculum in the CMS. The badge sits
+// on the chapter header, which is teal on mobile and white on desktop, so each
+// style uses a light fill with dark text to stay legible on both.
+const PRIORITY_ORDER: ChapterPriority[] = ['high', 'medium', 'low'];
+
+const PRIORITY_STYLES: Record<ChapterPriority, { label: string; badge: string; chip: string }> = {
+    high: {
+        label: 'High',
+        badge: 'bg-amber-100 text-amber-900 border-amber-200',
+        chip: 'bg-amber-100 text-amber-900 border-amber-300',
+    },
+    medium: {
+        label: 'Medium',
+        badge: 'bg-primary-soft text-ink border-primary-soft',
+        chip: 'bg-primary-soft text-ink border-primary',
+    },
+    low: {
+        label: 'Low',
+        badge: 'bg-slate-200 text-slate-700 border-slate-300',
+        chip: 'bg-slate-200 text-slate-700 border-slate-400',
+    },
+};
+
 // Common dropdown class for consistent styling
 const DROPDOWN_CLASS = "w-32 h-8 rounded-lg text-center bg-white border border-gray-300 shadow focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-150 lg:h-9 lg:shadow-none lg:border-line";
 
@@ -52,6 +75,7 @@ const ContentLibrary = () => {
     const [expandedChapters, setExpandedChapters] = useState<Record<number, boolean>>({});
     const [selectedGrade, setSelectedGrade] = useState(11);
     const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
+    const [selectedPriorities, setSelectedPriorities] = useState<ChapterPriority[]>([]);
     const [chapterList, setChapterList] = useState<Chapter[]>([]);
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -211,6 +235,22 @@ const ContentLibrary = () => {
         setChapterList(chapterData);
     };
 
+    const togglePriority = (priority: ChapterPriority) => {
+        setSelectedPriorities((current) =>
+            current.includes(priority)
+                ? current.filter((value) => value !== priority)
+                : [...current, priority]
+        );
+        MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_PRIORITY, { priority });
+    };
+
+    // Only offer the filter when the curriculum on screen actually has tagged
+    // chapters. Most curriculums have none, and empty chips would just be noise.
+    const hasPriorities = chapters.some((chapter) => chapter.priority);
+    const visibleChapters = selectedPriorities.length === 0
+        ? chapters
+        : chapters.filter((chapter) => chapter.priority && selectedPriorities.includes(chapter.priority));
+
     const handleResourceTracking = (resourceName: any) => {
         MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_RESOURCE, { resource_name: resourceName })
     }
@@ -315,14 +355,45 @@ const ContentLibrary = () => {
                         </Listbox>
                     </div>
                 </div>
+                {!isLoading && hasPriorities && (
+                    <div className="mx-5 mb-4 flex flex-wrap items-center gap-2 lg:mx-0 lg:mb-6">
+                        <span className="text-sm text-slate-500 mr-1">Priority:</span>
+                        {PRIORITY_ORDER.map((priority) => {
+                            const isSelected = selectedPriorities.includes(priority);
+                            const { label, chip } = PRIORITY_STYLES[priority];
+                            return (
+                                <button
+                                    key={priority}
+                                    type="button"
+                                    aria-pressed={isSelected}
+                                    onClick={() => togglePriority(priority)}
+                                    className={`px-3 py-1 rounded-full border text-xs font-semibold transition-colors ${isSelected ? chip : 'bg-white text-slate-500 border-line hover:border-slate-400'}`}
+                                >
+                                    {label}
+                                </button>
+                            );
+                        })}
+                        {selectedPriorities.length > 0 && (
+                            <button
+                                type="button"
+                                onClick={() => setSelectedPriorities([])}
+                                className="text-xs text-primary underline ml-1"
+                            >
+                                Clear
+                            </button>
+                        )}
+                    </div>
+                )}
                 {isLoading ? (
                     <Loading showLibraryOnly={true} />
                 ) : (
                     <div className="mt-4 pb-40 mx-5 lg:mx-0 lg:mt-0 lg:pb-0">
                         {chapters.length === 0 ? (
                             <div className="text-center pt-10">No chapters available</div>
+                        ) : visibleChapters.length === 0 ? (
+                            <div className="text-center pt-10">No chapters match the selected priority</div>
                         ) : (
-                            chapters.map((chapter) => (
+                            visibleChapters.map((chapter) => (
                                 <div key={chapter.id}>
                                     <button
                                         type="button"
@@ -332,7 +403,14 @@ const ContentLibrary = () => {
                                         : 'lg:bg-white lg:text-ink lg:border lg:border-line lg:hover:border-primary'}`}
                                         onClick={() => toggleChapterExpansion(chapter.id, getChapterName(chapter))}
                                     >
-                                        <div className="flex-1 min-w-0 mr-4 break-words">{getChapterName(chapter)}</div>
+                                        <div className="flex-1 min-w-0 mr-4 break-words">
+                                            <span>{getChapterName(chapter)}</span>
+                                            {chapter.priority && (
+                                                <span className={`ml-2 align-middle inline-block px-2 py-0.5 rounded-full border text-[11px] font-bold whitespace-nowrap ${PRIORITY_STYLES[chapter.priority].badge}`}>
+                                                    {PRIORITY_STYLES[chapter.priority].label} priority
+                                                </span>
+                                            )}
+                                        </div>
                                         <div className="w-8 flex justify-center">
                                             {expandedChapters[chapter.id] ? (
                                                 <CollapseIcon className="w-6 h-6" />

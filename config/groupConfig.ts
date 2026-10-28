@@ -13,6 +13,29 @@ const groupConfig: GroupConfigurations = {
         homeTabLabel: 'Home',
         displayLabel: 'All India',
         region: 'Other States',
+        showResources: true,
+        resources: [
+            {
+                title: 'JEE Chapter Priority List',
+                subtitle: 'Which chapters to study first',
+                href: '/library/content?course=JEE Content',
+                icon: 'list',
+            },
+            {
+                title: 'Futures Tool',
+                subtitle: 'Explore colleges and careers',
+                href: 'https://futures.avantifellows.org',
+                icon: 'compass',
+                external: true,
+            },
+            {
+                title: 'Student Handbook',
+                subtitle: 'Rules, schedule and FAQs',
+                href: 'https://drive.google.com/file/d/1IWeaB78HXdJUrwxh6eLOom7uCxFA5j6o/view',
+                icon: 'book',
+                external: true,
+            },
+        ],
     },
     EnableStudents: {
         showLiveClasses: false,
