@@ -165,6 +165,10 @@ export const getResourcesOfChapter = async (
   if (curriculumId) queryParams.append('curriculum_id', curriculumId.toString());
   if (teacherId) queryParams.append('teacher_id', teacherId.toString());
   if (topicId) queryParams.append('topic_id', topicId.toString());
+  // Chapter content is versioned by adding a row and retiring the old one, so
+  // a chapter can hold several generations of the same test. Students see the
+  // current one only.
+  queryParams.append('is_active', 'true');
 
   const chapterResources: Resource[] = await fetchWithParams('resources/curriculum', queryParams);
 
