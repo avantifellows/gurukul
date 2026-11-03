@@ -143,7 +143,7 @@ describe('findLatestScore', () => {
         ...overrides,
     });
 
-    it('returns nothing while the reports API sends no marks', () => {
+    it('returns nothing when no attempt carries marks', () => {
         expect(findLatestScore([report({}), report({ start_date: '2026-10-18' })], 300)).toBeNull();
         expect(findLatestScore(undefined, 300)).toBeNull();
     });
@@ -151,9 +151,9 @@ describe('findLatestScore', () => {
     it('picks the most recent scored attempt, whatever order they arrive in', () => {
         const score = findLatestScore(
             [
-                report({ start_date: '2026-09-02', marks: 140 }),
-                report({ start_date: '2026-10-18', marks: 171, test_name: 'JEE Main Mock 4' }),
-                report({ start_date: '2026-10-04', marks: 155 }),
+                report({ start_date: '2026-09-02', marks_scored: 140 }),
+                report({ start_date: '2026-10-18', marks_scored: 171, test_name: 'JEE Main Mock 4' }),
+                report({ start_date: '2026-10-04', marks_scored: 155 }),
             ],
             300
         )!;
@@ -167,7 +167,7 @@ describe('findLatestScore', () => {
         const score = findLatestScore(
             [
                 report({ start_date: '2026-10-20' }),
-                report({ start_date: '2026-10-18', marks: '171', total_marks: '300' }),
+                report({ start_date: '2026-10-18', marks_scored: '171', max_marks_possible: '300' }),
             ],
             300
         )!;
@@ -177,7 +177,7 @@ describe('findLatestScore', () => {
     });
 
     it('prefers the total the report states over the exam default', () => {
-        const score = findLatestScore([report({ marks: 60, total_marks: 100 })], 300)!;
+        const score = findLatestScore([report({ marks_scored: 60, max_marks_possible: 100 })], 300)!;
         expect(score.totalMarks).toBe(100);
     });
 });

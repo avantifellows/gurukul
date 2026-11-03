@@ -140,10 +140,9 @@ const toFiniteNumber = (value: unknown): number | null => {
 /**
  * The most recent report that carries a usable score.
  *
- * The reports API does not send marks yet — the data sits in DDB behind the
- * student reports v2 flow — so this returns null today and the screen hides its
- * score card. It starts working the moment the endpoint adds the fields; the
- * fallback total keeps a report that sends marks without a denominator usable.
+ * Reports older than the marks fields simply have none, so this returns null
+ * and the screen hides its score card rather than guessing. The fallback total
+ * keeps a report that sends marks without a denominator usable.
  */
 export const findLatestScore = (
     reports: Report[] | undefined | null,
@@ -153,9 +152,9 @@ export const findLatestScore = (
 
     const scored = reports
         .map((report) => {
-            const marks = toFiniteNumber(report.marks);
+            const marks = toFiniteNumber(report.marks_scored);
             if (marks === null) return null;
-            const totalMarks = toFiniteNumber(report.total_marks) ?? fallbackTotal;
+            const totalMarks = toFiniteNumber(report.max_marks_possible) ?? fallbackTotal;
             if (totalMarks <= 0) return null;
             return {
                 marks,

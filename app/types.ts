@@ -37,12 +37,11 @@ export interface Report {
   rank: string;
   report_link: string;
   start_date: string;
-  // Marks are not in the reports API response today — the data exists in DDB
-  // (student reports v2 flow) but the Gurukul endpoint does not surface it yet.
-  // The cutoffs screen reads them when they appear and simply hides its score
-  // card until then, so no UI change is needed once the API starts sending them.
-  marks?: number | string | null;
-  total_marks?: number | string | null;
+  // Straight from DynamoDB, via the reports listing: flat on the overall row in
+  // v1, under overall_performance in v2. Optional because rows predating the
+  // fields carry neither, and the cutoffs screen hides its score card then.
+  marks_scored?: number | string | null;
+  max_marks_possible?: number | string | null;
 };
 
 /**
