@@ -12,6 +12,11 @@ export interface AuthContextProps {
   group: string | null;
   studentId: string | null;
   apaarId: string | null;
+  // Off the student record. The cutoffs screen reads the category so it can
+  // speak to the student's own row without asking them to pick one; both are
+  // undefined for teachers and for records that have never been tagged.
+  studentCategory?: string;
+  studentStream?: string;
   logout: () => void;
   isLoading: boolean;
   groupConfig: GroupConfig;
@@ -32,7 +37,24 @@ export interface Report {
   rank: string;
   report_link: string;
   start_date: string;
+  // Marks are not in the reports API response today — the data exists in DDB
+  // (student reports v2 flow) but the Gurukul endpoint does not surface it yet.
+  // The cutoffs screen reads them when they appear and simply hides its score
+  // card until then, so no UI change is needed once the API starts sending them.
+  marks?: number | string | null;
+  total_marks?: number | string | null;
 };
+
+/**
+ * The one test score the cutoffs screen speaks about: the student's most recent
+ * attempt that carries marks. Null whenever no attempt has a usable score.
+ */
+export interface LatestScore {
+  marks: number;
+  totalMarks: number;
+  testName: string;
+  startDate: string;
+}
 
 export interface PrimaryButton {
   onClick?: () => void;
@@ -247,7 +269,7 @@ export interface ResourceTile {
   // true opens href in a new tab (external tools); omit for in-app navigation.
   external?: boolean;
   // Icon shown in the tile's leading chip; falls back to a generic list icon.
-  icon?: 'list' | 'compass' | 'book';
+  icon?: 'list' | 'compass' | 'book' | 'target';
 }
 
 export interface GroupConfig {
@@ -292,4 +314,80 @@ export type GroupConfigurations = {
 
 export interface BottomNavigationBarProps {
   homeLabel?: string;
+}
+
+/**
+ * The five reservation categories the cutoff sheets are published against.
+ * Student records carry free text ("General", "OBC", "obc-ncl"), so it is
+ * normalised onto this set before anything is matched against it.
+ */
+export type CutoffCategory = 'Open' | 'EWS' | 'OBC-NCL' | 'SC' | 'ST';
+
+/**
+ * One rung of the ladder an exam's cutoffs describe, in ascending order of
+ * marks. The student-facing name and description are the only wording that
+ * reaches the screen — the internal M1a/M1b/M2 labels stay out of the product.
+ *
+ * The statement copy is the test reports' own, word for word, so a student
+ * reads the same sentence in Gurukul and in their report.
+ */
+export interface CutoffTarget {
+  key: string;
+  // Column header in the full table; kept short enough for a phone.
+  columnLabel: string;
+  // Heading in the "What these mean" card.
+  name: string;
+  description: string;
+  // Shown when the student has not reached even this, the lowest target.
+  // "{marks}" is replaced with how many marks short they are.
+  belowHeadline?: string;
+  // Shown when this is the highest target the student has reached.
+  reachedHeadline: string;
+  // Named in the "Your next target: N more marks for ___." line while the
+  // student is still below this target. Omit on the top target.
+  nextTargetLabel?: string;
+}
+
+/** One category's marks, keyed by CutoffTarget.key. */
+export interface CutoffRow {
+  category: CutoffCategory;
+  marks: Record<string, number>;
+}
+
+/**
+ * Everything the cutoffs screen needs for one exam. Adding NEET, JEE Advanced
+ * or a state CET is a new entry in cutoffConfig — no code change — and the
+ * screen grows an exam switcher as soon as a second exam applies to a student.
+ */
+export interface ExamCutoffs {
+  id: string;
+  // Full name, used in headings and in the statement copy.
+  name: string;
+  // Label on the exam switcher, where space is tight.
+  shortName: string;
+  maxMarks: number;
+  // e.g. "2026 cycle" — names the admission cycle the marks belong to.
+  cycleLabel: string;
+  // One line under the score statement, crediting where the marks come from.
+  sourceNote: string;
+  // One line under the full table, restating the scale and the source.
+  tableNote: string;
+  // Student streams this exam applies to, lower-cased. Omit to offer the exam
+  // to every student, whatever their record says.
+  streams?: string[];
+  // Ascending by marks: the screen reads them as steps up a ladder.
+  targets: CutoffTarget[];
+  cutoffs: CutoffRow[];
+}
+
+/**
+ * What the score card says about one student: the headline sentence and, when
+ * there is a rung left to climb, the next-target line under it.
+ */
+export interface CutoffStatement {
+  headline: string;
+  nextTarget: string | null;
+  // Index of the highest target reached, -1 when below the first one. The
+  // screen does not render it; tests assert on it.
+  reachedIndex: number;
 }
