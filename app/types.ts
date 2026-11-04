@@ -42,6 +42,11 @@ export interface Report {
   // fields carry neither, and the cutoffs screen hides its score card then.
   marks_scored?: number | string | null;
   max_marks_possible?: number | string | null;
+  // What kind of paper it was — "major_test", "part_test" and so on. Empty on
+  // reports predating the field. A cutoff only means something against a
+  // full-length paper, so anything comparing a score has to read this.
+  test_format?: string | null;
+  test_type?: string | null;
 };
 
 /**
@@ -371,6 +376,10 @@ export interface ExamCutoffs {
   sourceNote: string;
   // One line under the full table, restating the scale and the source.
   tableNote: string;
+  // Paper formats whose marks can be held against these cutoffs, as the reports
+  // service spells them. A part test covers part of the syllabus, so its score
+  // says nothing about a full-length cutoff and it is left out.
+  fullLengthFormats: string[];
   // Student streams this exam applies to, lower-cased. Omit to offer the exam
   // to every student, whatever their record says.
   streams?: string[];

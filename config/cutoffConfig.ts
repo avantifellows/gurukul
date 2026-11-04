@@ -28,6 +28,10 @@ const cutoffConfig: ExamCutoffs[] = [
         cycleLabel: '2026 cycle',
         sourceNote: "Based on last year's JoSAA cutoffs.",
         tableNote: "Marks out of 300, from last year's JoSAA cutoffs.",
+        // The formats Gurukul already groups practice tests by, minus
+        // part_test: a part test covers part of the syllabus, so 171 on one is
+        // not 171 on a JEE Mains paper.
+        fullLengthFormats: ['major_test', 'full_syllabus_test', 'mock_test', 'previous_year_test'],
         streams: ['pcm', 'engineering', 'jee'],
         targets: [
             {

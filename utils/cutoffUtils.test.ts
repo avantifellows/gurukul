@@ -140,22 +140,26 @@ describe('findLatestScore', () => {
         rank: '1',
         report_link: 'https://reports.avantifellows.org/r/1',
         start_date: '2026-10-01',
+        marks_scored: 150,
+        max_marks_possible: 300,
+        test_format: 'mock_test',
         ...overrides,
     });
 
     it('returns nothing when no attempt carries marks', () => {
-        expect(findLatestScore([report({}), report({ start_date: '2026-10-18' })], 300)).toBeNull();
-        expect(findLatestScore(undefined, 300)).toBeNull();
+        expect(findLatestScore([report({ marks_scored: undefined })], jeeMains)).toBeNull();
+        expect(findLatestScore(undefined, jeeMains)).toBeNull();
+        expect(findLatestScore([], jeeMains)).toBeNull();
     });
 
-    it('picks the most recent scored attempt, whatever order they arrive in', () => {
+    it('picks the most recent qualifying attempt, whatever order they arrive in', () => {
         const score = findLatestScore(
             [
                 report({ start_date: '2026-09-02', marks_scored: 140 }),
                 report({ start_date: '2026-10-18', marks_scored: 171, test_name: 'JEE Main Mock 4' }),
                 report({ start_date: '2026-10-04', marks_scored: 155 }),
             ],
-            300
+            jeeMains
         )!;
 
         expect(score.marks).toBe(171);
@@ -163,21 +167,64 @@ describe('findLatestScore', () => {
         expect(score.totalMarks).toBe(300);
     });
 
-    it('ignores attempts with no marks and reads numeric strings', () => {
+    it('ignores a part test, however recent', () => {
+        // The case Surya caught: 36/300 on a part test is not a JEE Mains score,
+        // and taking the latest entry would have compared it to the cutoff.
         const score = findLatestScore(
             [
-                report({ start_date: '2026-10-20' }),
-                report({ start_date: '2026-10-18', marks_scored: '171', max_marks_possible: '300' }),
+                report({ start_date: '2026-10-18', marks_scored: 171 }),
+                report({ start_date: '2026-10-25', marks_scored: 36, test_format: 'part_test' }),
             ],
-            300
+            jeeMains
+        )!;
+
+        expect(score.marks).toBe(171);
+    });
+
+    it('ignores a paper marked out of anything else', () => {
+        // A 40-mark chapter test: right shape, wrong scale.
+        expect(
+            findLatestScore(
+                [report({ marks_scored: 31, max_marks_possible: 40, test_format: 'major_test' })],
+                jeeMains
+            )
+        ).toBeNull();
+    });
+
+    it('skips an attempt whose scale is unknown rather than assuming the exam total', () => {
+        expect(
+            findLatestScore([report({ marks_scored: 31, max_marks_possible: undefined })], jeeMains)
+        ).toBeNull();
+    });
+
+    it('accepts a report predating test_format on the strength of its scale', () => {
+        const score = findLatestScore(
+            [report({ marks_scored: 171, test_format: '' })],
+            jeeMains
+        )!;
+
+        expect(score.marks).toBe(171);
+    });
+
+    it('reads numeric strings, as DynamoDB decimals arrive', () => {
+        const score = findLatestScore(
+            [report({ marks_scored: '171', max_marks_possible: '300' })],
+            jeeMains
         )!;
 
         expect(score.marks).toBe(171);
         expect(score.totalMarks).toBe(300);
     });
 
-    it('prefers the total the report states over the exam default', () => {
-        const score = findLatestScore([report({ marks_scored: 60, max_marks_possible: 100 })], 300)!;
-        expect(score.totalMarks).toBe(100);
+    it('sorts an undated attempt last rather than letting it win', () => {
+        const score = findLatestScore(
+            [
+                report({ start_date: '', marks_scored: 90 }),
+                report({ start_date: '2026-10-18', marks_scored: 171 }),
+            ],
+            jeeMains
+        )!;
+
+        expect(score.marks).toBe(171);
     });
 });

@@ -138,24 +138,44 @@ const toFiniteNumber = (value: unknown): number | null => {
 };
 
 /**
- * The most recent report that carries a usable score.
+ * The student's most recent full-length attempt at this exam.
  *
- * Reports older than the marks fields simply have none, so this returns null
- * and the screen hides its score card rather than guessing. The fallback total
- * keeps a report that sends marks without a denominator usable.
+ * A cutoff is a mark on one particular paper, so only a score measured on the
+ * same scale can be held against it: a 40-mark chapter test is not 171/300 just
+ * because it is the latest thing the student sat. Two gates, both deliberately
+ * strict — a missing score card is a far smaller problem than a confident
+ * comparison against the wrong paper:
+ *
+ * 1. The attempt must be out of the exam's own total. A report with no
+ *    `max_marks_possible` is skipped rather than assumed to be out of 300.
+ * 2. When the report says what kind of paper it was, it must be one of the
+ *    exam's full-length formats. Reports predating `test_format` carry an empty
+ *    string and ride on the scale check alone.
+ *
+ * The latest surviving attempt by date wins; an unparseable date sorts last.
  */
 export const findLatestScore = (
     reports: Report[] | undefined | null,
-    fallbackTotal: number
+    exam: ExamCutoffs
 ): LatestScore | null => {
     if (!Array.isArray(reports)) return null;
+
+    const startedAt = (date: string): number => {
+        const time = new Date(date).getTime();
+        return Number.isNaN(time) ? -Infinity : time;
+    };
 
     const scored = reports
         .map((report) => {
             const marks = toFiniteNumber(report.marks_scored);
             if (marks === null) return null;
-            const totalMarks = toFiniteNumber(report.max_marks_possible) ?? fallbackTotal;
-            if (totalMarks <= 0) return null;
+
+            const totalMarks = toFiniteNumber(report.max_marks_possible);
+            if (totalMarks !== exam.maxMarks) return null;
+
+            const format = report.test_format?.trim();
+            if (format && !exam.fullLengthFormats.includes(format)) return null;
+
             return {
                 marks,
                 totalMarks,
@@ -168,8 +188,6 @@ export const findLatestScore = (
     if (scored.length === 0) return null;
 
     return scored.reduce((latest, score) =>
-        new Date(score.startDate).getTime() > new Date(latest.startDate).getTime()
-            ? score
-            : latest
+        startedAt(score.startDate) > startedAt(latest.startDate) ? score : latest
     );
 };

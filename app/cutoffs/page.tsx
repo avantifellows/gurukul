@@ -48,11 +48,11 @@ export default function CutoffsPage() {
     const category = normalizeCutoffCategory(studentCategory);
     const row = exam ? findCutoffRow(exam, category) : null;
 
-    // The reports list is not exam-scoped, so the latest scored attempt is the
-    // latest of all of them. Fine while JEE Mains is the only exam with
-    // cutoffs; a second exam will want the score filtered by test.
+    // Scoped to the exam: only a full-length paper out of this exam's own total
+    // can be held against its cutoffs. The reports list is not exam-scoped, so
+    // this is what keeps a chapter test out of the comparison.
     const latestScore = useMemo(
-        () => (exam ? findLatestScore(reports, exam.maxMarks) : null),
+        () => (exam ? findLatestScore(reports, exam) : null),
         [reports, exam]
     );
 
