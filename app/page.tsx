@@ -417,6 +417,9 @@ export default function Home() {
     if (icon === "compass") {
       return (<svg {...common}><circle cx="12" cy="12" r="9" /><path d="M15.5 8.5l-2 5-5 2 2-5z" /></svg>);
     }
+    if (icon === "video") {
+      return (<svg {...common}><rect x="3" y="5" width="18" height="14" rx="2.5" /><path d="M10.5 9.5l4.5 2.5-4.5 2.5z" /></svg>);
+    }
     if (icon === "book") {
       return (<svg {...common}><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" /><path d="M4 21V5" /><path d="M9 8h6" /></svg>);
     }

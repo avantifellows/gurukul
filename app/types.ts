@@ -247,7 +247,7 @@ export interface ResourceTile {
   // true opens href in a new tab (external tools); omit for in-app navigation.
   external?: boolean;
   // Icon shown in the tile's leading chip; falls back to a generic list icon.
-  icon?: 'list' | 'compass' | 'book';
+  icon?: 'list' | 'compass' | 'book' | 'video';
 }
 
 export interface GroupConfig {
