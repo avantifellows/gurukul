@@ -53,10 +53,11 @@ export const findCutoffRow = (
 /**
  * The exams a student should be offered, in config order.
  *
- * An exam with no `streams` applies to everyone. Otherwise it applies when the
- * student's stream is one of them — and, when the record has no stream at all,
- * every configured exam is offered rather than none, so a missing field never
- * leaves the screen empty.
+ * An exam with no `streams` applies to everyone. Otherwise it applies only to
+ * the streams it names: a medical student is not offered JEE Mains cutoffs just
+ * because that is the only exam configured — the screen says nothing instead.
+ * A record with no stream at all is the one case that falls back to every
+ * exam, since there is nothing to filter on.
  */
 export const examsForStudent = (
     exams: ExamCutoffs[],
@@ -64,10 +65,7 @@ export const examsForStudent = (
 ): ExamCutoffs[] => {
     const normalized = stream?.trim().toLowerCase();
     if (!normalized) return exams;
-    const matching = exams.filter(
-        (exam) => !exam.streams || exam.streams.includes(normalized)
-    );
-    return matching.length > 0 ? matching : exams;
+    return exams.filter((exam) => !exam.streams || exam.streams.includes(normalized));
 };
 
 /**
@@ -140,17 +138,20 @@ const toFiniteNumber = (value: unknown): number | null => {
 /**
  * The student's most recent full-length attempt at this exam.
  *
- * A cutoff is a mark on one particular paper, so only a score measured on the
- * same scale can be held against it: a 40-mark chapter test is not 171/300 just
- * because it is the latest thing the student sat. Two gates, both deliberately
- * strict — a missing score card is a far smaller problem than a confident
- * comparison against the wrong paper:
+ * A cutoff is a mark on one particular exam's paper, so three things have to
+ * line up before an attempt can be held against it. All three gates are
+ * deliberately strict: no score card is a far smaller problem than a confident
+ * statement about the wrong paper.
  *
- * 1. The attempt must be out of the exam's own total. A report with no
- *    `max_marks_possible` is skipped rather than assumed to be out of 300.
- * 2. When the report says what kind of paper it was, it must be one of the
+ * 1. The paper must belong to this exam. Real data is the argument here — a
+ *    NEET student's nursing crash-course paper is out of 300, exactly like JEE
+ *    Mains, so marks cannot stand in for exam identity. A report that does not
+ *    say which exam it was is skipped rather than assumed to be this one.
+ * 2. It must be out of the exam's own total, so a 40-mark chapter test is never
+ *    read as a mark out of 300.
+ * 3. When the report says what kind of paper it was, it must be one of the
  *    exam's full-length formats. Reports predating `test_format` carry an empty
- *    string and ride on the scale check alone.
+ *    string and ride on the other two gates.
  *
  * The latest surviving attempt by date wins; an unparseable date sorts last.
  */
@@ -169,6 +170,14 @@ export const findLatestScore = (
         .map((report) => {
             const marks = toFiniteNumber(report.marks_scored);
             if (marks === null) return null;
+
+            // Exams that name their streams only accept papers from them. An
+            // exam with no streams configured applies to everyone, so there is
+            // nothing to check it against.
+            if (exam.streams) {
+                const stream = report.stream?.trim().toLowerCase();
+                if (!stream || !exam.streams.includes(stream)) return null;
+            }
 
             const totalMarks = toFiniteNumber(report.max_marks_possible);
             if (totalMarks !== exam.maxMarks) return null;

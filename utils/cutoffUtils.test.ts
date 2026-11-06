@@ -129,8 +129,11 @@ describe('examsForStudent', () => {
         expect(examsForStudent([jeeMains, neet], '  ')).toHaveLength(2);
     });
 
-    it('offers everything rather than nothing when the stream matches no exam', () => {
-        expect(examsForStudent([jeeMains, neet], 'commerce')).toHaveLength(2);
+    it('offers nothing when the stream matches no exam', () => {
+        // A medical student must not be handed JEE Mains cutoffs just because
+        // JEE Mains is the only exam configured.
+        expect(examsForStudent([jeeMains], 'medical')).toEqual([]);
+        expect(examsForStudent([jeeMains, neet], 'commerce')).toEqual([]);
     });
 });
 
@@ -143,6 +146,7 @@ describe('findLatestScore', () => {
         marks_scored: 150,
         max_marks_possible: 300,
         test_format: 'mock_test',
+        stream: 'engineering',
         ...overrides,
     });
 
@@ -179,6 +183,32 @@ describe('findLatestScore', () => {
         )!;
 
         expect(score.marks).toBe(171);
+    });
+
+    it('ignores another exam\u2019s paper, even at the same total and format', () => {
+        // Taken from a real student: nine attempts, all NEET, and the one paper
+        // out of 300 is a nursing crash-course full syllabus test. Marks and
+        // format both pass; only the stream tells the two exams apart.
+        expect(
+            findLatestScore(
+                [
+                    report({
+                        test_name: 'DL_12_CrashCourse_FST5_Nursing',
+                        start_date: '2023-06-08',
+                        marks_scored: 0,
+                        max_marks_possible: 300,
+                        test_format: 'full_syllabus_test',
+                        stream: 'medical',
+                    }),
+                ],
+                jeeMains
+            )
+        ).toBeNull();
+    });
+
+    it('skips a report that does not say which exam it was', () => {
+        expect(findLatestScore([report({ stream: '' })], jeeMains)).toBeNull();
+        expect(findLatestScore([report({ stream: undefined })], jeeMains)).toBeNull();
     });
 
     it('ignores a paper marked out of anything else', () => {

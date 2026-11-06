@@ -47,6 +47,11 @@ export interface Report {
   // full-length paper, so anything comparing a score has to read this.
   test_format?: string | null;
   test_type?: string | null;
+  // Which exam the paper belonged to — "engineering", "medical", "ca", "clat".
+  // Marks cannot stand in for this: a NEET nursing paper and a JEE Mains paper
+  // are both out of 300.
+  stream?: string | null;
+  course?: string | null;
 };
 
 /**
