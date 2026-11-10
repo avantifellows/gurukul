@@ -61,12 +61,13 @@ const cutoffConfig: ExamCutoffs[] = [
                 key: 'tier2',
                 columnLabel: 'Tier 2',
                 name: 'NIT Tier 2 colleges',
-                // PENDING: this wording is wrong and must not ship as is.
-                // Vishal confirmed the Tier 1 definition but said Tier 2 was
-                // not derived from the top 3 branches — a different branch list
-                // was used, which he still has to send. The marks are right;
-                // only this sentence is wrong. Replace it before release.
-                description: 'A top-3 branch at one of the five lowest NIRF-ranked NITs — Raipur, Hamirpur, Puducherry, Meghalaya, Kurukshetra.',
+                // Per Vishal (10 Nov): the Tier 2 mark is the average of the
+                // Civil and Mechanical Engineering cutoffs — two branches every
+                // NIT offers, picked precisely because they are not the
+                // competitive ones — at a bottom-5 NIRF ranked NIT. Note this
+                // is deliberately not parallel to Tier 1, which is a top-3
+                // branch: the two tiers differ by branch as well as by college.
+                description: 'Civil or Mechanical Engineering — branches every NIT offers — at one of the five lowest NIRF-ranked NITs: Raipur, Hamirpur, Puducherry, Meghalaya, Kurukshetra.',
                 reachedHeadline: 'Good job! You are on track to qualifying JEE Mains and getting into an NIT!',
                 nextTargetLabel: 'NIT Admission',
             },
