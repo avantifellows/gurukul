@@ -40,7 +40,14 @@ const cutoffConfig: ExamCutoffs[] = [
         // part_test: a part test covers part of the syllabus, so 171 on one is
         // not 171 on a JEE Mains paper.
         fullLengthFormats: ['major_test', 'full_syllabus_test', 'mock_test', 'previous_year_test'],
-        streams: ['pcm', 'engineering', 'jee'],
+        // Record values, checked against dim_student.student_stream. 'pcmb'
+        // students sit the engineering bar (dim_student's own academic-level
+        // rule says so) and there are ~17k of them, so they belong here.
+        // 'jee' was in this list and matches no student record at all.
+        studentStreams: ['engineering', 'engg', 'pcm', 'pcmb'],
+        // Report values, checked against the paper a score came from.
+        reportStreams: ['engineering'],
+        courses: ['JEE Mains'],
         targets: [
             {
                 key: 'qualify',
@@ -79,6 +86,16 @@ const cutoffConfig: ExamCutoffs[] = [
             { category: 'OBC-NCL', marks: { qualify: 63, tier2: 125, tier1: 184 } },
             { category: 'SC', marks: { qualify: 40, tier2: 88, tier1: 138 } },
             { category: 'ST', marks: { qualify: 30, tier2: 77, tier1: 122 } },
+            // PWD students have their own, far lower bars — 15 and 30 against
+            // Open's 99 and 129 — so they get their own rows rather than being
+            // read as their base category. ~23k enrolled students are in these
+            // five. No Tier 1 figure exists for them, so that cell stays empty
+            // rather than borrowing another category's.
+            { category: 'PWD-Gen', marks: { qualify: 15, tier2: 30 } },
+            { category: 'PWD-EWS', marks: { qualify: 15, tier2: 30 } },
+            { category: 'PWD-OBC', marks: { qualify: 15, tier2: 30 } },
+            { category: 'PWD-SC', marks: { qualify: 15, tier2: 30 } },
+            { category: 'PWD-ST', marks: { qualify: 15, tier2: 30 } },
         ],
     },
 ];

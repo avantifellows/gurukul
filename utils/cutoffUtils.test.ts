@@ -25,6 +25,33 @@ describe('normalizeCutoffCategory', () => {
         expect(normalizeCutoffCategory('St')).toBe('ST');
     });
 
+    it('keeps PWD categories distinct from their base category', () => {
+        // ~23k enrolled students carry PWD as a prefix. Folding PWD-Gen into
+        // Open would show a bar of 99 where theirs is 15.
+        expect(normalizeCutoffCategory('PWD-Gen')).toBe('PWD-Gen');
+        expect(normalizeCutoffCategory('PWD-General')).toBe('PWD-Gen');
+        expect(normalizeCutoffCategory('pwd-obc')).toBe('PWD-OBC');
+        expect(normalizeCutoffCategory('PWD_SC')).toBe('PWD-SC');
+        expect(normalizeCutoffCategory('PWD-ST')).toBe('PWD-ST');
+        expect(normalizeCutoffCategory('PWD-EWS')).toBe('PWD-EWS');
+    });
+
+    it('gives a PWD student their own bar, not the base category\u2019s', () => {
+        const pwd = findCutoffRow(jeeMains, 'PWD-Gen')!;
+        const open = findCutoffRow(jeeMains, 'Open')!;
+
+        expect(pwd.marks.qualify).toBe(15);
+        expect(open.marks.qualify).toBe(99);
+
+        // A PWD-Gen student on 40 has cleared both their bars; read as Open
+        // they would be told they are 59 marks short of qualifying.
+        const statement = buildCutoffStatement(jeeMains, pwd, 40)!;
+        expect(statement.reachedIndex).toBe(1);
+        expect(statement.headline).toContain('getting into an NIT');
+        // No Tier 1 figure exists for PWD, so nothing is invented to aim at.
+        expect(statement.nextTarget).toBeNull();
+    });
+
     it('treats an unknown or missing category as nothing to personalise with', () => {
         expect(normalizeCutoffCategory(null)).toBeNull();
         expect(normalizeCutoffCategory(undefined)).toBeNull();
@@ -114,19 +141,29 @@ describe('buildCutoffStatement', () => {
 });
 
 describe('examsForStudent', () => {
-    const neet: ExamCutoffs = { ...jeeMains, id: 'neet', name: 'NEET', shortName: 'NEET', streams: ['pcb'] };
-    const common: ExamCutoffs = { ...jeeMains, id: 'cuet', name: 'CUET', shortName: 'CUET', streams: undefined };
+    const neet: ExamCutoffs = { ...jeeMains, id: 'neet', name: 'NEET', shortName: 'NEET', studentStreams: ['pcb'] };
+    const common: ExamCutoffs = { ...jeeMains, id: 'cuet', name: 'CUET', shortName: 'CUET', studentStreams: undefined };
 
     it('offers a stream its own exams, plus the ones open to everyone', () => {
-        expect(examsForStudent([jeeMains, neet, common], 'PCM').map((exam) => exam.id))
+        expect(examsForStudent([jeeMains, neet, common], 'pcm').map((exam) => exam.id))
             .toEqual(['jee-main', 'cuet']);
         expect(examsForStudent([jeeMains, neet, common], 'pcb').map((exam) => exam.id))
             .toEqual(['neet', 'cuet']);
     });
 
-    it('offers everything when the record has no stream', () => {
-        expect(examsForStudent([jeeMains, neet], null)).toHaveLength(2);
-        expect(examsForStudent([jeeMains, neet], '  ')).toHaveLength(2);
+    it('offers nothing when the record has no stream', () => {
+        // A blank stream is the second most common value in the student table,
+        // and CLAT / CA / NDA / foundation students sit inside it. Falling back
+        // to every exam handed all of them the JEE Mains ladder.
+        expect(examsForStudent([jeeMains, neet], null)).toEqual([]);
+        expect(examsForStudent([jeeMains, neet], '  ')).toEqual([]);
+        expect(examsForStudent([jeeMains, neet], undefined)).toEqual([]);
+    });
+
+    it('offers the engineering bar to the stream spellings records actually use', () => {
+        for (const stream of ['engineering', 'Engg', 'PCM', 'pcmb']) {
+            expect(examsForStudent([jeeMains], stream).map((e) => e.id)).toEqual(['jee-main']);
+        }
     });
 
     it('offers nothing when the stream matches no exam', () => {
@@ -204,6 +241,34 @@ describe('findLatestScore', () => {
                 jeeMains
             )
         ).toBeNull();
+    });
+
+    it('rejects a paper whose course names another exam', () => {
+        // v2 docs exist where stream and course disagree; the reports service's
+        // own NEET template checks either one.
+        expect(
+            findLatestScore([report({ course: 'NEET' })], jeeMains)
+        ).toBeNull();
+        expect(findLatestScore([report({ course: 'JEE Mains' })], jeeMains)).not.toBeNull();
+        // No course stated: the stream gate still carries it.
+        expect(findLatestScore([report({ course: '' })], jeeMains)).not.toBeNull();
+    });
+
+    it('reads the ladder by marks, not by the order the config lists them', () => {
+        // Tier 1 sits below Tier 2 here — the kind of slip a hand-maintained
+        // table invites, and the Tier 1 figures are still unconfirmed.
+        const scrambled = { category: 'Open' as const, marks: { qualify: 99, tier2: 129, tier1: 120 } };
+
+        // At 125 the student has cleared 99 and 120 but not 129, and is aimed
+        // at the 129 bar — not told they have passed it.
+        const below = buildCutoffStatement(jeeMains, scrambled, 125)!;
+        expect(jeeMains.targets[below.reachedIndex].key).toBe('tier1');
+        expect(below.nextTarget).toBe('Your next target: 4 more marks for NIT Admission.');
+
+        // At 130 every bar is cleared, and the highest one is the 129.
+        const above = buildCutoffStatement(jeeMains, scrambled, 130)!;
+        expect(jeeMains.targets[above.reachedIndex].key).toBe('tier2');
+        expect(above.nextTarget).toBeNull();
     });
 
     it('skips a report that does not say which exam it was', () => {

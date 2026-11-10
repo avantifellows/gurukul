@@ -330,7 +330,20 @@ export interface BottomNavigationBarProps {
  * Student records carry free text ("General", "OBC", "obc-ncl"), so it is
  * normalised onto this set before anything is matched against it.
  */
-export type CutoffCategory = 'Open' | 'EWS' | 'OBC-NCL' | 'SC' | 'ST';
+export type CutoffCategory =
+  | 'Open'
+  | 'EWS'
+  | 'OBC-NCL'
+  | 'SC'
+  | 'ST'
+  // PWD is a prefix on the base category in student records, not a category of
+  // its own, and it carries its own much lower cutoffs — so each one is a row
+  // here rather than an alias onto the base category.
+  | 'PWD-Gen'
+  | 'PWD-EWS'
+  | 'PWD-OBC'
+  | 'PWD-SC'
+  | 'PWD-ST';
 
 /**
  * One rung of the ladder an exam's cutoffs describe, in ascending order of
@@ -385,9 +398,18 @@ export interface ExamCutoffs {
   // service spells them. A part test covers part of the syllabus, so its score
   // says nothing about a full-length cutoff and it is left out.
   fullLengthFormats: string[];
-  // Student streams this exam applies to, lower-cased. Omit to offer the exam
-  // to every student, whatever their record says.
-  streams?: string[];
+  // Two different vocabularies, so two fields. Student records spell the stream
+  // one way ("pcm", "pcmb", "engineering") and reports another ("engineering",
+  // "medical"); one list serving both only works by luck.
+  //
+  // Which students are offered this exam at all. Omit to offer it to everyone.
+  studentStreams?: string[];
+  // Which papers may be scored against it. Omit to accept any paper's stream.
+  reportStreams?: string[];
+  // Exam names a paper may carry, as the reports service spells `course`. A
+  // report naming a different course is rejected even if its stream looks
+  // right. Omit to skip the check.
+  courses?: string[];
   // Ascending by marks: the screen reads them as steps up a ladder.
   targets: CutoffTarget[];
   cutoffs: CutoffRow[];

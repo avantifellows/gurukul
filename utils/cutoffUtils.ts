@@ -7,7 +7,10 @@ import {
     Report,
 } from '../app/types';
 
-export const CUTOFF_CATEGORIES: CutoffCategory[] = ['Open', 'EWS', 'OBC-NCL', 'SC', 'ST'];
+export const CUTOFF_CATEGORIES: CutoffCategory[] = [
+    'Open', 'EWS', 'OBC-NCL', 'SC', 'ST',
+    'PWD-Gen', 'PWD-EWS', 'PWD-OBC', 'PWD-SC', 'PWD-ST',
+];
 
 // Student records carry free text typed by whoever onboarded the batch, so the
 // same category arrives spelled several ways. Anything not listed here is read
@@ -28,6 +31,23 @@ const CATEGORY_ALIASES: Record<string, CutoffCategory> = {
     'obc(ncl)': 'OBC-NCL',
     'sc': 'SC',
     'st': 'ST',
+    // PWD records carry the disability as a prefix on the base category. These
+    // must never be folded into the base category: a PWD-Gen student's bar is
+    // 15 marks where Open's is 99, so reading them as Open would tell someone
+    // they are 84 marks short of something they cleared long ago.
+    'pwd-gen': 'PWD-Gen',
+    'pwd-general': 'PWD-Gen',
+    'pwd gen': 'PWD-Gen',
+    'pwd general': 'PWD-Gen',
+    'pwd-ews': 'PWD-EWS',
+    'pwd ews': 'PWD-EWS',
+    'pwd-obc': 'PWD-OBC',
+    'pwd obc': 'PWD-OBC',
+    'pwd-obc-ncl': 'PWD-OBC',
+    'pwd-sc': 'PWD-SC',
+    'pwd sc': 'PWD-SC',
+    'pwd-st': 'PWD-ST',
+    'pwd st': 'PWD-ST',
 };
 
 /**
@@ -53,19 +73,25 @@ export const findCutoffRow = (
 /**
  * The exams a student should be offered, in config order.
  *
- * An exam with no `streams` applies to everyone. Otherwise it applies only to
- * the streams it names: a medical student is not offered JEE Mains cutoffs just
- * because that is the only exam configured — the screen says nothing instead.
- * A record with no stream at all is the one case that falls back to every
- * exam, since there is nothing to filter on.
+ * An exam with no `studentStreams` applies to everyone. Otherwise it applies
+ * only to the streams it names.
+ *
+ * A record with no stream at all is offered nothing. This used to fall back to
+ * every exam so a missing field would not leave the screen empty, which had it
+ * exactly backwards: a blank stream is the second most common value in the
+ * student table, and the students inside it sit CLAT, CA, NDA and foundation
+ * courses. Falling back handed all of them the JEE Mains ladder as if it were
+ * theirs. An empty screen is the honest answer to "we do not know".
  */
 export const examsForStudent = (
     exams: ExamCutoffs[],
     stream?: string | null
 ): ExamCutoffs[] => {
     const normalized = stream?.trim().toLowerCase();
-    if (!normalized) return exams;
-    return exams.filter((exam) => !exam.streams || exam.streams.includes(normalized));
+    if (!normalized) return [];
+    return exams.filter(
+        (exam) => !exam.studentStreams || exam.studentStreams.includes(normalized)
+    );
 };
 
 /**
@@ -89,11 +115,17 @@ export const buildCutoffStatement = (
     // rather than go quiet.
     const ladder = exam.targets
         .map((target, index) => ({ target, index, mark: row.marks[target.key] }))
-        .filter((rung) => typeof rung.mark === 'number' && Number.isFinite(rung.mark));
+        .filter((rung) => typeof rung.mark === 'number' && Number.isFinite(rung.mark))
+        // Ordered by mark, not by how the config happens to list them. Targets
+        // are meant to ascend, but these are hand-maintained numbers: one row
+        // out of order would otherwise both promote a student past a bar they
+        // are under and point them at a "next" target below where they stand.
+        .sort((a, b) => a.mark - b.mark);
 
     if (ladder.length === 0) return null;
 
-    // Highest rung whose mark the student has met.
+    // Highest rung whose mark the student has met. Safe to read as the last
+    // match now that the ladder is sorted by mark.
     let reachedRung = -1;
     for (let position = 0; position < ladder.length; position += 1) {
         if (marks >= ladder[position].mark) reachedRung = position;
@@ -171,12 +203,21 @@ export const findLatestScore = (
             const marks = toFiniteNumber(report.marks_scored);
             if (marks === null) return null;
 
-            // Exams that name their streams only accept papers from them. An
-            // exam with no streams configured applies to everyone, so there is
-            // nothing to check it against.
-            if (exam.streams) {
+            // Exams that name their report streams only accept papers from
+            // them, and a paper that does not say which exam it was is skipped
+            // rather than assumed to be this one.
+            if (exam.reportStreams) {
                 const stream = report.stream?.trim().toLowerCase();
-                if (!stream || !exam.streams.includes(stream)) return null;
+                if (!stream || !exam.reportStreams.includes(stream)) return null;
+            }
+
+            // v2 documents exist where the stream and the course disagree —
+            // the reports service's own NEET template checks either one — so a
+            // paper naming another exam is rejected even when its stream looks
+            // right. Only checked when the report states a course.
+            if (exam.courses) {
+                const course = report.course?.trim();
+                if (course && !exam.courses.includes(course)) return null;
             }
 
             const totalMarks = toFiniteNumber(report.max_marks_possible);

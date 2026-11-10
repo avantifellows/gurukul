@@ -153,7 +153,7 @@ export default function CutoffsPage() {
                     {/* Score and statement are one block: the number, the test it
                         came from and what it means read straight down. Hidden
                         entirely until the reports API carries marks. */}
-                    {latestScore && statement && (
+                    {latestScore && (
                         <section className={`${CARD} lg:col-start-1 lg:row-start-1`}>
                             <p className={CARD_LABEL}>Your latest score</p>
                             <p className="flex items-baseline gap-2 mt-1.5">
@@ -166,17 +166,22 @@ export default function CutoffsPage() {
                                 {latestScore.testName}
                                 {latestScore.startDate ? ` · ${formatDate(latestScore.startDate)}` : ""}
                             </p>
-                            <div className="bg-primary-soft rounded-b-[11px] -mx-3.5 -mb-3.5 mt-3.5 p-3.5 text-center">
-                                <p className="text-[14.5px] font-semibold text-ink leading-snug">
-                                    {statement.headline}
-                                </p>
-                                {statement.nextTarget && (
-                                    <p className="text-[15.5px] font-bold text-ink leading-snug mt-2.5 pt-2.5 border-t border-ink/10">
-                                        {statement.nextTarget}
+                            {/* The marks need no category; only the sentence
+                                about them does. A student whose record has no
+                                category still sees what they scored. */}
+                            {statement && (
+                                <div className="bg-primary-soft rounded-b-[11px] -mx-3.5 -mb-3.5 mt-3.5 p-3.5 text-center">
+                                    <p className="text-[14.5px] font-semibold text-ink leading-snug">
+                                        {statement.headline}
                                     </p>
-                                )}
-                                <p className="text-[11.5px] text-slate-500 mt-2">{exam.sourceNote}</p>
-                            </div>
+                                    {statement.nextTarget && (
+                                        <p className="text-[15.5px] font-bold text-ink leading-snug mt-2.5 pt-2.5 border-t border-ink/10">
+                                            {statement.nextTarget}
+                                        </p>
+                                    )}
+                                    <p className="text-[11.5px] text-slate-500 mt-2">{exam.sourceNote}</p>
+                                </div>
+                            )}
                         </section>
                     )}
 
