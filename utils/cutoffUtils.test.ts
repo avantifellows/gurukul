@@ -48,7 +48,7 @@ describe('buildCutoffStatement', () => {
         const statement = buildCutoffStatement(jeeMains, openRow, 64)!;
 
         expect(statement.reachedIndex).toBe(-1);
-        expect(statement.headline).toBe('You are just 16 marks away from qualifying JEE Mains!');
+        expect(statement.headline).toBe('You are just 35 marks away from qualifying JEE Mains!');
         expect(statement.nextTarget).toBeNull();
     });
 
@@ -78,7 +78,7 @@ describe('buildCutoffStatement', () => {
     });
 
     it('treats a mark exactly on a target as reached', () => {
-        expect(buildCutoffStatement(jeeMains, openRow, 80)!.reachedIndex).toBe(0);
+        expect(buildCutoffStatement(jeeMains, openRow, 99)!.reachedIndex).toBe(0);
         expect(buildCutoffStatement(jeeMains, openRow, 201)!.reachedIndex).toBe(2);
     });
 

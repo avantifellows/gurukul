@@ -11,13 +11,21 @@ import { ExamCutoffs } from "@/app/types";
  * Wording note: the internal M1a / M1b / M2 labels never appear here. Students
  * read three named targets instead, in the order they would reach them.
  *
- * ┌──────────────────────────────────────────────────────────────────────────┐
- * │ PENDING: every mark in the `qualify` column below is a placeholder. The  │
- * │ tier marks are Amogh's M1a / M1b figures; the qualifying marks were put  │
- * │ in only so the statement had something to count against. Replace them    │
- * │ with the real JEE Mains qualifying cutoffs before this is switched on    │
- * │ for a group.                                                             │
- * └──────────────────────────────────────────────────────────────────────────┘
+ * Where the marks come from, column by column:
+ *
+ * - `qualify` and `tier2` are Avanti's own internal test cutoffs, read from
+ *   BigQuery `production_dbt_final.dim_test_cutoffs` for academic year
+ *   2026-2027, exam JEE Mains, stream engineering. `qualify` is the M2 bar and
+ *   `tier2` is the M1 bar — the same table `fact_student_test_results_overall`
+ *   uses to assign a student their academic level, so the screen and the
+ *   reports measure against the same marks. That table is hand-maintained and
+ *   re-set each academic year: when 2027-2028 lands, these need re-reading.
+ *
+ * - `tier1` is Amogh's M1a figure and has no source in the warehouse. The NTA
+ *   bands in `dim_nta_cutoffs` do carry M1a, but for JEE Mains they are
+ *   percentiles from 2019 onwards (Gen M1a is the 98.89th percentile), not
+ *   marks out of 300. These five numbers are a marks conversion of that band
+ *   that only Amogh has. Confirm them with him before this ships.
  */
 const cutoffConfig: ExamCutoffs[] = [
     {
@@ -25,9 +33,9 @@ const cutoffConfig: ExamCutoffs[] = [
         name: 'JEE Mains',
         shortName: 'JEE Mains',
         maxMarks: 300,
-        cycleLabel: '2026 cycle',
+        cycleLabel: '2026-27',
         sourceNote: "Based on last year's JoSAA cutoffs.",
-        tableNote: "Marks out of 300, from last year's JoSAA cutoffs.",
+        tableNote: 'Marks out of 300, from this year’s cutoffs.',
         // The formats Gurukul already groups practice tests by, minus
         // part_test: a part test covers part of the syllabus, so 171 on one is
         // not 171 on a JEE Mains paper.
@@ -64,11 +72,13 @@ const cutoffConfig: ExamCutoffs[] = [
             },
         ],
         cutoffs: [
-            { category: 'Open', marks: { qualify: 80, tier2: 129, tier1: 201 } },
-            { category: 'EWS', marks: { qualify: 68, tier2: 129, tier1: 194 } },
-            { category: 'OBC-NCL', marks: { qualify: 68, tier2: 125, tier1: 184 } },
-            { category: 'SC', marks: { qualify: 52, tier2: 88, tier1: 138 } },
-            { category: 'ST', marks: { qualify: 42, tier2: 77, tier1: 122 } },
+            // qualify = M2, tier2 = M1, both for 2026-2027 (warehouse categories
+            // Gen / Gen-EWS / OBC map onto Open / EWS / OBC-NCL here).
+            { category: 'Open', marks: { qualify: 99, tier2: 129, tier1: 201 } },
+            { category: 'EWS', marks: { qualify: 66, tier2: 129, tier1: 194 } },
+            { category: 'OBC-NCL', marks: { qualify: 63, tier2: 125, tier1: 184 } },
+            { category: 'SC', marks: { qualify: 40, tier2: 88, tier1: 138 } },
+            { category: 'ST', marks: { qualify: 30, tier2: 77, tier1: 122 } },
         ],
     },
 ];
