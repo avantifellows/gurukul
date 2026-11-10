@@ -77,6 +77,9 @@ export function getPageHeading(pathname: string, homeLabel: string) {
   if (pathname.startsWith("/reports")) {
     return { title: "Test Reports", subtitle: "Your past attempts and analysis" };
   }
+  if (pathname.startsWith("/cutoffs")) {
+    return { title: "Exam Cutoffs", subtitle: "Where your score stands" };
+  }
   if (pathname.startsWith("/library")) {
     return { title: "Library", subtitle: "Courses, chapters and recordings" };
   }
