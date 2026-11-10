@@ -61,6 +61,11 @@ const cutoffConfig: ExamCutoffs[] = [
                 key: 'tier2',
                 columnLabel: 'Tier 2',
                 name: 'NIT Tier 2 colleges',
+                // PENDING: this wording is wrong and must not ship as is.
+                // Vishal confirmed the Tier 1 definition but said Tier 2 was
+                // not derived from the top 3 branches — a different branch list
+                // was used, which he still has to send. The marks are right;
+                // only this sentence is wrong. Replace it before release.
                 description: 'A top-3 branch at one of the five lowest NIRF-ranked NITs — Raipur, Hamirpur, Puducherry, Meghalaya, Kurukshetra.',
                 reachedHeadline: 'Good job! You are on track to qualifying JEE Mains and getting into an NIT!',
                 nextTargetLabel: 'NIT Admission',
@@ -87,15 +92,12 @@ const cutoffConfig: ExamCutoffs[] = [
             { category: 'SC', marks: { qualify: 40, tier2: 88, tier1: 138 } },
             { category: 'ST', marks: { qualify: 30, tier2: 77, tier1: 122 } },
             // PWD students have their own, far lower bars — 15 and 30 against
-            // Open's 99 and 129 — so they get their own rows rather than being
-            // read as their base category. ~23k enrolled students are in these
-            // five. No Tier 1 figure exists for them, so that cell stays empty
-            // rather than borrowing another category's.
-            { category: 'PWD-Gen', marks: { qualify: 15, tier2: 30 } },
-            { category: 'PWD-EWS', marks: { qualify: 15, tier2: 30 } },
-            { category: 'PWD-OBC', marks: { qualify: 15, tier2: 30 } },
-            { category: 'PWD-SC', marks: { qualify: 15, tier2: 30 } },
-            { category: 'PWD-ST', marks: { qualify: 15, tier2: 30 } },
+            // Open's 99 and 129 — so they are never read as their base
+            // category. All five PWD categories publish identical marks, so
+            // ~23k enrolled students share this one row instead of five
+            // repeating rows on a phone. No Tier 1 figure exists for them, so
+            // that cell stays empty rather than borrowing another row's.
+            { category: 'PWD', marks: { qualify: 15, tier2: 30 } },
         ],
     },
 ];

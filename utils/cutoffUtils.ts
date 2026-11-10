@@ -8,8 +8,7 @@ import {
 } from '../app/types';
 
 export const CUTOFF_CATEGORIES: CutoffCategory[] = [
-    'Open', 'EWS', 'OBC-NCL', 'SC', 'ST',
-    'PWD-Gen', 'PWD-EWS', 'PWD-OBC', 'PWD-SC', 'PWD-ST',
+    'Open', 'EWS', 'OBC-NCL', 'SC', 'ST', 'PWD',
 ];
 
 // Student records carry free text typed by whoever onboarded the batch, so the
@@ -32,22 +31,27 @@ const CATEGORY_ALIASES: Record<string, CutoffCategory> = {
     'sc': 'SC',
     'st': 'ST',
     // PWD records carry the disability as a prefix on the base category. These
-    // must never be folded into the base category: a PWD-Gen student's bar is
-    // 15 marks where Open's is 99, so reading them as Open would tell someone
+    // must never be folded into the base category: a PWD student's bar is 15
+    // marks where Open's is 99, so reading them as Open would tell someone
     // they are 84 marks short of something they cleared long ago.
-    'pwd-gen': 'PWD-Gen',
-    'pwd-general': 'PWD-Gen',
-    'pwd gen': 'PWD-Gen',
-    'pwd general': 'PWD-Gen',
-    'pwd-ews': 'PWD-EWS',
-    'pwd ews': 'PWD-EWS',
-    'pwd-obc': 'PWD-OBC',
-    'pwd obc': 'PWD-OBC',
-    'pwd-obc-ncl': 'PWD-OBC',
-    'pwd-sc': 'PWD-SC',
-    'pwd sc': 'PWD-SC',
-    'pwd-st': 'PWD-ST',
-    'pwd st': 'PWD-ST',
+    //
+    // All five PWD categories publish the same marks, so they share one row —
+    // which is also why the row is labelled "PWD" and not "Gen-PWD": a PWD-SC
+    // student has to be able to see that the row is theirs.
+    'pwd': 'PWD',
+    'pwd-gen': 'PWD',
+    'pwd-general': 'PWD',
+    'pwd gen': 'PWD',
+    'pwd general': 'PWD',
+    'pwd-ews': 'PWD',
+    'pwd ews': 'PWD',
+    'pwd-obc': 'PWD',
+    'pwd obc': 'PWD',
+    'pwd-obc-ncl': 'PWD',
+    'pwd-sc': 'PWD',
+    'pwd sc': 'PWD',
+    'pwd-st': 'PWD',
+    'pwd st': 'PWD',
 };
 
 /**

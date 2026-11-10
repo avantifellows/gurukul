@@ -336,14 +336,12 @@ export type CutoffCategory =
   | 'OBC-NCL'
   | 'SC'
   | 'ST'
-  // PWD is a prefix on the base category in student records, not a category of
-  // its own, and it carries its own much lower cutoffs — so each one is a row
-  // here rather than an alias onto the base category.
-  | 'PWD-Gen'
-  | 'PWD-EWS'
-  | 'PWD-OBC'
-  | 'PWD-SC'
-  | 'PWD-ST';
+  // PWD is a prefix on the base category in student records, never a category
+  // on its own, and it carries far lower cutoffs than the base — so it is its
+  // own row and is never folded into the base category. All five PWD
+  // categories publish identical marks, so they share one row rather than
+  // repeating the same numbers five times on a phone.
+  | 'PWD';
 
 /**
  * One rung of the ladder an exam's cutoffs describe, in ascending order of

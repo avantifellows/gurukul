@@ -28,16 +28,17 @@ describe('normalizeCutoffCategory', () => {
     it('keeps PWD categories distinct from their base category', () => {
         // ~23k enrolled students carry PWD as a prefix. Folding PWD-Gen into
         // Open would show a bar of 99 where theirs is 15.
-        expect(normalizeCutoffCategory('PWD-Gen')).toBe('PWD-Gen');
-        expect(normalizeCutoffCategory('PWD-General')).toBe('PWD-Gen');
-        expect(normalizeCutoffCategory('pwd-obc')).toBe('PWD-OBC');
-        expect(normalizeCutoffCategory('PWD_SC')).toBe('PWD-SC');
-        expect(normalizeCutoffCategory('PWD-ST')).toBe('PWD-ST');
-        expect(normalizeCutoffCategory('PWD-EWS')).toBe('PWD-EWS');
+        // All five land on one row, which carries the marks all five share.
+        expect(normalizeCutoffCategory('PWD-Gen')).toBe('PWD');
+        expect(normalizeCutoffCategory('PWD-General')).toBe('PWD');
+        expect(normalizeCutoffCategory('pwd-obc')).toBe('PWD');
+        expect(normalizeCutoffCategory('PWD_SC')).toBe('PWD');
+        expect(normalizeCutoffCategory('PWD-ST')).toBe('PWD');
+        expect(normalizeCutoffCategory('PWD-EWS')).toBe('PWD');
     });
 
     it('gives a PWD student their own bar, not the base category\u2019s', () => {
-        const pwd = findCutoffRow(jeeMains, 'PWD-Gen')!;
+        const pwd = findCutoffRow(jeeMains, 'PWD')!;
         const open = findCutoffRow(jeeMains, 'Open')!;
 
         expect(pwd.marks.qualify).toBe(15);
@@ -56,7 +57,7 @@ describe('normalizeCutoffCategory', () => {
         expect(normalizeCutoffCategory(null)).toBeNull();
         expect(normalizeCutoffCategory(undefined)).toBeNull();
         expect(normalizeCutoffCategory('')).toBeNull();
-        expect(normalizeCutoffCategory('PwD')).toBeNull();
+        expect(normalizeCutoffCategory('Minority')).toBeNull();
     });
 });
 
