@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { buildReportLink, normalizeChapterPriority, resolveChapterPriority } from './resourceUtils';
+import {
+    buildReportLink,
+    filterResourcesByPlayer,
+    normalizeChapterPriority,
+    resolveChapterPriority,
+} from './resourceUtils';
+import type { Resource } from '@/app/types';
 
 describe('buildReportLink', () => {
     it('routes the report link through the report-launch API, encoded', () => {
@@ -56,5 +62,83 @@ describe('resolveChapterPriority', () => {
         expect(resolveChapterPriority(undefined, 1)).toBeNull();
         expect(resolveChapterPriority(curriculums, undefined)).toBeNull();
         expect(resolveChapterPriority(curriculums, null)).toBeNull();
+    });
+});
+
+describe('filterResourcesByPlayer', () => {
+    const QUIZ = 'https://quiz.avantifellows.org/quiz/abc';
+    const SASHAKT = 'https://assessment.sashakt.in/test/xyz';
+
+    const quiz = (over: Partial<Resource>): Resource =>
+        ({
+            id: 1,
+            name: [{ lang_code: 'en', resource: 'Motion in Two Dimension' }],
+            chapter_id: 11,
+            type: 'quiz',
+            subtype: 'Assessment',
+            link: QUIZ,
+            ...over,
+        }) as Resource;
+
+    const links = (rows: Resource[]) => rows.map((row) => row.link);
+
+    const bothFlavours = [
+        quiz({ id: 1, link: QUIZ }),
+        quiz({ id: 2, link: SASHAKT }),
+    ];
+
+    it('sends a Sashakt group to the Sashakt copy', () => {
+        expect(links(filterResourcesByPlayer(bothFlavours, 'HimachalStudents'))).toEqual([SASHAKT]);
+    });
+
+    it('sends every listed group to Sashakt', () => {
+        const groups = [
+            'AllIndiaStudents', 'DelhiStudents', 'DishaStudents', 'GujaratStudents',
+            'HaryanaStudents', 'HimachalStudents', 'MaharashtraStudents',
+            'OLFStudents', 'PunjabStudents', 'UttarakhandStudents',
+        ];
+        groups.forEach((group) => {
+            expect(links(filterResourcesByPlayer(bothFlavours, group))).toEqual([SASHAKT]);
+        });
+    });
+
+    it('leaves every other group on the quiz engine', () => {
+        ['EnableStudents', 'ChhattisgarhStudents', 'EMRSStudents'].forEach((group) => {
+            expect(links(filterResourcesByPlayer(bothFlavours, group))).toEqual([QUIZ]);
+        });
+    });
+
+    it('falls back to the quiz engine with no group', () => {
+        expect(links(filterResourcesByPlayer(bothFlavours, undefined))).toEqual([QUIZ]);
+        expect(links(filterResourcesByPlayer(bothFlavours, null))).toEqual([QUIZ]);
+    });
+
+    // The whole point of the counterpart check: a chapter that exists in only
+    // one player must stay visible, or a Sashakt group loses every test that
+    // was never twinned.
+    it('keeps a lone copy whichever flavour it is', () => {
+        const onlyQuiz = [quiz({ id: 1, link: QUIZ })];
+        expect(links(filterResourcesByPlayer(onlyQuiz, 'HimachalStudents'))).toEqual([QUIZ]);
+
+        const onlySashakt = [quiz({ id: 2, link: SASHAKT })];
+        expect(links(filterResourcesByPlayer(onlySashakt, 'EnableStudents'))).toEqual([SASHAKT]);
+    });
+
+    it('pairs on chapter and name, so a different chapter is not a counterpart', () => {
+        const rows = [
+            quiz({ id: 1, chapter_id: 11, link: QUIZ }),
+            quiz({ id: 2, chapter_id: 12, link: SASHAKT }),
+        ];
+        expect(filterResourcesByPlayer(rows, 'HimachalStudents')).toHaveLength(2);
+    });
+
+    it('leaves non-quiz resources untouched', () => {
+        const rows = [
+            quiz({ id: 1, link: QUIZ }),
+            quiz({ id: 2, link: SASHAKT }),
+            quiz({ id: 3, type: 'document', link: 'https://drive.example/notes' }),
+        ];
+        const kept = filterResourcesByPlayer(rows, 'HimachalStudents');
+        expect(links(kept)).toEqual([SASHAKT, 'https://drive.example/notes']);
     });
 });

@@ -89,7 +89,24 @@ export const resolveChapterPriority = (
  * engine. A chapter whose test has been twinned carries one row per player, so
  * without this every student would see the same practice test listed twice.
  */
-const SASHAKT_GROUPS = new Set(['OLFStudents']);
+// The groups whose students get the Sashakt rendering of a practice test when
+// both players carry it. Everyone else stays on the quiz engine. Names are the
+// identity.group value from the login token, not a display label.
+//
+// HaryanaStudents has not logged in since July 2026; it is listed so that the
+// group lands on Sashakt if it comes back, rather than being missed later.
+const SASHAKT_GROUPS = new Set([
+    'AllIndiaStudents',
+    'DelhiStudents',
+    'DishaStudents',
+    'GujaratStudents',
+    'HaryanaStudents',
+    'HimachalStudents',
+    'MaharashtraStudents',
+    'OLFStudents',
+    'PunjabStudents',
+    'UttarakhandStudents',
+]);
 
 const isSashaktLink = (link?: string): boolean => {
     if (!link) return false;
