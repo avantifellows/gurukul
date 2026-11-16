@@ -246,6 +246,22 @@ const groupConfig: GroupConfigurations = {
         displayLabel: 'Tamil Nadu (Teachers)',
         region: 'Other States',
     },
+    OLFStudents: {
+        // OLF students reach their practice tests through the Library rather
+        // than scheduled sessions: the group carries no group_session rows, so
+        // the live-class and test sections would always render empty.
+        showLiveClasses: false,
+        showTests: false,
+        showForms: false,
+        showPracticeTests: true,
+        showHomework: false,
+        showContentLibrary: true,
+        showClassLibrary: false,
+        homeTabLabel: 'Library',
+        showHomeTab: false,
+        displayLabel: 'OLF Students',
+        region: 'Other States',
+    },
     EMRSStudents: {
         showLiveClasses: false,
         showTests: true,

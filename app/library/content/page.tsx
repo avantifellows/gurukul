@@ -19,7 +19,7 @@ import { MixpanelTracking } from '@/services/mixpanel';
 import { MIXPANEL_EVENT } from '@/constants/config';
 import { Listbox } from '@headlessui/react';
 import { IoIosArrowDown as DropdownArrow } from 'react-icons/io';
-import { getResourceName, getChapterName, getTopicName, buildResourceLink } from '@/utils/resourceUtils';
+import { getResourceName, getChapterName, getTopicName, buildResourceLink, filterResourcesByPlayer } from '@/utils/resourceUtils';
 import { useAuth } from '@/services/AuthContext';
 
 // Helper to get icon, prefix, and color for a resource
@@ -86,7 +86,7 @@ const ContentLibrary = () => {
     const jeeSubjects = ['Physics', 'Chemistry', 'Maths'];
     const caSubjects = ['Accounting', 'Business Economics', 'Quantitative Aptitude', 'Business Laws'];
     const clatSubjects = ['English', 'Logical Reasoning', 'Legal Reasoning', 'Quantitative Techniques', 'Current Affairs'];
-    const { userId } = useAuth();
+    const { userId, group } = useAuth();
 
     // Get grade options based on selected course
     const getGradeOptions = () => {
@@ -426,7 +426,7 @@ const ContentLibrary = () => {
                                             ) : (
                                                 <ul className="lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-x-8">
                                                     {/* Render modules for the chapter */}
-                                                    {[...chapterResources].sort((a, b) => {
+                                                    {filterResourcesByPlayer([...chapterResources], group).sort((a, b) => {
                                                         // Modules first
                                                         if (a.type === 'document' && a.subtype === 'Module') return -1;
                                                         if (b.type === 'document' && b.subtype === 'Module') return 1;
@@ -449,9 +449,12 @@ const ContentLibrary = () => {
                                                         topics
                                                             .filter((topic) => topic.chapter_id === chapter.id)
                                                             .map((topic) => {
-                                                                const videos = resources.filter(
-                                                                    (resource) => resource.topic_id === topic.id &&
-                                                                        resource.link
+                                                                const videos = filterResourcesByPlayer(
+                                                                    resources.filter(
+                                                                        (resource) => resource.topic_id === topic.id &&
+                                                                            resource.link
+                                                                    ),
+                                                                    group
                                                                 );
 
                                                                 // Only render topic card if it has resources

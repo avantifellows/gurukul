@@ -85,6 +85,65 @@ export const resolveChapterPriority = (
 };
 
 /**
+ * Groups that sit their practice tests in Sashakt rather than the Avanti quiz
+ * engine. A chapter whose test has been twinned carries one row per player, so
+ * without this every student would see the same practice test listed twice.
+ */
+const SASHAKT_GROUPS = new Set(['OLFStudents']);
+
+const isSashaktLink = (link?: string): boolean => {
+    if (!link) return false;
+    const sashaktUrl =
+        process.env.NEXT_PUBLIC_AF_SASHAKT_URL || 'https://assessment.sashakt.in';
+    return link.startsWith(sashaktUrl);
+};
+
+/**
+ * Keep one player's copy of each twinned practice test.
+ *
+ * The same test can exist as two active rows -- one quiz-engine link, one
+ * Sashakt link -- because Gurukul chooses the player from the link itself.
+ * Both rows are legitimate and both are active, so the Library has to pick:
+ * Sashakt for the groups piloting it, the quiz engine for everyone else.
+ *
+ * Rows are matched on name within a chapter, since the twin is published with
+ * the same name as the row it mirrors. A resource with no counterpart is left
+ * alone whichever player it points at, so a chapter that exists only in one
+ * player still shows up.
+ */
+export const filterResourcesByPlayer = (
+    resources: Resource[],
+    group?: string | null
+): Resource[] => {
+    const preferSashakt = !!group && SASHAKT_GROUPS.has(group);
+
+    const counterpart = new Map<string, boolean>();
+    resources.forEach((resource) => {
+        if (resource.type !== 'quiz') return;
+        const key = `${resource.chapter_id ?? ''}::${getResourceName(resource)}`;
+        const seenSashakt = counterpart.get(key) ?? false;
+        counterpart.set(key, seenSashakt || isSashaktLink(resource.link));
+    });
+
+    return resources.filter((resource) => {
+        if (resource.type !== 'quiz') return true;
+        const key = `${resource.chapter_id ?? ''}::${getResourceName(resource)}`;
+        const sashakt = isSashaktLink(resource.link);
+        // Only one flavour present for this test: nothing to choose between.
+        const hasBoth =
+            counterpart.get(key) === true &&
+            resources.some(
+                (other) =>
+                    other.type === 'quiz' &&
+                    `${other.chapter_id ?? ''}::${getResourceName(other)}` === key &&
+                    !isSashaktLink(other.link)
+            );
+        if (!hasBoth) return true;
+        return sashakt === preferSashakt;
+    });
+};
+
+/**
  * Build final link for a resource.
  * Quiz resources go through a Gurukul server route that mints a short-lived
  * quiz launch token from the existing portal auth cookie.
