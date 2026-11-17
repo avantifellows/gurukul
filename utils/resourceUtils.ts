@@ -99,11 +99,14 @@ const SASHAKT_GROUPS = new Set([
     'UttarakhandStudents',
 ]);
 
-const isSashaktLink = (link?: string): boolean => {
-    if (!link) return false;
+// Which player a resource belongs to. The row says so; the link host is only
+// a fallback for rows written before type_params.player existed.
+const isSashaktResource = (resource: Resource): boolean => {
+    const player = resource.type_params?.player;
+    if (player) return player === 'sashakt';
     const sashaktUrl =
         process.env.NEXT_PUBLIC_AF_SASHAKT_URL || 'https://assessment.sashakt.in';
-    return link.startsWith(sashaktUrl);
+    return !!resource.link && resource.link.startsWith(sashaktUrl);
 };
 
 /**
@@ -130,13 +133,13 @@ export const filterResourcesByPlayer = (
         if (resource.type !== 'quiz') return;
         const key = `${resource.chapter_id ?? ''}::${getResourceName(resource)}`;
         const seenSashakt = counterpart.get(key) ?? false;
-        counterpart.set(key, seenSashakt || isSashaktLink(resource.link));
+        counterpart.set(key, seenSashakt || isSashaktResource(resource));
     });
 
     return resources.filter((resource) => {
         if (resource.type !== 'quiz') return true;
         const key = `${resource.chapter_id ?? ''}::${getResourceName(resource)}`;
-        const sashakt = isSashaktLink(resource.link);
+        const sashakt = isSashaktResource(resource);
         // Only one flavour present for this test: nothing to choose between.
         const hasBoth =
             counterpart.get(key) === true &&
@@ -144,7 +147,7 @@ export const filterResourcesByPlayer = (
                 (other) =>
                     other.type === 'quiz' &&
                     `${other.chapter_id ?? ''}::${getResourceName(other)}` === key &&
-                    !isSashaktLink(other.link)
+                    !isSashaktResource(other)
             );
         if (!hasBoth) return true;
         return sashakt === preferSashakt;

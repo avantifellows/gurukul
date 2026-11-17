@@ -132,6 +132,23 @@ describe('filterResourcesByPlayer', () => {
         expect(filterResourcesByPlayer(rows, 'HimachalStudents')).toHaveLength(2);
     });
 
+    // The row states its player, so the filter keeps working if Sashakt ever
+    // moves domain, or a second Avanti-hosted player appears.
+    it('trusts type_params.player over the link host', () => {
+        const rows = [
+            quiz({ id: 1, link: 'https://elsewhere.example/a', type_params: { player: 'quiz' } }),
+            quiz({ id: 2, link: 'https://elsewhere.example/b', type_params: { player: 'sashakt' } }),
+        ];
+        expect(links(filterResourcesByPlayer(rows, 'HimachalStudents')))
+            .toEqual(['https://elsewhere.example/b']);
+        expect(links(filterResourcesByPlayer(rows, 'EnableStudents')))
+            .toEqual(['https://elsewhere.example/a']);
+    });
+
+    it('falls back to the link host when the row has no player', () => {
+        expect(links(filterResourcesByPlayer(bothFlavours, 'HimachalStudents'))).toEqual([SASHAKT]);
+    });
+
     it('leaves non-quiz resources untouched', () => {
         const rows = [
             quiz({ id: 1, link: QUIZ }),

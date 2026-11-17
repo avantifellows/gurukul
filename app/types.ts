@@ -99,9 +99,12 @@ export interface Resource {
   type: string;
   subtype: string;
   type_params: {
-    date: string,
-    resource_type: string;
+    date?: string,
+    resource_type?: string;
     src_link?: string;
+    // Which player serves this resource. Set by the publishers; absent only
+    // on rows that predate them.
+    player?: 'quiz' | 'sashakt';
   },
   source: {
     link: string;
