@@ -21,11 +21,25 @@ import { ExamCutoffs } from "@/app/types";
  *   reports measure against the same marks. That table is hand-maintained and
  *   re-set each academic year: when 2027-2028 lands, these need re-reading.
  *
- * - `tier1` is Amogh's M1a figure and has no source in the warehouse. The NTA
- *   bands in `dim_nta_cutoffs` do carry M1a, but for JEE Mains they are
- *   percentiles from 2019 onwards (Gen M1a is the 98.89th percentile), not
- *   marks out of 300. These five numbers are a marks conversion of that band
- *   that only Amogh has. Confirm them with him before this ships.
+ * - `tier1` is the M1a bar, and it is the one column with no marks source in
+ *   the warehouse. `dim_nta_cutoffs` does carry M1a, but for JEE Mains it is a
+ *   percentile from 2019 onwards (Gen M1a is the 98.89th percentile), not marks
+ *   out of 300. These five are the marks equivalent, which lives only in
+ *   Amogh's own working sheet. He confirmed all five on 16 Nov 2026.
+ *
+ * How the three bars relate, in Amogh's words (16 Nov 2026):
+ *
+ *   M1 external  the old M1 — the lowest rank that got an NIT or IIIT. Still
+ *                used to report projected qualification numbers to donors, and
+ *                deliberately NOT shown here: it is the softest of the three.
+ *   M1b          "M1 internal". Realistic. This is `tier2`, and it is what
+ *                `dim_test_cutoffs` stores as plain `M1`.
+ *   M1a          Aspirational, added so students aim above M1 external. This
+ *                is `tier1`.
+ *
+ * M1a and M1b were added after ops fed back that one bar let students aim too
+ * low. Both came out of a regression of marks against rank on last year's
+ * students, which is why they are stated in marks at all.
  */
 const cutoffConfig: ExamCutoffs[] = [
     {
