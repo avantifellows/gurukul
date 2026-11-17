@@ -247,7 +247,7 @@ const groupConfig: GroupConfigurations = {
         region: 'Other States',
     },
     OLFStudents: {
-        showLiveClasses: false,
+        showLiveClasses: true,
         showTests: true,
         showForms: true,
         showPracticeTests: true,

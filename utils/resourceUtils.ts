@@ -84,17 +84,8 @@ export const resolveChapterPriority = (
     return normalizeChapterPriority(match?.priority_text);
 };
 
-/**
- * Groups that sit their practice tests in Sashakt rather than the Avanti quiz
- * engine. A chapter whose test has been twinned carries one row per player, so
- * without this every student would see the same practice test listed twice.
- */
-// The groups whose students get the Sashakt rendering of a practice test when
-// both players carry it. Everyone else stays on the quiz engine. Names are the
-// identity.group value from the login token, not a display label.
-//
-// HaryanaStudents has not logged in since July 2026; it is listed so that the
-// group lands on Sashakt if it comes back, rather than being missed later.
+// Groups served by Sashakt where a test exists in both players. Names are the
+// login token's identity.group.
 const SASHAKT_GROUPS = new Set([
     'AllIndiaStudents',
     'DelhiStudents',
