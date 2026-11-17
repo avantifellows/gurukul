@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
     buildReportLink,
+    buildResourceLink,
     filterResourcesByPlayer,
     normalizeChapterPriority,
     resolveChapterPriority,
@@ -147,6 +148,36 @@ describe('filterResourcesByPlayer', () => {
 
     it('falls back to the link host when the row has no player', () => {
         expect(links(filterResourcesByPlayer(bothFlavours, 'HimachalStudents'))).toEqual([SASHAKT]);
+    });
+
+    // A row kept as the Sashakt copy must also launch through the Sashakt
+    // route. These two decisions used to be made from different inputs -- the
+    // filter from type_params.player, the link from the URL host -- so a
+    // stamped row on another host was kept and then launched as a quiz.
+    it('routes a kept row through its own player\'s launch route', () => {
+        const row = quiz({
+            id: 2,
+            link: 'https://elsewhere.example/b',
+            type_params: { player: 'sashakt' },
+        });
+        expect(filterResourcesByPlayer([row], 'HimachalStudents')).toHaveLength(1);
+        expect(buildResourceLink(row)).toContain('/api/sashakt-launch');
+
+        const quizRow = quiz({
+            id: 3,
+            link: SASHAKT,
+            type_params: { player: 'quiz' },
+        });
+        expect(buildResourceLink(quizRow)).toContain('/api/quiz-launch');
+    });
+
+    it('pairs twins whose names differ only in case or spacing', () => {
+        const rows = [
+            quiz({ id: 1, link: QUIZ, name: [{ lang_code: 'en', resource: 'Motion in Two Dimension' }] }),
+            quiz({ id: 2, link: SASHAKT, name: [{ lang_code: 'en', resource: ' Motion In Two Dimension ' }] }),
+        ];
+        expect(links(filterResourcesByPlayer(rows, 'HimachalStudents'))).toEqual([SASHAKT]);
+        expect(links(filterResourcesByPlayer(rows, 'EnableStudents'))).toEqual([QUIZ]);
     });
 
     it('leaves non-quiz resources untouched', () => {
