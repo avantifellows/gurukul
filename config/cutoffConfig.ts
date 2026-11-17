@@ -24,8 +24,15 @@ import { ExamCutoffs } from "@/app/types";
  * - `tier1` is the M1a bar, and it is the one column with no marks source in
  *   the warehouse. `dim_nta_cutoffs` does carry M1a, but for JEE Mains it is a
  *   percentile from 2019 onwards (Gen M1a is the 98.89th percentile), not marks
- *   out of 300. These five are the marks equivalent, which lives only in
- *   Amogh's own working sheet. He confirmed all five on 16 Nov 2026.
+ *   out of 300. These five are the marks equivalent, which today lives only in
+ *   Amogh's cutoffs working sheet — he confirmed all five on 16 Nov 2026, and
+ *   that sheet is the source of record for every bracket on this screen. (Ask
+ *   Amogh for the link; it is an internal sheet and this repo is public.)
+ *
+ *   Agreed with Amogh on 17 Nov 2026 that the M1a MARKS will be loaded into
+ *   BigQuery alongside M1 and M2. Once they land in `dim_test_cutoffs`, this
+ *   column stops being a hand-copied exception and should be read from there
+ *   with the other two, so all three come from one source.
  *
  * How the three bars relate, in Amogh's words (16 Nov 2026):
  *
