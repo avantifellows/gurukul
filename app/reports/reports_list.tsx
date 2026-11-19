@@ -9,6 +9,13 @@ import { formatDate } from "@/utils/dateUtils";
 import { buildReportLink } from "@/utils/resourceUtils";
 import { useAuth } from "@/services/AuthContext";
 
+// The cumulative report sums a student's last 2-3 big tests (AIAT, major,
+// full-syllabus). Reporting shows a simple "not yet" page to anyone with fewer
+// than 2, so the card only needs a cheap guard here.
+const REPORTS_PUBLIC_URL =
+    process.env.NEXT_PUBLIC_AF_REPORTS_URL || "https://reports.avantifellows.org";
+const CUMULATIVE_REPORT_LINK = buildReportLink(`${REPORTS_PUBLIC_URL}/reports/cumulative_report`);
+
 export default function ReportsList({ userId }: ReportsListProps) {
     const [responseData, setResponseData] = useState<{ reports: Report[] } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -63,6 +70,17 @@ export default function ReportsList({ userId }: ReportsListProps) {
         <div className="grid grid-cols-1 gap-4 pb-40 lg:gap-0 lg:pb-0">
             {responseData.reports.length > 0 ? (
                 <>
+                    {responseData.reports.length >= 2 && (
+                        <Link href={CUMULATIVE_REPORT_LINK} prefetch={false} target="_blank" className="bg-card rounded-lg shadow-lg mx-4 relative flex items-center my-1 py-4 md:my-2 border-2 border-primary lg:mx-0 lg:my-0 lg:mb-5 lg:pr-6 lg:justify-between lg:bg-white lg:rounded-xl lg:shadow-none lg:hover:bg-heading lg:transition-colors group">
+                            <div className="text-left mx-6 md:mx-8 lg:ml-7 lg:mr-0">
+                                <p className="text-sm md:text-base font-semibold text-primary lg:text-[15px]">Your progress across big tests</p>
+                                <p className="text-gray-700 text-sm md:text-base mt-1 lg:text-sm lg:text-slate-500">Your last 3 big tests (like AIAT) in one report, with the chapters to work on next</p>
+                            </div>
+                            <span className="hidden lg:inline text-sm font-medium text-primary shrink-0 group-hover:underline">
+                                Open report
+                            </span>
+                        </Link>
+                    )}
                     {responseData.reports.map((report: Report, index: number) => (
                         <Link href={buildReportLink(report.report_link)} prefetch={false} target="_blank" key={index} className="bg-card rounded-lg shadow-lg h-24 mx-4 relative flex items-center my-1 md:my-2 lg:mx-0 lg:my-0 lg:mb-3 lg:h-auto lg:py-4 lg:pr-6 lg:justify-between lg:bg-white lg:border lg:border-line lg:rounded-xl lg:shadow-none lg:hover:border-primary lg:transition-colors group">
                             <div className={`${index % 2 === 0 ? 'bg-orange-200' : 'bg-red-200'} h-full w-2 absolute left-0 top-0 rounded-s-md lg:rounded-s-xl`}></div>

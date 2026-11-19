@@ -17,11 +17,18 @@ describe('toLaunchPath', () => {
         );
     });
 
+    it('maps the cumulative report, with or without a user_id, to its token route', () => {
+        expect(toLaunchPath('/reports/cumulative_report')).toBe('/reports/cumulative_report');
+        expect(toLaunchPath('/reports/cumulative_report/U1')).toBe('/reports/cumulative_report');
+        expect(toLaunchPath('/reports/cumulative_report/U1/')).toBe('/reports/cumulative_report');
+    });
+
     // Anything that is not a {session}/{user} report path must return null so
     // the route 400s instead of redirecting somewhere unintended.
     it('rejects paths it should not rewrite', () => {
         expect(toLaunchPath('/reports/student_quiz_report/S1')).toBeNull();
         expect(toLaunchPath('/reports/some_other_report/S1/U1')).toBeNull();
         expect(toLaunchPath('/reports/student_quiz_report//U1')).toBeNull();
+        expect(toLaunchPath('/reports/cumulative_report/U1/extra')).toBeNull();
     });
 });
