@@ -149,7 +149,7 @@ const groupConfig: GroupConfigurations = {
         showLiveClasses: false,
         showTests: true,
         showForms: true,
-        showPracticeTests: false,
+        showPracticeTests: true,
         showHomework: false,
         showContentLibrary: true,
         showClassLibrary: false,
