@@ -118,6 +118,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [userId, setUserId] = useState<string | null>(null);
     const [displayId, setDisplayId] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
+    // The student record behind the signed-in user. Kept so screens that speak
+    // to a student's own situation — the cutoffs screen reads their category —
+    // do not each have to re-fetch it. Null for teachers and untagged records.
+    const [student, setStudent] = useState<Student | null>(null);
     const [group, setGroup] = useState<string | null>(null);
     const [studentId, setStudentId] = useState<string | null>(null);
     const [apaarId, setApaarId] = useState<string | null>(null);
@@ -167,6 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     if (userDetails?.user) {
                         setUser(userDetails.user);
                         const studentInfo = userDetails.student;
+                        setStudent(studentInfo ?? null);
 
                         const mixpanel = MixpanelTracking.getInstance();
                         const userProperties = {
@@ -243,6 +248,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setLoggedIn(false);
             clearIdentityState();
             setUser(null);
+            setStudent(null);
             
             // Redirect to portal (this will open in system browser if in PWA)
             redirectToPortal();
@@ -263,6 +269,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 group,
                 studentId,
                 apaarId,
+                studentCategory: student?.category,
+                studentStream: student?.stream,
                 logout,
                 isLoading,
                 groupConfig,

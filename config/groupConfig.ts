@@ -29,6 +29,12 @@ const groupConfig: GroupConfigurations = {
                 external: true,
             },
             {
+                title: 'Exam Cutoffs',
+                subtitle: 'What score gets you where',
+                href: '/cutoffs',
+                icon: 'target',
+            },
+            {
                 title: 'Student Handbook',
                 subtitle: 'Rules, schedule and FAQs',
                 href: 'https://drive.google.com/file/d/1IWeaB78HXdJUrwxh6eLOom7uCxFA5j6o/view',
