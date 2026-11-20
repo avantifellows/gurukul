@@ -22,6 +22,8 @@ export const COURSES = {
 
 export const MIXPANEL_EVENT = {
     REPORTS_PAGE_VIEW: "Reports Page View",
+    CUTOFFS_PAGE_VIEW: "Cutoffs Page View",
+    SELECTED_EXAM_CUTOFF: "Selected Exam Cutoff",
     SELECTED_LIBRARY: "Selected Library",
     SELECTED_TAB: "Selected Tab",
     SELECTED_CHAPTER: "Selected Chapter",

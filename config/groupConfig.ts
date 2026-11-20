@@ -29,6 +29,19 @@ const groupConfig: GroupConfigurations = {
                 external: true,
             },
             {
+                title: 'Exam Cutoffs',
+                subtitle: 'What score gets you where',
+                href: '/cutoffs',
+                icon: 'target',
+            },
+            {
+                title: 'Exam Guidance Videos',
+                subtitle: 'Forms, cutoffs and choice filling',
+                href: 'https://www.youtube.com/shorts/0kg5RzRYeDc',
+                icon: 'video',
+                external: true,
+            },
+            {
                 title: 'Student Handbook',
                 subtitle: 'Rules, schedule and FAQs',
                 href: 'https://drive.google.com/file/d/1IWeaB78HXdJUrwxh6eLOom7uCxFA5j6o/view',
