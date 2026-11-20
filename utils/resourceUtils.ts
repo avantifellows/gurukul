@@ -84,6 +84,82 @@ export const resolveChapterPriority = (
     return normalizeChapterPriority(match?.priority_text);
 };
 
+// Groups served by Sashakt where a test exists in both players. Names are the
+// login token's identity.group.
+const SASHAKT_GROUPS = new Set([
+    'AllIndiaStudents',
+    'DelhiStudents',
+    'DishaStudents',
+    'GujaratStudents',
+    'HaryanaStudents',
+    'HimachalStudents',
+    'MaharashtraStudents',
+    'OLFStudents',
+    'PunjabStudents',
+    'UttarakhandStudents',
+]);
+
+// Which player a resource belongs to. The row says so; the link host is only
+// a fallback for rows written before type_params.player existed.
+const isSashaktResource = (resource: Resource): boolean => {
+    const player = resource.type_params?.player;
+    if (player) return player === 'sashakt';
+    const sashaktUrl =
+        process.env.NEXT_PUBLIC_AF_SASHAKT_URL || 'https://assessment.sashakt.in';
+    return !!resource.link && resource.link.startsWith(sashaktUrl);
+};
+
+// Rows are paired on chapter and name, so the name has to compare the way a
+// human would read it: a stray space or a capital letter is not a different
+// test.
+const pairingKey = (resource: Resource): string =>
+    `${resource.chapter_id ?? ''}::${getResourceName(resource).trim().toLowerCase()}`;
+
+/**
+ * Keep one player's copy of each twinned practice test.
+ *
+ * The same test can exist as two active rows -- one quiz-engine link, one
+ * Sashakt link -- because Gurukul chooses the player from the link itself.
+ * Both rows are legitimate and both are active, so the Library has to pick:
+ * Sashakt for the groups piloting it, the quiz engine for everyone else.
+ *
+ * Rows are matched on name within a chapter, since the twin is published with
+ * the same name as the row it mirrors. A resource with no counterpart is left
+ * alone whichever player it points at, so a chapter that exists only in one
+ * player still shows up.
+ */
+export const filterResourcesByPlayer = (
+    resources: Resource[],
+    group?: string | null
+): Resource[] => {
+    const preferSashakt = !!group && SASHAKT_GROUPS.has(group);
+
+    const counterpart = new Map<string, boolean>();
+    resources.forEach((resource) => {
+        if (resource.type !== 'quiz') return;
+        const key = pairingKey(resource);
+        const seenSashakt = counterpart.get(key) ?? false;
+        counterpart.set(key, seenSashakt || isSashaktResource(resource));
+    });
+
+    return resources.filter((resource) => {
+        if (resource.type !== 'quiz') return true;
+        const key = pairingKey(resource);
+        const sashakt = isSashaktResource(resource);
+        // Only one flavour present for this test: nothing to choose between.
+        const hasBoth =
+            counterpart.get(key) === true &&
+            resources.some(
+                (other) =>
+                    other.type === 'quiz' &&
+                    pairingKey(other) === key &&
+                    !isSashaktResource(other)
+            );
+        if (!hasBoth) return true;
+        return sashakt === preferSashakt;
+    });
+};
+
 /**
  * Build final link for a resource.
  * Quiz resources go through a Gurukul server route that mints a short-lived
@@ -95,10 +171,10 @@ export const buildResourceLink = (resource: Resource): string | undefined => {
     if (resource.type !== 'quiz') return resource.link;
     const params = new URLSearchParams({ url: resource.link }).toString();
     // A quiz resource can point at either quiz engine or Sashakt; each has its
-    // own launch route because the two mint a session in different ways.
-    const sashaktUrl =
-        process.env.NEXT_PUBLIC_AF_SASHAKT_URL || 'https://assessment.sashakt.in';
-    if (resource.link.startsWith(sashaktUrl)) {
+    // own launch route because the two mint a session in different ways. Routed
+    // off the same answer the Library filter uses, so a row cannot be kept as
+    // one player's copy and then launched through the other's route.
+    if (isSashaktResource(resource)) {
         return `/api/sashakt-launch?${params}`;
     }
     return `/api/quiz-launch?${params}`;

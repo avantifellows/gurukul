@@ -29,6 +29,12 @@ const groupConfig: GroupConfigurations = {
                 external: true,
             },
             {
+                title: 'Exam Cutoffs',
+                subtitle: 'What score gets you where',
+                href: '/cutoffs',
+                icon: 'target',
+            },
+            {
                 title: 'Exam Guidance Videos',
                 subtitle: 'Forms, cutoffs and choice filling',
                 href: 'https://www.youtube.com/shorts/0kg5RzRYeDc',
@@ -251,6 +257,19 @@ const groupConfig: GroupConfigurations = {
         showLibraryTab: false,
         showReportsTab: false,
         displayLabel: 'Tamil Nadu (Teachers)',
+        region: 'Other States',
+    },
+    OLFStudents: {
+        showLiveClasses: true,
+        showTests: true,
+        showForms: true,
+        showPracticeTests: true,
+        showHomework: false,
+        showContentLibrary: true,
+        showClassLibrary: false,
+        testsSectionTitle: 'Tests',
+        homeTabLabel: 'Home',
+        displayLabel: 'OLF Students',
         region: 'Other States',
     },
     EMRSStudents: {
