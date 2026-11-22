@@ -85,19 +85,10 @@ export const resolveChapterPriority = (
 };
 
 // Groups served by Sashakt where a test exists in both players. Names are the
-// login token's identity.group.
-const SASHAKT_GROUPS = new Set([
-    'AllIndiaStudents',
-    'DelhiStudents',
-    'DishaStudents',
-    'GujaratStudents',
-    'HaryanaStudents',
-    'HimachalStudents',
-    'MaharashtraStudents',
-    'OLFStudents',
-    'PunjabStudents',
-    'UttarakhandStudents',
-]);
+// login token's identity.group. Empty while Sashakt quizzes are switched off:
+// every group gets the quiz-engine copy of a twinned test. Add a group back
+// here to send it to Sashakt again.
+const SASHAKT_GROUPS: ReadonlySet<string> = new Set<string>([]);
 
 // Which player a resource belongs to. The row says so; the link host is only
 // a fallback for rows written before type_params.player existed.
@@ -121,7 +112,7 @@ const pairingKey = (resource: Resource): string =>
  * The same test can exist as two active rows -- one quiz-engine link, one
  * Sashakt link -- because Gurukul chooses the player from the link itself.
  * Both rows are legitimate and both are active, so the Library has to pick:
- * Sashakt for the groups piloting it, the quiz engine for everyone else.
+ * Sashakt for the groups in SASHAKT_GROUPS, the quiz engine for everyone else.
  *
  * Rows are matched on name within a chapter, since the twin is published with
  * the same name as the row it mirrors. A resource with no counterpart is left
@@ -130,9 +121,10 @@ const pairingKey = (resource: Resource): string =>
  */
 export const filterResourcesByPlayer = (
     resources: Resource[],
-    group?: string | null
+    group?: string | null,
+    sashaktGroups: ReadonlySet<string> = SASHAKT_GROUPS
 ): Resource[] => {
-    const preferSashakt = !!group && SASHAKT_GROUPS.has(group);
+    const preferSashakt = !!group && sashaktGroups.has(group);
 
     const counterpart = new Map<string, boolean>();
     resources.forEach((resource) => {
