@@ -88,25 +88,30 @@ describe('filterResourcesByPlayer', () => {
         quiz({ id: 2, link: SASHAKT }),
     ];
 
-    it('sends a Sashakt group to the Sashakt copy', () => {
-        expect(links(filterResourcesByPlayer(bothFlavours, 'HimachalStudents'))).toEqual([SASHAKT]);
-    });
-
-    it('sends every listed group to Sashakt', () => {
-        const groups = [
+    // Sashakt quizzes are switched off: no group is in SASHAKT_GROUPS, so the
+    // groups that used to pilot it get the quiz-engine copy like everyone else.
+    it('sends every group to the quiz engine while Sashakt is switched off', () => {
+        const formerSashaktGroups = [
             'AllIndiaStudents', 'DelhiStudents', 'DishaStudents', 'GujaratStudents',
             'HaryanaStudents', 'HimachalStudents', 'MaharashtraStudents',
             'OLFStudents', 'PunjabStudents', 'UttarakhandStudents',
         ];
-        groups.forEach((group) => {
-            expect(links(filterResourcesByPlayer(bothFlavours, group))).toEqual([SASHAKT]);
-        });
+        [...formerSashaktGroups, 'EnableStudents', 'ChhattisgarhStudents', 'EMRSStudents']
+            .forEach((group) => {
+                expect(links(filterResourcesByPlayer(bothFlavours, group))).toEqual([QUIZ]);
+            });
     });
 
-    it('leaves every other group on the quiz engine', () => {
-        ['EnableStudents', 'ChhattisgarhStudents', 'EMRSStudents'].forEach((group) => {
-            expect(links(filterResourcesByPlayer(bothFlavours, group))).toEqual([QUIZ]);
-        });
+    // The rest exercise the pairing itself, so they name a pilot group
+    // explicitly rather than depending on who is in SASHAKT_GROUPS today.
+    const PILOT = new Set(['HimachalStudents']);
+
+    it('sends a pilot group to the Sashakt copy', () => {
+        expect(links(filterResourcesByPlayer(bothFlavours, 'HimachalStudents', PILOT))).toEqual([SASHAKT]);
+    });
+
+    it('leaves a group outside the pilot on the quiz engine', () => {
+        expect(links(filterResourcesByPlayer(bothFlavours, 'EnableStudents', PILOT))).toEqual([QUIZ]);
     });
 
     it('falls back to the quiz engine with no group', () => {
@@ -119,7 +124,7 @@ describe('filterResourcesByPlayer', () => {
     // was never twinned.
     it('keeps a lone copy whichever flavour it is', () => {
         const onlyQuiz = [quiz({ id: 1, link: QUIZ })];
-        expect(links(filterResourcesByPlayer(onlyQuiz, 'HimachalStudents'))).toEqual([QUIZ]);
+        expect(links(filterResourcesByPlayer(onlyQuiz, 'HimachalStudents', PILOT))).toEqual([QUIZ]);
 
         const onlySashakt = [quiz({ id: 2, link: SASHAKT })];
         expect(links(filterResourcesByPlayer(onlySashakt, 'EnableStudents'))).toEqual([SASHAKT]);
@@ -130,7 +135,7 @@ describe('filterResourcesByPlayer', () => {
             quiz({ id: 1, chapter_id: 11, link: QUIZ }),
             quiz({ id: 2, chapter_id: 12, link: SASHAKT }),
         ];
-        expect(filterResourcesByPlayer(rows, 'HimachalStudents')).toHaveLength(2);
+        expect(filterResourcesByPlayer(rows, 'HimachalStudents', PILOT)).toHaveLength(2);
     });
 
     // The row states its player, so the filter keeps working if Sashakt ever
@@ -140,14 +145,14 @@ describe('filterResourcesByPlayer', () => {
             quiz({ id: 1, link: 'https://elsewhere.example/a', type_params: { player: 'quiz' } }),
             quiz({ id: 2, link: 'https://elsewhere.example/b', type_params: { player: 'sashakt' } }),
         ];
-        expect(links(filterResourcesByPlayer(rows, 'HimachalStudents')))
+        expect(links(filterResourcesByPlayer(rows, 'HimachalStudents', PILOT)))
             .toEqual(['https://elsewhere.example/b']);
-        expect(links(filterResourcesByPlayer(rows, 'EnableStudents')))
+        expect(links(filterResourcesByPlayer(rows, 'EnableStudents', PILOT)))
             .toEqual(['https://elsewhere.example/a']);
     });
 
     it('falls back to the link host when the row has no player', () => {
-        expect(links(filterResourcesByPlayer(bothFlavours, 'HimachalStudents'))).toEqual([SASHAKT]);
+        expect(links(filterResourcesByPlayer(bothFlavours, 'HimachalStudents', PILOT))).toEqual([SASHAKT]);
     });
 
     // A row kept as the Sashakt copy must also launch through the Sashakt
@@ -160,7 +165,7 @@ describe('filterResourcesByPlayer', () => {
             link: 'https://elsewhere.example/b',
             type_params: { player: 'sashakt' },
         });
-        expect(filterResourcesByPlayer([row], 'HimachalStudents')).toHaveLength(1);
+        expect(filterResourcesByPlayer([row], 'HimachalStudents', PILOT)).toHaveLength(1);
         expect(buildResourceLink(row)).toContain('/api/sashakt-launch');
 
         const quizRow = quiz({
@@ -176,8 +181,8 @@ describe('filterResourcesByPlayer', () => {
             quiz({ id: 1, link: QUIZ, name: [{ lang_code: 'en', resource: 'Motion in Two Dimension' }] }),
             quiz({ id: 2, link: SASHAKT, name: [{ lang_code: 'en', resource: ' Motion In Two Dimension ' }] }),
         ];
-        expect(links(filterResourcesByPlayer(rows, 'HimachalStudents'))).toEqual([SASHAKT]);
-        expect(links(filterResourcesByPlayer(rows, 'EnableStudents'))).toEqual([QUIZ]);
+        expect(links(filterResourcesByPlayer(rows, 'HimachalStudents', PILOT))).toEqual([SASHAKT]);
+        expect(links(filterResourcesByPlayer(rows, 'EnableStudents', PILOT))).toEqual([QUIZ]);
     });
 
     it('leaves non-quiz resources untouched', () => {
@@ -186,7 +191,7 @@ describe('filterResourcesByPlayer', () => {
             quiz({ id: 2, link: SASHAKT }),
             quiz({ id: 3, type: 'document', link: 'https://drive.example/notes' }),
         ];
-        const kept = filterResourcesByPlayer(rows, 'HimachalStudents');
+        const kept = filterResourcesByPlayer(rows, 'HimachalStudents', PILOT);
         expect(links(kept)).toEqual([SASHAKT, 'https://drive.example/notes']);
     });
 });
