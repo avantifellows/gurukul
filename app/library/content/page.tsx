@@ -267,7 +267,7 @@ const ContentLibrary = () => {
 
     return (
         <>
-            <main className="max-w-xl mx-auto bg-white min-h-screen lg:max-w-none lg:bg-transparent">
+            <main className="mx-auto bg-white min-h-screen lg:max-w-none lg:bg-transparent">
                 <TopBar />
                 <div className="lg:mx-auto lg:max-w-6xl lg:px-10 lg:pb-16">
                 <div className="bg-heading text-primary h-20 flex flex-col lg:bg-transparent lg:h-auto lg:pt-8 lg:pb-2">

@@ -116,7 +116,7 @@ export default function Loading({ showReportsOnly = false, showLibraryOnly = fal
     );
 
     return (
-        <main className={`${!showChapterContentOnly ? 'min-h-screen' : ''} max-w-xl mx-auto md:mx-auto bg-heading lg:bg-transparent ${showLibraryOnly || showChapterContentOnly ? 'lg:max-w-none' : 'lg:max-w-6xl lg:mx-auto lg:px-10'}`}>
+        <main className={`${!showChapterContentOnly ? 'min-h-screen' : ''} mx-auto bg-heading lg:bg-transparent ${showLibraryOnly || showChapterContentOnly ? 'lg:max-w-none' : 'lg:max-w-6xl lg:mx-auto lg:px-10'}`}>
             {/* Show only library shimmer when showLibraryOnly is true */}
             {showLibraryOnly ? (
                 <>

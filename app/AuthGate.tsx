@@ -18,7 +18,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   // Show loading while checking auth
   if (isLoading) {
     return (
-      <div className="max-w-xl mx-auto lg:max-w-3xl">
+      <div className="max-w-xl mx-auto sm:max-w-3xl">
         <Loading />
       </div>
     );
@@ -29,12 +29,12 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     return <LandingPage />;
   }
 
-  // Authenticated users get the phone-width column below `lg`, and the full
-  // canvas beside a persistent navigation rail above it.
+  // Content is fluid at every width. Below `sm` the bottom bar navigates; from
+  // `sm` up a navigation rail does: icon-only until `lg`, full after.
   return (
     <div className="lg:bg-surface">
       <DesktopSidebar />
-      <div className="max-w-xl mx-auto border-x border-gray-300 shadow-2xl min-h-screen bg-heading lg:max-w-none lg:mx-0 lg:border-x-0 lg:shadow-none lg:bg-transparent lg:pl-rail">
+      <div className="min-h-screen bg-heading sm:pl-rail-collapsed lg:bg-transparent lg:pl-rail">
         {children}
       </div>
     </div>
