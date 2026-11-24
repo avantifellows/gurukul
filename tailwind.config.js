@@ -31,6 +31,8 @@ module.exports = {
         // Width of the desktop navigation rail; used by the rail itself and by
         // the content offset next to it.
         "rail": "16.5rem",
+        // Icon-only rail used between `sm` and `lg` (tablets).
+        "rail-collapsed": "4.5rem",
       },
     },
   },

@@ -88,7 +88,7 @@ const TopBar = () => {
   return (
     <>
       {/* Phone: the original greeting bar, unchanged. */}
-      <div className="lg:hidden max-w-xl mx-auto text-white p-4 h-24 flex items-center justify-between bg-primary">
+      <div className="lg:hidden mx-auto text-white p-4 h-24 flex items-center justify-between bg-primary">
         <div className="text-lg font-semibold">
           {getRouteNameContent()}
         </div>

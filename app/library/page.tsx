@@ -57,7 +57,7 @@ const Page: React.FC = () => {
 
   function LibraryCard({ icon, title, description, onClick }: { icon: ReactNode, title: string, description: string, onClick: () => void }) {
     return (
-      <button type="button" onClick={onClick} className="w-full text-left bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6 cursor-pointer lg:mx-0 lg:my-0 lg:mt-0 lg:h-auto lg:py-5 lg:pl-5 lg:pr-6 lg:rounded-xl lg:bg-white lg:border lg:border-line lg:shadow-none lg:hover:border-primary lg:transition-colors">
+      <button type="button" onClick={onClick} className="w-[calc(100%-3rem)] lg:w-full text-left bg-card rounded-md shadow-lg shadow-slate-400 h-24 mt-2 my-10 text-black flex items-center justify-start pl-4 mx-6 cursor-pointer lg:mx-0 lg:my-0 lg:mt-0 lg:h-auto lg:py-5 lg:pl-5 lg:pr-6 lg:rounded-xl lg:bg-white lg:border lg:border-line lg:shadow-none lg:hover:border-primary lg:transition-colors">
         <div className="flex flex-row items-center">
           {icon}
           <div className="flex flex-col ml-4 ">
@@ -143,7 +143,7 @@ const Page: React.FC = () => {
   ];
 
   return (
-    <main className="max-w-xl mx-auto bg-heading min-h-screen lg:max-w-none lg:bg-transparent">
+    <main className="mx-auto bg-heading min-h-screen lg:max-w-none lg:bg-transparent">
       <TopBar />
       <div className="lg:mx-auto lg:max-w-6xl lg:px-10 lg:pt-8 lg:pb-16">
 

@@ -92,7 +92,7 @@ export default function CutoffsPage() {
 
     if (authLoading || !loggedIn) {
         return (
-            <main className="max-w-xl mx-auto bg-white lg:max-w-none lg:bg-transparent">
+            <main className="mx-auto bg-white lg:max-w-none lg:bg-transparent">
                 <TopBar />
                 <Loading />
             </main>
@@ -107,7 +107,7 @@ export default function CutoffsPage() {
 
     if (!exam) {
         return (
-            <main className="max-w-xl mx-auto bg-white min-h-screen lg:max-w-none lg:bg-transparent">
+            <main className="mx-auto bg-white min-h-screen lg:max-w-none lg:bg-transparent">
                 <TopBar />
                 {pageHeading}
                 <div className="lg:mx-auto lg:max-w-6xl lg:px-10 lg:pt-8 lg:pb-16">
@@ -121,7 +121,7 @@ export default function CutoffsPage() {
     }
 
     return (
-        <main className="max-w-xl mx-auto bg-white min-h-screen lg:max-w-none lg:bg-transparent">
+        <main className="mx-auto bg-white min-h-screen lg:max-w-none lg:bg-transparent">
             <TopBar />
             {pageHeading}
 

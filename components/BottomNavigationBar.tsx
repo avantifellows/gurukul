@@ -37,7 +37,7 @@ const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
   return (
     <div className="relative lg:hidden">
       {/* Powered by section */}
-      <div className="max-w-xl mx-auto fixed bottom-[72px] left-0 right-0 bg-gray-100 border-t-2 shadow-2xl shadow-black px-4 py-2 text-xs text-gray-700 md:px-8 md:py-3 md:text-sm flex items-center">
+      <div className="fixed bottom-[72px] left-0 right-0 sm:bottom-0 sm:left-rail-collapsed bg-gray-100 border-t-2 shadow-2xl shadow-black px-4 py-2 text-xs text-gray-700 md:px-8 md:py-3 md:text-sm flex items-center">
         {sponsorLogosMode === 'capgeminiOnly' ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-0.5 md:gap-1 text-center">
             powered by
@@ -69,8 +69,8 @@ const BottomNavigationBar = ({ homeLabel }: BottomNavigationBarProps) => {
         )}
       </div>
 
-      {/* Navigation bar */}
-      <div className={`max-w-xl mx-auto fixed bottom-0 left-0 right-0 text-xs md:text-lg px-12 md:px-16 bg-white pb-4 pt-2 flex items-center ${navItems.length === 3 ? 'justify-between' : ''}`}>
+      {/* Navigation bar. From `sm` up the icon rail (DesktopSidebar) navigates. */}
+      <div className={`sm:hidden fixed bottom-0 left-0 right-0 text-xs md:text-lg px-12 md:px-16 bg-white pb-4 pt-2 flex items-center ${navItems.length === 3 ? 'justify-between' : ''}`}>
         {navItems.length === 3 ? (
           // Original layout for 3 icons
           navItems.map(renderNavItem)

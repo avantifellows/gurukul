@@ -528,12 +528,12 @@ export default function Home() {
   return (
     <>
       {(isLoading || authLoading) ? (
-        <div className="max-w-xl mx-auto lg:max-w-none">
+        <div className="mx-auto lg:max-w-none">
           <TopBar />
           <Loading />
         </div>
       ) : (
-        <main className="min-h-screen max-w-xl mx-auto md:mx-auto bg-heading lg:max-w-none lg:bg-transparent">
+        <main className="min-h-screen mx-auto bg-heading lg:max-w-none lg:bg-transparent">
           <TopBar />
           {/* Below `lg` this is a no-op and the phone column is unchanged;
               above it, the day sits in one left-aligned reading column. */}

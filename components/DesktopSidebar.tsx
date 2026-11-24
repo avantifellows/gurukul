@@ -25,9 +25,10 @@ const initialsOf = (userName: string) =>
     .join("");
 
 /**
- * Persistent navigation for screens wide enough to keep it on-screen all the
- * time. Below `lg` it is not rendered at all and BottomNavigationBar takes over,
- * so the phone layout is untouched.
+ * Persistent navigation rail. Below `sm` it is not rendered and
+ * BottomNavigationBar takes over, so the phone layout is untouched. Between
+ * `sm` and `lg` (tablets) it collapses to icons with short labels; the sponsor
+ * strip stays at the bottom of the screen and logout stays in the top bar.
  */
 const DesktopSidebar = () => {
   const { userName, logout, groupConfig } = useAuth();
@@ -42,16 +43,16 @@ const DesktopSidebar = () => {
   };
 
   return (
-    <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-rail flex-col bg-primary text-white">
-      <div className="flex items-center gap-3 px-6 h-20 shrink-0">
+    <aside className="hidden sm:flex fixed inset-y-0 left-0 z-40 w-rail-collapsed lg:w-rail flex-col bg-primary text-white">
+      <div className="flex items-center justify-center lg:justify-start gap-3 lg:px-6 h-20 shrink-0">
         <Image src={AvantiLogo} alt="" aria-hidden className="w-9 h-9 shrink-0" />
-        <div className="leading-tight">
+        <div className="hidden lg:block leading-tight">
           <div className="text-lg font-bold tracking-tight">Gurukul</div>
           <div className="text-[11px] text-white/80">by Avanti Fellows</div>
         </div>
       </div>
 
-      <nav className="flex-1 px-3 pt-2" aria-label="Main">
+      <nav className="flex-1 px-2 lg:px-3 pt-2" aria-label="Main">
         <ul className="flex flex-col gap-1">
           {navItems.map((item) => {
             const Icon = item.isActive ? item.activeIcon : item.inactiveIcon;
@@ -60,14 +61,14 @@ const DesktopSidebar = () => {
                 <Link
                   href={item.href}
                   aria-current={item.isActive ? "page" : undefined}
-                  className={`relative flex items-center gap-3 h-11 px-3 rounded-lg text-[15px] transition-colors ${
+                  className={`relative flex flex-col lg:flex-row items-center gap-1 lg:gap-3 py-2 lg:py-0 lg:h-11 lg:px-3 rounded-lg text-[11px] lg:text-[15px] text-center lg:text-left transition-colors ${
                     item.isActive
                       ? "bg-white/20 text-white font-semibold"
                       : "text-white hover:bg-white/10"
                   }`}
                 >
                   {item.isActive && (
-                    <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r bg-white" />
+                    <span className="hidden lg:block absolute left-0 top-2 bottom-2 w-[3px] rounded-r bg-white" />
                   )}
                   <Icon className="w-5 h-5 shrink-0" />
                   {item.label}
@@ -78,7 +79,7 @@ const DesktopSidebar = () => {
         </ul>
       </nav>
 
-      <div className="px-4 pb-4 shrink-0">
+      <div className="hidden lg:block px-4 pb-4 shrink-0">
         <div className="rounded-xl bg-white/10 px-4 py-3 mb-3">
           <div className="flex items-center justify-around gap-3">
             <div className="flex flex-col items-center gap-1.5">
