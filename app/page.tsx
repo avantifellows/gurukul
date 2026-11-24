@@ -429,6 +429,14 @@ export default function Home() {
     return (<svg {...common}><path d="M10 6h10M10 12h10M10 18h10" /><path d="M4 6h1M4 12h1M4 18h1" /></svg>);
   };
 
+  // Programs that have the library switched off (e.g. physical centres) must
+  // not reach it through a Resources tile either, such as the chapter
+  // priority list, which links into /library/content.
+  const libraryHidden = groupConfig.showLibraryTab === false || groupConfig.showContentLibrary === false;
+  const visibleResources = (groupConfig.resources ?? []).filter(
+    (tile) => !(libraryHidden && !tile.external && tile.href.startsWith('/library'))
+  );
+
   const renderResources = (resources: ResourceTile[]) => (
     <div className="mt-4 flex flex-col gap-3 mx-5 lg:mx-0 lg:mt-3">
       {resources.map((tile, index) => {
@@ -542,10 +550,10 @@ export default function Home() {
                   message, so students never see "no more forms" on a normal day. */}
               {groupConfig.showForms && forms.length > 0 && renderTestSection("Forms", forms)}
               {groupConfig.showTests && renderTestSection(groupConfig.testsSectionTitle || "Tests", tests)}
-              {groupConfig.showResources && groupConfig.resources && groupConfig.resources.length > 0 && (
+              {groupConfig.showResources && visibleResources.length > 0 && (
                 <div>
                   <SectionHeading>Resources</SectionHeading>
-                  {renderResources(groupConfig.resources)}
+                  {renderResources(visibleResources)}
                 </div>
               )}
               {/* Practice Tests Accordion for all groups */}
