@@ -14,6 +14,7 @@ import { MixpanelTracking } from "@/services/mixpanel";
 import { MIXPANEL_EVENT } from "@/constants/config";
 import { IoIosArrowDown as ExpandIcon, IoIosArrowUp as CollapseIcon, IoIosArrowForward } from 'react-icons/io';
 import { buildGurukulSessionUrl } from "@/utils/portalLinks";
+import { buildResourceTiles } from "@/config/mentorshipSupport";
 
 export default function Home() {
   const { loggedIn, userId, groupConfig, isLoading: authLoading } = useAuth();
@@ -423,6 +424,9 @@ export default function Home() {
     if (icon === "target") {
       return (<svg {...common}><circle cx="12" cy="12" r="8.5" /><circle cx="12" cy="12" r="4.5" /><circle cx="12" cy="12" r="1" fill="currentColor" /></svg>);
     }
+    if (icon === "mentor") {
+      return (<svg {...common}><circle cx="9" cy="8" r="3.2" /><path d="M3.5 19a5.5 5.5 0 0 1 11 0" /><circle cx="17" cy="9.5" r="2.4" /><path d="M15.5 14.2A4.5 4.5 0 0 1 21 18.5" /></svg>);
+    }
     if (icon === "book") {
       return (<svg {...common}><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" /><path d="M4 21V5" /><path d="M9 8h6" /></svg>);
     }
@@ -433,8 +437,11 @@ export default function Home() {
   // not reach it through a Resources tile either, such as the chapter
   // priority list, which links into /library/content.
   const libraryHidden = groupConfig.showLibraryTab === false || groupConfig.showContentLibrary === false;
-  const visibleResources = (groupConfig.resources ?? []).filter(
-    (tile) => !(libraryHidden && !tile.external && tile.href.startsWith('/library'))
+  const visibleResources = buildResourceTiles(
+    groupConfig,
+    (groupConfig.resources ?? []).filter(
+      (tile) => !(libraryHidden && !tile.external && tile.href.startsWith('/library'))
+    )
   );
 
   const renderResources = (resources: ResourceTile[]) => (
@@ -446,7 +453,14 @@ export default function Home() {
               {resourceTileIcon(tile.icon)}
             </span>
             <span className="flex-grow flex flex-col gap-0.5">
-              <span className="text-[15px] font-semibold text-ink">{tile.title}</span>
+              <span className="text-[15px] font-semibold text-ink">
+                {tile.title}
+                {tile.badge && (
+                  <span className="ml-1.5 inline-block align-middle rounded-full bg-primary-soft text-primary text-[10px] font-bold px-2 py-0.5">
+                    {tile.badge}
+                  </span>
+                )}
+              </span>
               {tile.subtitle && <span className="text-[12.5px] text-slate-500">{tile.subtitle}</span>}
             </span>
             <IoIosArrowForward className="w-4 h-4 text-slate-500" />
@@ -550,7 +564,7 @@ export default function Home() {
                   message, so students never see "no more forms" on a normal day. */}
               {groupConfig.showForms && forms.length > 0 && renderTestSection("Forms", forms)}
               {groupConfig.showTests && renderTestSection(groupConfig.testsSectionTitle || "Tests", tests)}
-              {groupConfig.showResources && visibleResources.length > 0 && (
+              {visibleResources.length > 0 && (
                 <div>
                   <SectionHeading>Resources</SectionHeading>
                   {renderResources(visibleResources)}

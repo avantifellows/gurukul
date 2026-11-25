@@ -281,7 +281,9 @@ export interface ResourceTile {
   // true opens href in a new tab (external tools); omit for in-app navigation.
   external?: boolean;
   // Icon shown in the tile's leading chip; falls back to a generic list icon.
-  icon?: 'list' | 'compass' | 'book' | 'target' | 'video';
+  icon?: 'list' | 'compass' | 'book' | 'target' | 'video' | 'mentor';
+  // Small pill after the title, e.g. "For your program".
+  badge?: string;
 }
 
 export interface GroupConfig {
@@ -318,6 +320,9 @@ export interface GroupConfig {
   // true and resources has at least one tile.
   showResources?: boolean;
   resources?: ResourceTile[];
+  // Mentorship Support tile + /mentorship page (Voucher / Blended Program
+  // only). Off unless the program's config sets it to true.
+  showMentorshipSupport?: boolean;
 }
 
 export type GroupConfigurations = {
