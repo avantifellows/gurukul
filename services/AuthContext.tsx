@@ -271,6 +271,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 apaarId,
                 studentCategory: student?.category,
                 studentStream: student?.stream,
+                studentGradeId: student?.grade_id,
                 logout,
                 isLoading,
                 groupConfig,

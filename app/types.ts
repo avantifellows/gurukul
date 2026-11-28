@@ -17,6 +17,9 @@ export interface AuthContextProps {
   // undefined for teachers and for records that have never been tagged.
   studentCategory?: string;
   studentStream?: string;
+  // db-service grade id (4 = grade 12, 5 = dropper). Mentorship Support opens
+  // on the student's own option with it.
+  studentGradeId?: number;
   logout: () => void;
   isLoading: boolean;
   groupConfig: GroupConfig;

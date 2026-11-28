@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ResourceTile } from '@/app/types';
-import { buildResourceTiles, isMentorshipEnabled, MENTORSHIP_GRADES } from './mentorshipSupport';
+import { buildResourceTiles, defaultMentorshipGrade, isMentorshipEnabled, MENTORSHIP_GRADES } from './mentorshipSupport';
 
 const handbook: ResourceTile = { title: 'Student Handbook', subtitle: 'Rules, schedule and FAQs', href: 'https://example.org/handbook', external: true, icon: 'book' };
 const futures: ResourceTile = { title: 'Futures Tool', href: 'https://example.org/futures', external: true, icon: 'compass' };
@@ -42,5 +42,19 @@ describe('MENTORSHIP_GRADES', () => {
         const text = MENTORSHIP_GRADES.flatMap((g) => [...g.help, ...g.expect]).map((i) => `${i.title} ${i.body}`).join('\n');
         expect(text).not.toContain('[');
         expect(text).toContain('Your mentor will talk to you every 2 weeks.');
+    });
+});
+
+describe('defaultMentorshipGrade', () => {
+    it('opens droppers on their own option and everyone else on Class 12', () => {
+        expect(defaultMentorshipGrade(5)).toBe(13);
+        expect(defaultMentorshipGrade(4)).toBe(12);
+        expect(defaultMentorshipGrade(3)).toBe(12);
+        expect(defaultMentorshipGrade(undefined)).toBe(12);
+        expect(defaultMentorshipGrade(null)).toBe(12);
+    });
+
+    it('labels the options the way students describe themselves', () => {
+        expect(MENTORSHIP_GRADES.map((g) => g.label)).toEqual(['Class 12', 'Dropper']);
     });
 });

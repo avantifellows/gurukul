@@ -456,7 +456,7 @@ export default function Home() {
               <span className="text-[15px] font-semibold text-ink">
                 {tile.title}
                 {tile.badge && (
-                  <span className="ml-1.5 inline-block align-middle rounded-full bg-primary-soft text-primary text-[10px] font-bold px-2 py-0.5">
+                  <span className="ml-1.5 hidden sm:inline-block align-middle rounded-full bg-primary-soft text-primary text-[10px] font-bold px-2 py-0.5">
                     {tile.badge}
                   </span>
                 )}
@@ -500,6 +500,14 @@ export default function Home() {
       fetchData();
     }
   }, [loggedIn, userId, authLoading]);
+
+  // "Back to Resources" links to /#resources. The section only exists once
+  // today's sessions have loaded, so the browser's own jump to the anchor
+  // finds nothing; scroll there ourselves when it appears.
+  useEffect(() => {
+    if (isLoading || authLoading || window.location.hash !== "#resources") return;
+    document.getElementById("resources")?.scrollIntoView({ block: "start" });
+  }, [isLoading, authLoading]);
 
   const { forms, tests, practiceTests, homework } = filterAndSortTests(quizzes);
 
@@ -565,7 +573,7 @@ export default function Home() {
               {groupConfig.showForms && forms.length > 0 && renderTestSection("Forms", forms)}
               {groupConfig.showTests && renderTestSection(groupConfig.testsSectionTitle || "Tests", tests)}
               {visibleResources.length > 0 && (
-                <div>
+                <div id="resources" className="scroll-mt-24">
                   <SectionHeading>Resources</SectionHeading>
                   {renderResources(visibleResources)}
                 </div>

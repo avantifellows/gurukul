@@ -8,6 +8,7 @@ import BottomNavigationBar from "@/components/BottomNavigationBar";
 import Loading from "../loading";
 import { useAuth } from "@/services/AuthContext";
 import {
+    defaultMentorshipGrade,
     isMentorshipEnabled,
     MENTORSHIP_EYEBROW,
     MENTORSHIP_GRADES,
@@ -26,10 +27,12 @@ import { MIXPANEL_EVENT } from "@/constants/config";
  * back home, so no other program gains this page.
  */
 export default function MentorshipPage() {
-    const { loggedIn, isLoading: authLoading, groupConfig } = useAuth();
+    const { loggedIn, isLoading: authLoading, groupConfig, studentGradeId } = useAuth();
     const router = useRouter();
     const enabled = isMentorshipEnabled(groupConfig);
-    const [grade, setGrade] = useState<MentorshipGrade>(12);
+    // Until the student picks, show their own option (droppers see Dropper).
+    const [picked, setPicked] = useState<MentorshipGrade | null>(null);
+    const grade = picked ?? defaultMentorshipGrade(studentGradeId);
 
     useEffect(() => {
         if (authLoading || !loggedIn) return;
@@ -42,7 +45,7 @@ export default function MentorshipPage() {
 
     if (authLoading || !loggedIn || !enabled) {
         return (
-            <main className="max-w-xl mx-auto bg-white lg:max-w-none lg:bg-transparent">
+            <main className="bg-white lg:bg-transparent">
                 <TopBar />
                 <Loading />
             </main>
@@ -50,19 +53,19 @@ export default function MentorshipPage() {
     }
 
     const selectGrade = (next: MentorshipGrade) => {
-        setGrade(next);
+        setPicked(next);
         MixpanelTracking.getInstance().trackEvent(MIXPANEL_EVENT.SELECTED_MENTORSHIP_GRADE, { grade: next });
     };
 
     const content = MENTORSHIP_GRADES.find((entry) => entry.grade === grade) ?? MENTORSHIP_GRADES[0];
 
     return (
-        <main className="max-w-xl mx-auto bg-white min-h-screen lg:max-w-none lg:bg-transparent">
+        <main className="bg-white min-h-screen lg:bg-transparent">
             <TopBar />
 
             <div className="px-4 pt-4 pb-40 lg:mx-auto lg:max-w-6xl lg:px-10 lg:pt-7 lg:pb-16">
                 <Link
-                    href="/"
+                    href="/#resources"
                     prefetch={false}
                     className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary-dark mb-4"
                 >
@@ -73,8 +76,7 @@ export default function MentorshipPage() {
                     <p className="text-[11px] font-bold uppercase tracking-[0.05em] text-primary-dark">
                         {MENTORSHIP_EYEBROW}
                     </p>
-                    <h2 className="text-[19px] lg:text-[22px] font-bold text-ink mt-2 mb-1.5">Mentorship Support</h2>
-                    <p className="text-sm text-slate-600 leading-relaxed max-w-3xl">{MENTORSHIP_INTRO}</p>
+                    <p className="text-sm text-slate-600 leading-relaxed max-w-3xl mt-2">{MENTORSHIP_INTRO}</p>
                 </section>
 
                 <div className="flex items-center gap-3.5 font-bold text-ink mt-4 mb-3.5">
@@ -94,18 +96,13 @@ export default function MentorshipPage() {
                                 aria-selected={active}
                                 aria-controls={`grade${entry.grade}`}
                                 onClick={() => selectGrade(entry.grade)}
-                                className={`flex-1 bg-white border rounded-[11px] px-2.5 py-3 lg:px-4 lg:py-4 flex items-center gap-2 lg:gap-3 text-left text-ink transition-colors ${active
-                                    ? "border-primary ring-2 ring-primary/10"
-                                    : "border-line hover:border-primary"
+                                className={`flex-1 border rounded-[11px] px-3 py-3 lg:px-4 lg:py-4 text-left transition-colors ${active
+                                    ? "bg-primary-soft border-primary ring-2 ring-primary/15 text-primary-dark"
+                                    : "bg-white border-line text-ink hover:border-primary"
                                     }`}
                             >
-                                <span className="hidden sm:flex w-9 h-9 flex-shrink-0 rounded-[10px] bg-primary-soft text-primary items-center justify-center font-semibold">
-                                    {entry.grade}
-                                </span>
-                                <span>
-                                    <strong className="block text-[12px] sm:text-sm">{entry.label}</strong>
-                                    <small className="block text-[11px] sm:text-xs text-slate-500 mt-1">{entry.caption}</small>
-                                </span>
+                                <strong className="block text-sm">{entry.label}</strong>
+                                <small className={`block text-[11px] sm:text-xs mt-1 ${active ? "text-primary-dark/80" : "text-slate-500"}`}>{entry.caption}</small>
                             </button>
                         );
                     })}

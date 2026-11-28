@@ -5,7 +5,9 @@ import type { GroupConfig, ResourceTile } from "@/app/types";
  *
  * Shown only to programs whose Gurukul config sets `showMentorshipSupport`
  * (the Voucher / Blended program). The copy is the program team's approved
- * mockup, word for word; edit it here, not in the page.
+ * mockup, word for word, except the grade labels: students see "Class 12" and
+ * "Dropper", since grade 13 is only our internal number. Edit copy here, not
+ * in the page.
  */
 
 export const MENTORSHIP_PATH = "/mentorship";
@@ -36,7 +38,9 @@ export interface MentorshipGradeContent {
 export const MENTORSHIP_INTRO =
     "Your mentor is someone you can come to about your preparation, big or small. You don’t have to wait for your next check-in—reach out whenever a question or concern comes up.";
 
-export const MENTORSHIP_EYEBROW = "Resources · Voucher / Blended Program";
+// Kept generic: students may not know their program by its internal name,
+// and the switch could be turned on for other programs later.
+export const MENTORSHIP_EYEBROW = "For your program";
 
 const sharedHelp: MentorshipItem[] = [
     { title: "Stress or things at home", body: "Share what is weighing on you. A therapist can be brought in if needed." },
@@ -60,7 +64,7 @@ const sharedExpect: MentorshipItem[] = [
 export const MENTORSHIP_GRADES: MentorshipGradeContent[] = [
     {
         grade: 12,
-        label: "Grade 12 Mentorship",
+        label: "Class 12",
         caption: "Board exams + JEE guidance",
         help: [
             { title: "A study plan", body: "A weekly timetable, a revision plan and priority chapters to help balance board exams with JEE." },
@@ -75,7 +79,7 @@ export const MENTORSHIP_GRADES: MentorshipGradeContent[] = [
     },
     {
         grade: 13,
-        label: "Grade 13 Mentorship",
+        label: "Dropper",
         caption: "JEE preparation and next steps",
         help: [
             { title: "A study plan", body: "A weekly timetable, revision plan and list of priority chapters." },
@@ -90,6 +94,14 @@ export const MENTORSHIP_GRADES: MentorshipGradeContent[] = [
         ],
     },
 ];
+
+// db-service grade ids: 4 is grade 12, 5 is a dropper (internally grade 13).
+// Same on prod and staging.
+const DROPPER_GRADE_ID = 5;
+
+/** The option a student should see first: their own, else Class 12. */
+export const defaultMentorshipGrade = (gradeId?: number | null): MentorshipGrade =>
+    gradeId === DROPPER_GRADE_ID ? 13 : 12;
 
 export const isMentorshipEnabled = (config: Pick<GroupConfig, "showMentorshipSupport">): boolean =>
     config.showMentorshipSupport === true;
