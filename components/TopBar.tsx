@@ -38,6 +38,7 @@ const TopBar = () => {
   const routeNames: { [key: string]: string } = {
     '/reports': 'Report',
     '/cutoffs': 'Exam Cutoffs',
+    '/mentorship': 'Mentorship Support',
     '/library': 'Library',
     '/library/content': 'Library',
     '/library/class': 'Library',

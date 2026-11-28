@@ -17,6 +17,9 @@ export interface AuthContextProps {
   // undefined for teachers and for records that have never been tagged.
   studentCategory?: string;
   studentStream?: string;
+  // db-service grade id (4 = grade 12, 5 = dropper). Mentorship Support opens
+  // on the student's own option with it.
+  studentGradeId?: number;
   logout: () => void;
   isLoading: boolean;
   groupConfig: GroupConfig;
@@ -281,7 +284,9 @@ export interface ResourceTile {
   // true opens href in a new tab (external tools); omit for in-app navigation.
   external?: boolean;
   // Icon shown in the tile's leading chip; falls back to a generic list icon.
-  icon?: 'list' | 'compass' | 'book' | 'target' | 'video';
+  icon?: 'list' | 'compass' | 'book' | 'target' | 'video' | 'mentor';
+  // Small pill after the title, e.g. "For your program".
+  badge?: string;
 }
 
 export interface GroupConfig {
@@ -318,6 +323,9 @@ export interface GroupConfig {
   // true and resources has at least one tile.
   showResources?: boolean;
   resources?: ResourceTile[];
+  // Mentorship Support tile + /mentorship page (Voucher / Blended Program
+  // only). Off unless the program's config sets it to true.
+  showMentorshipSupport?: boolean;
 }
 
 export type GroupConfigurations = {

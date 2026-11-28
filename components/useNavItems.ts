@@ -80,6 +80,9 @@ export function getPageHeading(pathname: string, homeLabel: string) {
   if (pathname.startsWith("/cutoffs")) {
     return { title: "Exam Cutoffs", subtitle: "Where your score stands" };
   }
+  if (pathname.startsWith("/mentorship")) {
+    return { title: "Mentorship Support", subtitle: null as string | null };
+  }
   if (pathname.startsWith("/library")) {
     return { title: "Library", subtitle: "Courses, chapters and recordings" };
   }
